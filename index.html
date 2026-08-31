@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tupelo Ghost">
 <meta property="og:title" content="Tupelo Ghost Arcade">
-<meta property="og:description" content="Four haunted machines, no coins needed. Mix phantom paints, duel a friend, stack to the paper moon, glide through the swamp dark.">
+<meta property="og:description" content="Six haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
 <meta property="og:url" content="https://tupeloghost.github.io/Pocket-Arcade/">
-<meta name="description" content="Four haunted machines, no coins needed. Mix phantom paints, duel a friend, stack to the paper moon, glide through the swamp dark.">
+<meta name="description" content="Six haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -88,6 +88,8 @@
   .gcard:nth-child(2) .ico{animation-delay:.9s}
   .gcard:nth-child(3) .ico{animation-delay:1.8s}
   .gcard:nth-child(4) .ico{animation-delay:2.7s}
+  .gcard:nth-child(5) .ico{animation-delay:1.3s}
+  .gcard:nth-child(6) .ico{animation-delay:2.2s}
   @keyframes icofloat{from{transform:translateY(1px) rotate(-2deg)}to{transform:translateY(-3px) rotate(2deg)}}
   .gcard .info{flex:1; min-width:0;}
   .gcard .name{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:21px; letter-spacing:1.5px; line-height:1;}
@@ -202,6 +204,8 @@
   .blob .body.wisp{box-shadow:inset -4px -5px 0 rgba(0,0,0,.06), 0 0 16px 4px rgba(242,231,207,.65); opacity:.94;}
   .splash{position:absolute; z-index:6; pointer-events:none; width:8px;height:8px;border-radius:50%;}
   #pg-hint{margin:12px 0; font-size:13px; color:var(--dim); font-weight:800; text-align:center; width:min(92vw,430px); min-height:18px;}
+  #pg-moon{width:min(94vw,430px); height:7px; border-radius:99px; background:rgba(255,255,255,.08); margin-bottom:10px; overflow:hidden;}
+  #pg-moonfill{height:100%; width:100%; border-radius:99px; background:linear-gradient(90deg, var(--gold), #f2e7cf); transition:width .12s linear, background .3s;}
   #pg-hint b{color:var(--text);}
 
   /* ============ THUMB WAR ============ */
@@ -227,6 +231,11 @@
     filter:drop-shadow(0 0 12px rgba(242,231,207,.85));
   }
   .orb.mashy{font-size:36px; color:var(--text); font-family:'Space Mono', monospace; font-weight:700;}
+  .x2badge{
+    position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:4;
+    color:var(--gold); font-weight:700; font-size:13px; letter-spacing:1.5px;
+    text-shadow:0 0 12px rgba(232,160,90,.7); pointer-events:none;
+  }
   .msg{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:clamp(20px,6vw,32px); line-height:1.15; letter-spacing:1.5px;}
   .submsg{color:var(--dim); font-weight:800; font-size:13.5px; margin-top:-4px;}
   #tw-mid{
@@ -264,6 +273,7 @@
   .oddgrid .opt{font-size:34px; width:70px; height:70px; min-width:0; padding:0;}
   .tw-winhalf{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:17px; letter-spacing:2px; padding:9px 20px; border-radius:999px;}
   .flip{transform:rotate(180deg);}
+  #scr-tw.solo .tw-side.top, #scr-tw.solo .flip{transform:none;}
 
   /* ============ STACK ============ */
   #st-canvas{display:block; touch-action:manipulation;}
@@ -280,12 +290,52 @@
   #sn-canvas{display:block; border-radius:18px; border:2px solid rgba(255,255,255,.12); background:rgba(0,0,0,.3); touch-action:none;}
   .sn-tip{margin-top:12px; color:var(--dim); font-weight:800; font-size:13px; text-align:center;}
 
+  /* ============ FIREFLY RUSH ============ */
+  #ru-field{position:absolute; inset:0; overflow:hidden; touch-action:manipulation;}
+  .fly{
+    position:absolute; width:48px; height:48px; margin:-24px 0 0 -24px;
+    border-radius:50%; cursor:pointer; z-index:3;
+    animation:flylife linear forwards;
+  }
+  .fly.amber{background:radial-gradient(circle at 38% 32%, #ffe0b0, #e8a05a 65%); box-shadow:0 0 18px 5px rgba(232,160,90,.55);}
+  .fly.spirit{background:radial-gradient(circle at 38% 32%, #ffffff, #f2e7cf 60%); box-shadow:0 0 22px 6px rgba(38,224,255,.6);}
+  .fly.hollow{background:radial-gradient(circle at 50% 42%, #241a3e, #0e0a1c 72%); box-shadow:0 0 18px 5px rgba(139,121,217,.55);}
+  .fly.hollow::after{
+    content:''; position:absolute; top:38%; left:27%; width:8px; height:8px; border-radius:50%;
+    background:#8b79d9; box-shadow:14px 0 0 #8b79d9;
+  }
+  @keyframes flylife{
+    0%{transform:scale(.2); opacity:0}
+    12%{transform:scale(1.08); opacity:1}
+    22%{transform:scale(1)}
+    78%{transform:scale(.95); opacity:.95}
+    100%{transform:scale(.2); opacity:0}
+  }
+  .ru-lifes{position:absolute; top:8px; left:0; right:0; display:flex; gap:9px; justify-content:center; z-index:4; pointer-events:none;}
+  .ru-life{color:var(--gold); font-size:19px; text-shadow:0 0 10px rgba(232,160,90,.6); transition:opacity .3s;}
+  .ru-life.gone{opacity:.15;}
+  #ru-field.hurt{animation:shakeX .32s ease;}
+
   /* ============ CHALLENGES ============ */
   .ch-chip{display:none; align-items:center; gap:5px; font-weight:900; font-size:11.5px; letter-spacing:.5px; padding:4px 10px; border-radius:999px; border:1.5px solid var(--gold); color:var(--gold); white-space:nowrap;}
   .ch-chip.on{display:inline-flex;}
   .ch-chip.beaten{border-color:var(--lime); color:var(--lime);}
   .chbtn{margin-top:16px; width:min(92vw,430px); font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:16px; letter-spacing:1.5px; color:var(--text); background:rgba(232,160,90,.10); border:2px dashed rgba(232,160,90,.5); border-radius:18px; padding:14px; cursor:pointer;}
   .chbtn:active{transform:scale(.97);}
+  .chbtn.dare{
+    margin:0 0 16px; border-color:rgba(139,121,217,.5); background:rgba(139,121,217,.10);
+    font-size:14px; min-height:48px;
+  }
+  .chbtn.dare.lit{border-color:rgba(232,160,90,.65); background:rgba(232,160,90,.12);}
+  .chbtn.dare .dare-done{color:var(--gold);}
+  .dare-banner{
+    position:fixed; top:-70px; left:50%; transform:translateX(-50%);
+    z-index:95; background:var(--card); border:1.5px solid rgba(232,160,90,.6);
+    border-radius:999px; padding:12px 22px; font-weight:700; font-size:14px;
+    color:var(--gold); box-shadow:0 6px 24px rgba(0,0,0,.5);
+    transition:top .45s cubic-bezier(.34,1.56,.64,1); white-space:nowrap;
+  }
+  .dare-banner.show{top:14px;}
   .ch-slot{display:flex; flex-direction:column; gap:10px; align-items:center; margin-top:10px;}
   .ch-result{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:18px; letter-spacing:1px; color:var(--dim);}
   .ch-result.win{color:var(--lime);}
@@ -332,15 +382,16 @@
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
     </div>
-    <p>MIDNIGHT ARCADE · FOUR HAUNTS · NO COINS NEEDED</p>
+    <p>MIDNIGHT ARCADE · SIX HAUNTS · NO COINS NEEDED</p>
     <div class="epi">The arcade at the end of the dirt road. It only opens after dark.</div>
   </div>
+  <button class="chbtn dare" id="dare-card"></button>
   <div class="cards">
     <button class="gcard" data-game="pigment" style="--accent:var(--lime)">
       <div class="ico">🎨</div>
       <div class="info">
         <div class="name">PHANTOM PAINT</div>
-        <div class="desc">Mix moonlit primaries to brew each target color before the paint runs dry.</div>
+        <div class="desc">Brew the target colors and chain fast. The moonlight is draining.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">PUZZLE</span><span class="tag best">BEST <b id="best-pigment">–</b></span></div>
       </div>
     </button>
@@ -348,7 +399,7 @@
       <div class="ico">⚡</div>
       <div class="info">
         <div class="name">SPIRIT DUEL</div>
-        <div class="desc">Split-screen duel. Same trial on both sides. The quicker spirit steals the point.</div>
+        <div class="desc">Duel the Ghost solo, or pass and play a friend. The quicker spirit steals the point.</div>
         <div class="meta"><span class="tag players">2P</span><span class="tag">DUEL</span><span class="tag">FIRST TO 7</span></div>
       </div>
     </button>
@@ -356,7 +407,7 @@
       <div class="ico">🌙</div>
       <div class="info">
         <div class="name">GHOST STACK</div>
-        <div class="desc">Tap to drop the drifting blocks. Miss the edge, lose the overhang. Stack a tower to the paper moon.</div>
+        <div class="desc">Drop the drifting blocks. The ghost salvages every sliver you lose: reclaim it, or spend it to cheat death.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">TIMING</span><span class="tag best">BEST <b id="best-stack">–</b></span></div>
       </div>
     </button>
@@ -364,12 +415,69 @@
       <div class="ico">🐍</div>
       <div class="info">
         <div class="name">SPECTER SNAKE</div>
-        <div class="desc">Glide through the swamp dark, swallow fireflies, grow long. Never cross yourself.</div>
+        <div class="desc">Swallow fireflies and dodge The Hollow that hunts you. Never cross yourself.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">CLASSIC</span><span class="tag best">BEST <b id="best-snake">–</b></span></div>
+      </div>
+    </button>
+    <button class="gcard" data-game="flight" style="--accent:var(--grape)">
+      <div class="ico">👻</div>
+      <div class="info">
+        <div class="name">WISP FLIGHT</div>
+        <div class="desc">Tap to keep the little ghost aloft. Thread the bramble gaps above the black water.</div>
+        <div class="meta"><span class="tag players">1P</span><span class="tag">ENDLESS</span><span class="tag best">BEST <b id="best-flight">–</b></span></div>
+      </div>
+    </button>
+    <button class="gcard" data-game="rush" style="--accent:var(--gold)">
+      <div class="ico">✨</div>
+      <div class="info">
+        <div class="name">FIREFLY RUSH</div>
+        <div class="desc">Catch the fireflies before they fade. Never, ever tap The Hollow.</div>
+        <div class="meta"><span class="tag players">1P</span><span class="tag">FRENZY</span><span class="tag best">BEST <b id="best-rush">–</b></span></div>
       </div>
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
+</div>
+
+<!-- ================= WISP FLIGHT ================= -->
+<div id="scr-flight" class="screen">
+  <div class="gamebar">
+    <button class="backbtn" data-back>← Arcade</button>
+    <div class="gb-title">WISP FLIGHT</div><span class="ch-chip" id="fl-chban"></span>
+    <div class="gb-right"><span id="fl-score">0</span></div>
+  </div>
+  <div class="game-body">
+    <canvas id="fl-canvas"></canvas>
+    <div class="st-tip">Tap (or Space) to drift upward. Clean center passes score double.</div>
+    <div class="gover" id="fl-over">
+      <h2>THE BRAMBLES GOT YOU</h2>
+      <p id="fl-over-msg"></p>
+      <div class="newbest" id="fl-newbest" style="display:none">★ NEW BEST ★</div>
+      <button class="bigbtn" id="fl-retry" style="margin-top:14px;">DRIFT AGAIN</button>
+      <div class="ch-slot" id="fl-chslot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= FIREFLY RUSH ================= -->
+<div id="scr-rush" class="screen">
+  <div class="gamebar">
+    <button class="backbtn" data-back>← Arcade</button>
+    <div class="gb-title">FIREFLY RUSH</div><span class="ch-chip" id="ru-chban"></span>
+    <div class="gb-right"><span id="ru-score">0</span></div>
+  </div>
+  <div class="game-body">
+    <div id="ru-field"></div>
+    <div class="ru-lifes" id="ru-lifes"></div>
+    <div class="st-tip">Catch the fireflies before they fade. The violet ones are Hollows. Do not touch.</div>
+    <div class="gover" id="ru-over">
+      <h2>THE DARK WENT QUIET</h2>
+      <p id="ru-over-msg"></p>
+      <div class="newbest" id="ru-newbest" style="display:none">★ NEW BEST ★</div>
+      <button class="bigbtn" id="ru-retry" style="margin-top:14px;">RUSH AGAIN</button>
+      <div class="ch-slot" id="ru-chslot"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ================= PIGMENT ================= -->
@@ -396,6 +504,7 @@
         </div>
       </div>
     </div>
+    <div id="pg-moon"><div id="pg-moonfill"></div></div>
     <div id="pg-board"></div>
     <div id="pg-hint"></div>
     <div class="gover" id="pg-over">
@@ -430,6 +539,13 @@
       <h2 style="margin:auto 0;">👻</h2>
       <div class="tw-winhalf" id="tw-winbottom"></div>
       <button class="bigbtn" id="tw-rematch" style="margin-top:22px;">REMATCH</button>
+      <button class="smallbtn ghost" id="tw-switch">CHANGE MODE</button>
+    </div>
+    <div class="gover" id="tw-mode">
+      <h2>SPIRIT DUEL</h2>
+      <p>Same trial on both sides. First to 7 points.</p>
+      <button class="bigbtn" id="tw-vs-ghost">DUEL THE GHOST 👻</button>
+      <button class="bigbtn" id="tw-vs-friend" style="background:linear-gradient(135deg, var(--cyan), var(--B)); margin-top:10px;">PASS &amp; PLAY VS A FRIEND</button>
     </div>
   </div>
 </div>
@@ -444,7 +560,7 @@
   <div class="game-body">
     <canvas id="st-canvas"></canvas>
     <div id="st-toast">PERFECT!</div>
-    <div class="st-tip">Tap anywhere (or press Space) to drop the block</div>
+    <div class="st-tip">Tap (or Space) to drop. Lost slivers fill the salvage jar: perfects reclaim them, a full jar survives one miss.</div>
     <div class="gover" id="st-over">
       <h2>GRAVITY WINS</h2>
       <p id="st-over-msg"></p>
@@ -511,7 +627,7 @@ const Shell = (function(){
   }
 
   async function refreshBests(){
-    for(const k of ['pigment','stack','snake']){
+    for(const k of ['pigment','stack','snake','flight','rush']){
       const v = await store.get('best-'+k);
       const el = document.getElementById('best-'+k);
       if(el) el.textContent = (v == null) ? '–' : v;
@@ -528,6 +644,7 @@ const Shell = (function(){
     current = null;
     show('hub');
     refreshBests();
+    if(typeof Dare !== 'undefined') Dare.refresh();
   }
 
   document.querySelectorAll('.gcard').forEach(c=>{
@@ -567,7 +684,7 @@ Shell.register('pigment', (function(){
   };
   const MIX = {RY:'O',YR:'O',YB:'G',BY:'G',BR:'P',RB:'P'};
 
-  let board, grid, level, score, moves, need, target, selected, busy, over, timers, chain, lastCollect;
+  let board, grid, level, score, moves, need, target, selected, busy, over, timers, chain, lastCollect, timeLeft, timeMax, timeToken;
 
   const $ = id => document.getElementById(id);
 
@@ -652,6 +769,41 @@ Shell.register('pigment', (function(){
     }
   }
   function hint(h){ $('pg-hint').innerHTML = h; }
+
+  function drawMoon(){
+    const pct = Math.max(0, timeLeft/timeMax)*100;
+    const fill = $('pg-moonfill');
+    fill.style.width = pct+'%';
+    fill.style.background = pct < 25
+      ? 'linear-gradient(90deg, var(--coral), var(--gold))'
+      : 'linear-gradient(90deg, var(--gold), #f2e7cf)';
+  }
+  function startMoonClock(){
+    const tk = (timeToken = (timeToken||0) + 1);
+    (function loop(){
+      if(over || tk !== timeToken) return;
+      timeLeft -= 0.1;
+      drawMoon();
+      if(timeLeft <= 0){ moonOut(); return; }
+      later(loop, 100);
+    })();
+  }
+  function moonOut(){
+    if(over) return;
+    over = true; deselect();
+    later(async ()=>{
+      const isBest = await Shell.reportBest('pigment', score);
+      $('pg-over-title').textContent = 'THE MOONLIGHT FADED';
+      $('pg-over-msg').innerHTML = 'Level <b>'+level+'</b> · Score <b>'+score+'</b>';
+      $('pg-newbest').style.display = isBest ? 'block' : 'none';
+      $('pg-chslot').innerHTML = '';
+      $('pg-over-btn').textContent = 'TRY AGAIN';
+      $('pg-over-btn').onclick = ()=>{ level=1; score=0; $('pg-over').classList.remove('show'); startLevel(); };
+      $('pg-over').classList.add('show');
+      Challenge.onGameOver('P', score, 'pg-chslot');
+      buzz([70,60,70]);
+    }, 250);
+  }
   function deselect(){
     if(selected){
       const bl = grid[selected.r][selected.c];
@@ -732,6 +884,13 @@ Shell.register('pigment', (function(){
       const p = posOf(blob.r, blob.c), cs = cellSize();
       splash(p.left+cs/2, p.top+cs/2, COLORS[blob.color].hex);
       popup(p.left+cs/2, p.top+4, '+'+gain+(chain>1 ? ' ×'+chain : ''));
+      timeLeft = Math.min(timeMax, timeLeft + 6);
+      drawMoon();
+      if(chain % 3 === 0){
+        moves++;
+        popup(p.left+cs/2, p.top+30, '+1 MOVE ✦');
+        bump($('pg-moves'));
+      }
       remove(blob); hud(); bump($('pg-score')); buzz(chain>1 ? [30,30,30] : 40);
       hint(need>0
         ? (chain>1 ? 'CHAIN ×'+chain+'! Keep it rolling, <b>'+need+'</b> to go.' : 'Lovely! <b>'+need+'</b> more to go.')
@@ -796,6 +955,10 @@ Shell.register('pigment', (function(){
     chain = 0; lastCollect = 0;
     need = Math.min(2+level, 7);
     moves = need*3 + 2;
+    timeMax = 22 + need*5;
+    timeLeft = timeMax;
+    drawMoon();
+    startMoonClock();
     target = ['O','G','P'][Math.floor(Math.random()*3)];
     board.querySelectorAll('.blob,.splash').forEach(b=>b.remove());
     board.querySelectorAll('.pg-cell').forEach(b=>b.remove());
@@ -849,7 +1012,8 @@ Shell.register('pigment', (function(){
 Shell.register('tw', (function(){
   const WIN = 7, PNAME = ['EMBER','HAUNT'], PCOL = ['var(--coral)','var(--cyan)'];
   const $ = id => document.getElementById(id);
-  let arenas, sidesEl, pipsEl, scores, locked, timers, lastGame, active;
+  let arenas, sidesEl, pipsEl, scores, locked, timers, lastGame, active, totalRounds, doubleRound;
+  let cpu = false, cpuSkill = 1500, cpuInfo = null;
 
   function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
   function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
@@ -877,10 +1041,12 @@ Shell.register('tw', (function(){
     if(locked || !active) return;
     locked = true; clearTimers();
     const loser = 1-winner;
-    scores[winner]++; drawPips(); buzz(60);
+    const pts = doubleRound ? 2 : 1;
+    scores[winner] += pts; drawPips(); buzz(doubleRound ? [60,50,60] : 60);
+    if(cpu){ cpuSkill = Math.max(500, Math.min(2400, cpuSkill + (winner === 1 ? 140 : -110))); }
     sidesEl[winner].classList.add('winflash');
     sidesEl[loser].classList.add('loseflash');
-    fill(winner, '<div class="msg" style="color:'+PCOL[winner]+'">+1 POINT</div><div class="submsg">'+note+'</div>');
+    fill(winner, '<div class="msg" style="color:'+PCOL[winner]+'">+'+pts+' POINT'+(pts>1?'S':'')+'</div><div class="submsg">'+note+'</div>');
     fill(loser, '<div class="msg" style="opacity:.55">'+note.toUpperCase()+'</div>');
     later(()=>{
       sidesEl[winner].classList.remove('winflash');
@@ -893,6 +1059,7 @@ Shell.register('tw', (function(){
   function gReflex(){
     $('tw-midtext').innerHTML = 'DON’T TAP EARLY';
     fillBoth('<div class="orb">WAIT…</div><div class="submsg">Tap only when it catches fire</div>');
+    cpuInfo = {kind:'reflex', sel:'.orb'};
     let hot = false;
     for(let p=0;p<2;p++) bindTaps(p, '.orb', pp=>{
       if(locked) return;
@@ -913,6 +1080,7 @@ Shell.register('tw', (function(){
     const order = shuffle(opts.slice());
     fillBoth('<div class="targetbox">'+targ+'</div><div class="submsg">Tap the matching charm first!</div>'+
       '<div class="optrow">'+order.map(o=>'<div class="opt" data-v="'+o+'">'+o+'</div>').join('')+'</div>');
+    cpuInfo = {kind:'pick', sel:'.opt[data-v="'+targ+'"]'};
     for(let p=0;p<2;p++) bindTaps(p, '.opt', (pp,el)=>{
       if(locked) return;
       el.dataset.v===targ ? resolve(pp,'Sharp eyes in the dark') : resolve(1-pp, PNAME[pp]+' grabbed the wrong charm');
@@ -934,6 +1102,7 @@ Shell.register('tw', (function(){
     const q = plus ? a+' + '+b : Math.max(a,b)+' − '+Math.min(a,b);
     fillBoth('<div class="mathq">'+q+' = '+shown+'</div><div class="submsg">First correct answer wins</div>'+
       '<div class="optrow"><div class="opt big" data-v="1">TRUE</div><div class="opt big" data-v="0">FALSE</div></div>');
+    cpuInfo = {kind:'pick', sel:'.opt[data-v="'+(isTrue?1:0)+'"]'};
     for(let p=0;p<2;p++) bindTaps(p, '.opt', (pp,el)=>{
       if(locked) return;
       (el.dataset.v==='1')===isTrue ? resolve(pp,'Quick maths') : resolve(1-pp, PNAME[pp]+' did bad maths');
@@ -947,6 +1116,7 @@ Shell.register('tw', (function(){
     const order = shuffle([common,common,common,common,common,odd]);
     fillBoth('<div class="submsg">One is not like the others…</div>'+
       '<div class="oddgrid">'+order.map(c=>'<div class="opt" data-v="'+c+'">'+c+'</div>').join('')+'</div>');
+    cpuInfo = {kind:'pick', sel:'.opt[data-v="'+odd+'"]'};
     for(let p=0;p<2;p++) bindTaps(p, '.opt', (pp,el)=>{
       if(locked) return;
       el.dataset.v===odd ? resolve(pp,'Owl eyes') : resolve(1-pp, PNAME[pp]+' tapped a copycat');
@@ -964,6 +1134,7 @@ Shell.register('tw', (function(){
       '<div class="submsg">Ignore the word. Tap the color it’s painted in!</div>'+
       '<div class="optrow">'+order.map(c=>'<div class="opt" data-v="'+c[0]+'">'+
         '<span style="display:block;width:28px;height:28px;border-radius:50%;background:'+c[1]+'"></span></div>').join('')+'</div>');
+    cpuInfo = {kind:'pick', sel:'.opt[data-v="'+ink[0]+'"]'};
     for(let p=0;p<2;p++) bindTaps(p, '.opt', (pp,el)=>{
       if(locked) return;
       el.dataset.v===ink[0] ? resolve(pp,'Unfooled by the word') : resolve(1-pp, PNAME[pp]+' fell for the word');
@@ -978,6 +1149,7 @@ Shell.register('tw', (function(){
     fillBoth('<div style="font-size:26px;line-height:1.35;max-width:230px;letter-spacing:2px;">'+em.repeat(n)+'</div>'+
       '<div class="submsg">Count fast. First correct tap wins!</div>'+
       '<div class="optrow">'+nums.map(v=>'<div class="opt big" data-v="'+v+'">'+v+'</div>').join('')+'</div>');
+    cpuInfo = {kind:'pick', sel:'.opt[data-v="'+n+'"]', slow:1.5};
     for(let p=0;p<2;p++) bindTaps(p, '.opt', (pp,el)=>{
       if(locked) return;
       +el.dataset.v===n ? resolve(pp,'Counted every firefly') : resolve(1-pp, PNAME[pp]+' miscounted');
@@ -987,6 +1159,7 @@ Shell.register('tw', (function(){
   function gChase(){
     $('tw-midtext').innerHTML = 'CATCH THE WISP';
     fillBoth('<div class="submsg">Catch it before your rival does!</div><div class="wisp-chase" data-wisp>👻</div>');
+    cpuInfo = {kind:'chase', sel:'[data-wisp]'};
     const s = {
       x:.5, y:.5,
       vx:(Math.random()<.5?-1:1)*(.010+Math.random()*.004),
@@ -1012,6 +1185,7 @@ Shell.register('tw', (function(){
     $('tw-midtext').innerHTML = 'GHOST MASH';
     const N = 15, counts = [0,0];
     fillBoth('<div class="orb mashy" data-mash>'+N+'</div><div class="submsg">Mash it! First to zero wins</div>');
+    cpuInfo = {kind:'mash', sel:'[data-mash]'};
     for(let p=0;p<2;p++) bindTaps(p, '[data-mash]', (pp,el)=>{
       if(locked) return;
       counts[pp]++;
@@ -1024,22 +1198,75 @@ Shell.register('tw', (function(){
 
   const GAMES = [gReflex, gMatch, gMath, gOdd, gStroop, gCount, gChase, gMash];
 
+  /* ---------- the Ghost: a CPU rival that plays player 1's side ---------- */
+  function tapEl(el){ if(el) el.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true})); }
+  function cpuDelay(){ return cpuSkill * (0.8 + Math.random()*0.5) * (cpuInfo && cpuInfo.slow || 1); }
+
+  function cpuPlay(){
+    if(!cpu || !active || !cpuInfo) return;
+    const info = cpuInfo;
+    const el = arenas[1].querySelector(info.sel);
+    if(!el) return;
+    if(info.kind === 'mash'){
+      const iv = Math.min(300, Math.max(110, 170 * (cpuSkill/1500)));
+      (function mashTick(){
+        if(locked || !active) return;
+        tapEl(arenas[1].querySelector(info.sel));
+        later(mashTick, iv + Math.random()*70);
+      })();
+    } else if(info.kind === 'chase'){
+      later(()=>{ if(!locked && active) tapEl(arenas[1].querySelector(info.sel)); }, cpuDelay() + 600);
+    } else if(info.kind === 'reflex'){
+      if(Math.random() < 0.08){
+        later(()=>{
+          const o = arenas[1].querySelector(info.sel);
+          if(!locked && active && o && !o.classList.contains('hot')) tapEl(o);
+        }, 500 + Math.random()*800);
+      }
+      (function watch(){
+        if(locked || !active) return;
+        const o = arenas[1].querySelector(info.sel);
+        if(o && o.classList.contains('hot')) later(()=>{ if(!locked && active) tapEl(o); }, 180 + cpuSkill*0.3*Math.random());
+        else later(watch, 60);
+      })();
+    } else {
+      later(()=>{
+        if(locked || !active) return;
+        let t = arenas[1].querySelector(info.sel);
+        if(Math.random() < 0.10){
+          const opts = arenas[1].querySelectorAll('.opt');
+          if(opts.length > 1) t = opts[Math.floor(Math.random()*opts.length)];
+        }
+        tapEl(t);
+      }, cpuDelay());
+    }
+  }
+
   function nextRound(){
     if(!active) return;
     clearTimers(); locked = true;
+    totalRounds++;
+    doubleRound = totalRounds > 1 && Math.random() < 0.18;
     const mp = (scores[0] === WIN-1 || scores[1] === WIN-1) ? ' · <b>MATCH POINT</b>' : '';
-    $('tw-midtext').innerHTML = PNAME[0]+' '+scores[0]+' · '+scores[1]+' '+PNAME[1] + mp;
-    fillBoth('<div class="msg" style="color:var(--gold)">'+(mp ? 'MATCH POINT…' : 'READY…')+'</div>');
+    $('tw-midtext').innerHTML = PNAME[0]+' '+scores[0]+' · '+scores[1]+' '+PNAME[1] + mp + (doubleRound ? ' · <b>⚡ WORTH 2</b>' : '');
+    fillBoth('<div class="msg" style="color:var(--gold)">'+(doubleRound ? '⚡ DOUBLE ROUND ⚡' : (mp ? 'MATCH POINT…' : 'READY…'))+'</div>');
     later(()=>{
       if(!active) return;
       let g;
       do{ g = Math.floor(Math.random()*GAMES.length); } while(g===lastGame);
       lastGame = g; locked = false;
       GAMES[g]();
-    }, 900);
+      if(doubleRound) document.querySelectorAll('#scr-tw .tw-arena').forEach(a=>{
+        const b = document.createElement('div');
+        b.className = 'x2badge'; b.textContent = '⚡ ×2';
+        a.appendChild(b);
+      });
+      cpuPlay();
+    }, Math.max(450, 900 - totalRounds*35));
   }
 
   function endGame(winner){
+    if(typeof Dare !== 'undefined') Dare.duelWin(cpu && winner === 0);
     const won = PNAME[winner]+' WINS '+scores[winner]+'–'+scores[1-winner]+'!';
     const lost = 'DEFEAT… REMATCH?';
     const wb = $('tw-winbottom'), wt = $('tw-wintop');
@@ -1052,9 +1279,20 @@ Shell.register('tw', (function(){
   }
 
   function reset(){
-    scores = [0,0]; lastGame = -1;
+    scores = [0,0]; lastGame = -1; totalRounds = 0; doubleRound = false;
     $('tw-over').classList.remove('show');
     drawPips(); nextRound();
+  }
+
+  function startMatch(vsCpu){
+    cpu = vsCpu;
+    cpuSkill = 1500;
+    PNAME[1] = cpu ? 'THE GHOST' : 'HAUNT';
+    document.getElementById('scr-tw').classList.toggle('solo', cpu);
+    sidesEl[1].querySelector('.tw-badge').innerHTML =
+      '<span class="sw" style="background:var(--cyan)"></span>' + (cpu ? 'THE GHOST 👻' : 'HAUNT');
+    $('tw-mode').classList.remove('show');
+    reset();
   }
 
   return {
@@ -1064,11 +1302,21 @@ Shell.register('tw', (function(){
       pipsEl = [$('tw-pips0'), $('tw-pips1')];
       timers = []; active = true;
       $('tw-rematch').onclick = reset;
-      reset();
+      $('tw-vs-ghost').onclick = ()=>startMatch(true);
+      $('tw-vs-friend').onclick = ()=>startMatch(false);
+      $('tw-switch').onclick = ()=>{
+        clearTimers(); locked = true;
+        $('tw-over').classList.remove('show');
+        $('tw-mode').classList.add('show');
+      };
+      fillBoth('');
+      $('tw-mode').classList.add('show');
     },
     unmount(){
       active = false; clearTimers();
-      fillBoth(''); $('tw-over').classList.remove('show');
+      fillBoth('');
+      $('tw-over').classList.remove('show');
+      $('tw-mode').classList.remove('show');
     }
   };
 })());
@@ -1079,7 +1327,16 @@ Shell.register('tw', (function(){
 ================================================================ */
 Shell.register('stack', (function(){
   const $ = id => document.getElementById(id);
-  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash;
+  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash, puffs, zoneIdx, bestH, crossedBest, lastLand, salvage;
+  const SAVE_COST = 40, SALVAGE_CAP = 60;
+
+  const ZONES = [
+    {name:'',                top:'70,110,80',    mid:'30,90,80'},
+    {name:'THE TREETOPS',    top:'110,150,110',  mid:'80,110,160'},
+    {name:'THE NIGHT WINDS', top:'139,121,217',  mid:'60,90,160'},
+    {name:'THE STARFIELD',   top:'150,140,220',  mid:'40,50,110'},
+    {name:'THE PAPER MOON',  top:'242,231,207',  mid:'160,140,200'}
+  ];
 
   const HUES = [28, 14, 46, 152, 190, 256]; // amber, clay, bone-gold, moss, haunt, dusk
   function hue(i){ return HUES[i % HUES.length] + (Math.floor(i/HUES.length)*8)%30; }
@@ -1103,8 +1360,8 @@ Shell.register('stack', (function(){
 
   function reset(){
     blocks = [{x: W()/2 - 70, w: 140}];
-    score = 0; over = false; speed = 2.4; dir = 1; streak = 0;
-    debris = []; flash = 0;
+    score = 0; over = false; speed = 3.0; dir = 1; streak = 0;
+    debris = []; flash = 0; puffs = []; zoneIdx = 0; crossedBest = false; lastLand = null; salvage = 0;
     $('st-score').textContent = '0';
     $('st-over').classList.remove('show');
     spawn();
@@ -1124,11 +1381,20 @@ Shell.register('stack', (function(){
     const overlap = right - left;
     const rowY = H() - 60 - (blocks.length+1)*BH;
     if(overlap <= 4){
-      over = true;
       debris.push({x:moving.x, w:moving.w, y:rowY, vy:-1.5, rot:0, vr:(Math.random()<.5?-1:1)*0.07, ci:blocks.length});
-      moving = null;
       cv.classList.add('shake-hard');
       setTimeout(()=>cv.classList.remove('shake-hard'), 400);
+      if(salvage >= SAVE_COST){
+        salvage -= SAVE_COST;
+        streak = 0;
+        flash = 1;
+        toast('THE GHOST CAUGHT IT!');
+        buzz([50,40,60]);
+        spawn();
+        return;
+      }
+      over = true;
+      moving = null;
       setTimeout(finish, 650);
       return;
     }
@@ -1136,26 +1402,54 @@ Shell.register('stack', (function(){
     if(perfect){
       streak++;
       flash = 1;
-      let w2 = prev.w, x2 = prev.x;
-      if(streak >= 3 && prev.w < 140){
-        w2 = Math.min(prev.w + 10, 140);
-        x2 = Math.max(0, Math.min(prev.x - (w2 - prev.w)/2, W() - w2));
+      let w2 = prev.w, x2 = prev.x, grow = 0;
+      if(prev.w < 140){
+        if(salvage > 0){
+          const r = Math.min(12, salvage, 140 - prev.w);
+          salvage -= r; grow += r;
+        }
+        if(streak >= 3) grow += 10;
+        grow = Math.min(grow, 140 - prev.w);
+        if(grow > 0){
+          w2 = prev.w + grow;
+          x2 = Math.max(0, Math.min(prev.x - grow/2, W() - w2));
+        }
       }
       blocks.push({x: x2, w: w2});
-      toast(streak >= 3 ? 'PERFECT x'+streak+'! WIDER!' : (streak === 2 ? 'PERFECT x2!' : 'PERFECT!'));
+      toast(grow > 0 ? 'PERFECT! RECLAIMED +'+grow : (streak >= 2 ? 'PERFECT x'+streak+'!' : 'PERFECT!'));
       buzz(streak >= 2 ? [30,40,30] : 30);
     } else {
       streak = 0;
       blocks.push({x: left, w: overlap});
+      salvage = Math.min(SALVAGE_CAP, salvage + Math.round((moving.w - overlap)*0.5));
       const ci = blocks.length - 1;
       if(moving.x < left) debris.push({x:moving.x, w:left-moving.x, y:rowY, vy:0, rot:0, vr:-0.08, ci});
       if(moving.x + moving.w > right) debris.push({x:right, w:(moving.x+moving.w)-right, y:rowY, vy:0, rot:0, vr:0.08, ci});
     }
+    lastLand = {i: blocks.length-1, t: performance.now()};
+    const landed = blocks[blocks.length-1];
+    for(let k=0;k<7;k++){
+      puffs.push({
+        x: landed.x + Math.random()*landed.w, y: rowY + BH - 2,
+        vx:(Math.random()-.5)*2.4, vy:-(0.4+Math.random()*1.1),
+        r:1.5+Math.random()*2, life:14
+      });
+    }
     score++;
     $('st-score').textContent = score;
     bump($('st-score'));
+    let announced = false;
+    if(!crossedBest && bestH > 0 && score > bestH){
+      crossedBest = true; announced = true;
+      toast('PAST YOUR BEST!'); flash = 1; buzz([40,60,40]);
+    }
+    const z = Math.min(ZONES.length-1, Math.floor(score/12));
+    if(z !== zoneIdx){
+      zoneIdx = z;
+      if(!announced && ZONES[z].name){ toast(ZONES[z].name); flash = Math.max(flash, .7); buzz([30,40,30]); }
+    }
     Challenge.onScore('S', score);
-    speed = Math.min(7, 2.4 + score*0.14);
+    speed = Math.min(7.5, 3.0 + score*0.16);
     spawn();
   }
 
@@ -1168,6 +1462,7 @@ Shell.register('stack', (function(){
   async function finish(){
     if(!running) return;
     const isBest = await Shell.reportBest('stack', score);
+    if(score > bestH) bestH = score;
     $('st-over-msg').innerHTML = 'You stacked <b>'+score+'</b> '+(score===1?'block':'blocks')+' toward the moon.';
     $('st-newbest').style.display = isBest ? 'block' : 'none';
     $('st-over').classList.add('show');
@@ -1180,11 +1475,12 @@ Shell.register('stack', (function(){
     const w = W(), h = H();
     ctx.clearRect(0,0,w,h);
 
-    // sky lightens toward moonlight as you climb
+    // sky shifts through altitude zones as you climb
     const g = ctx.createLinearGradient(0,0,0,h);
     const t = Math.min(1, score/40);
-    g.addColorStop(0, 'rgba(242,231,207,'+(0.03+t*0.10)+')');
-    g.addColorStop(0.5, 'rgba(139,121,217,'+(0.04+t*0.08)+')');
+    const zone = ZONES[Math.min(ZONES.length-1, Math.floor(score/12))];
+    g.addColorStop(0, 'rgba('+zone.top+','+(0.05+t*0.13)+')');
+    g.addColorStop(0.5, 'rgba('+zone.mid+','+(0.05+t*0.10)+')');
     g.addColorStop(1, 'rgba(0,0,0,0.3)');
     ctx.fillStyle = g;
     ctx.fillRect(0,0,w,h);
@@ -1222,17 +1518,49 @@ Shell.register('stack', (function(){
     ctx.fillStyle = 'rgba(255,255,255,.08)';
     ctx.fillRect(0, h-60, w, 60);
 
-    // placed blocks
+    // your best height, drawn on the tower itself
+    if(bestH > 0){
+      const by = h - 60 - bestH*BH;
+      ctx.strokeStyle = crossedBest ? 'rgba(232,160,90,.6)' : 'rgba(242,231,207,.35)';
+      ctx.setLineDash([6,6]);
+      ctx.beginPath(); ctx.moveTo(0, by); ctx.lineTo(w, by); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '700 10px "Space Mono", monospace';
+      ctx.fillStyle = crossedBest ? 'rgba(232,160,90,.8)' : 'rgba(242,231,207,.5)';
+      ctx.textAlign = 'right';
+      ctx.fillText('BEST '+bestH, w-8, by-5);
+      ctx.textAlign = 'left';
+    }
+
+    // placed blocks (fresh one lands with a squash)
+    const nowT = performance.now();
     for(let i=0;i<blocks.length;i++){
       const b = blocks[i];
-      const y = h - 60 - (i+1)*BH;
+      let y = h - 60 - (i+1)*BH, bx = b.x, bw = b.w, bh = BH;
+      if(lastLand && i === lastLand.i){
+        const e = Math.max(0, 1 - (nowT - lastLand.t)/180);
+        if(e > 0){
+          bw = b.w*(1+0.25*e); bx = b.x - (bw-b.w)/2;
+          bh = BH*(1-0.22*e); y += BH - bh;
+        }
+      }
       ctx.fillStyle = colorFor(i);
-      ctx.fillRect(b.x, y, b.w, BH);
+      ctx.fillRect(bx, y, bw, bh);
       ctx.fillStyle = darkFor(i);
-      ctx.fillRect(b.x, y+BH-6, b.w, 6);
+      ctx.fillRect(bx, y+bh-6, bw, 6);
       ctx.fillStyle = 'rgba(255,255,255,.25)';
-      ctx.fillRect(b.x, y, b.w, 4);
+      ctx.fillRect(bx, y, bw, 4);
     }
+
+    // landing dust
+    for(const p of puffs){
+      p.x += p.vx; p.y += p.vy; p.vy += 0.03; p.life--;
+      ctx.globalAlpha = Math.max(0, p.life/14)*0.5;
+      ctx.fillStyle = '#f2e7cf';
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    puffs = puffs.filter(p=>p.life>0);
 
     // sliced overhangs tumble into the dark
     for(const d of debris){
@@ -1270,6 +1598,31 @@ Shell.register('stack', (function(){
     }
     ctx.restore();
 
+    // salvage jar: the ghost keeps what you lose
+    ctx.fillStyle = 'rgba(255,255,255,.10)';
+    ctx.fillRect(10, 14, 74, 8);
+    if(salvage > 0){
+      ctx.fillStyle = salvage >= SAVE_COST ? 'rgba(139,121,217,.95)' : 'rgba(232,160,90,.85)';
+      ctx.fillRect(10, 14, 74*Math.min(1, salvage/SALVAGE_CAP), 8);
+    }
+    ctx.font = '700 9px "Space Mono", monospace';
+    ctx.fillStyle = 'rgba(242,231,207,.55)';
+    ctx.textAlign = 'left';
+    ctx.fillText('SALVAGE', 10, 34);
+    if(salvage >= SAVE_COST){
+      ctx.fillStyle = 'rgba(139,121,217,.95)';
+      ctx.fillText('👻 SAVE READY', 10, 46);
+    }
+
+    // streak counter, big and proud
+    if(streak >= 2 && !over){
+      ctx.font = '700 21px "Cormorant Garamond", serif';
+      ctx.fillStyle = 'rgba(232,160,90,.92)';
+      ctx.textAlign = 'center';
+      ctx.fillText('✦ PERFECT ×'+streak+' ✦', w/2, 46);
+      ctx.textAlign = 'left';
+    }
+
     // moonlight flash on a perfect drop
     if(flash > 0){
       ctx.fillStyle = 'rgba(242,231,207,'+(flash*0.22)+')';
@@ -1290,6 +1643,8 @@ Shell.register('stack', (function(){
     mount(){
       cv = $('st-canvas'); ctx = cv.getContext('2d');
       running = true;
+      bestH = 0;
+      Shell.store.get('best-stack').then(v=>{ bestH = v || 0; });
       sizeCanvas();
       reset();
       cv.addEventListener('pointerdown', onTap);
@@ -1318,7 +1673,7 @@ Shell.register('stack', (function(){
 Shell.register('snake', (function(){
   const $ = id => document.getElementById(id);
   const N = 17;
-  let cv, ctx, dpr, cell, tick, curMs, snake, dirQ, dir, food, score, over, running, touchStart, sparks;
+  let cv, ctx, dpr, cell, tick, curMs, snake, dirQ, dir, foods, score, over, running, touchStart, sparks, combo, lastEatTick, tickN, ghostTicks, hollow, hollowStep, deathBy;
 
   function sizeCanvas(){
     dpr = window.devicePixelRatio || 1;
@@ -1334,30 +1689,39 @@ Shell.register('snake', (function(){
   function placeFood(){
     while(true){
       const f = {x:Math.floor(Math.random()*N), y:Math.floor(Math.random()*N)};
-      if(!snake.some(s=>s.x===f.x && s.y===f.y)){
-        f.special = Math.random() < 0.18;
-        f.ttl = f.special ? 42 : -1;
-        food = f; return;
-      }
+      if(snake.some(s=>s.x===f.x && s.y===f.y)) continue;
+      if(foods.some(o=>o.x===f.x && o.y===f.y)) continue;
+      if(hollow && Math.abs(f.x-hollow.x)+Math.abs(f.y-hollow.y) < 3) continue;
+      f.special = Math.random() < 0.18;
+      f.ttl = f.special ? 42 : -1;
+      foods.push(f); return;
     }
   }
-  function burst(gx, gy, special){
+  function farCorner(){
+    return {x: snake[0].x < N/2 ? N-2 : 1, y: snake[0].y < N/2 ? N-2 : 1};
+  }
+  function burst(gx, gy, special, gain, cmb){
     const cx = gx*cell+cell/2, cy = gy*cell+cell/2;
     for(let i=0;i<10;i++){
       const a = Math.random()*Math.PI*2, sp = 1 + Math.random()*2.4;
       sparks.push({x:cx, y:cy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:6, color: special ? '#26e0ff' : '#e8a05a'});
     }
-    sparks.push({x:cx, y:cy-4, vx:0, vy:-2.6, life:8, text:'+'+(special?3:1), color: special ? '#26e0ff' : '#e8a05a'});
+    if(gain != null){
+      sparks.push({x:cx, y:cy-4, vx:0, vy:-2.6, life:8, text:'+'+gain+(cmb>1?' ×'+cmb:''), color: special ? '#26e0ff' : '#e8a05a'});
+      if(special) sparks.push({x:cx, y:cy-18, vx:0, vy:-2.2, life:10, text:'GHOST MODE', color:'#f2e7cf'});
+    }
   }
 
   function reset(){
     snake = [{x:8,y:9},{x:7,y:9},{x:6,y:9}];
     dir = {x:1,y:0}; dirQ = [];
     score = 0; over = false; sparks = [];
+    combo = 0; lastEatTick = -999; tickN = 0; ghostTicks = 0;
+    foods = []; hollow = null; hollowStep = 0; deathBy = null;
     $('sn-score').textContent = '0';
     $('sn-over').classList.remove('show');
-    placeFood();
-    schedule(150);
+    placeFood(); placeFood();
+    schedule(115);
   }
   function schedule(ms){
     curMs = ms;
@@ -1371,30 +1735,77 @@ Shell.register('snake', (function(){
 
   function step(){
     if(over || !running) return;
+    tickN++;
+    if(ghostTicks > 0) ghostTicks--;
     if(dirQ.length){
       const nd = dirQ.shift();
       if(!(nd.x === -dir.x && nd.y === -dir.y)) dir = nd;
     }
     const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
-    if(head.x<0 || head.y<0 || head.x>=N || head.y>=N || snake.some(s=>s.x===head.x && s.y===head.y)){
+    const hitSelf = ghostTicks <= 0 && snake.some(s=>s.x===head.x && s.y===head.y);
+    if(head.x<0 || head.y<0 || head.x>=N || head.y>=N || hitSelf){
       over = true;
       finish();
       return;
     }
     snake.unshift(head);
-    if(head.x===food.x && head.y===food.y){
-      const gain = food.special ? 3 : 1;
+    const fi = foods.findIndex(f=>f.x===head.x && f.y===head.y);
+    if(fi >= 0){
+      const f = foods[fi];
+      const base = f.special ? 3 : 1;
+      combo = (tickN - lastEatTick <= 28) ? Math.min(5, combo+1) : 1;
+      lastEatTick = tickN;
+      const gain = base * combo;
       score += gain;
       $('sn-score').textContent = score;
       bump($('sn-score'));
       Challenge.onScore('N', score);
-      buzz(food.special ? [25,30,25] : 25);
-      burst(head.x, head.y, food.special);
+      buzz(f.special ? [25,30,25] : 25);
+      if(f.special) ghostTicks = 34;
+      burst(head.x, head.y, f.special, gain, combo);
+      foods.splice(fi, 1);
       placeFood();
-      schedule(Math.max(70, 150 - score*4));
+      schedule(Math.max(65, 115 - (snake.length-3)*3));
     } else {
       snake.pop();
-      if(food.special && --food.ttl <= 0){ burst(food.x, food.y, false); placeFood(); }
+    }
+    // spirit fireflies won't wait around
+    for(let i=foods.length-1;i>=0;i--){
+      if(foods[i].special && --foods[i].ttl <= 0){
+        burst(foods[i].x, foods[i].y, false);
+        foods.splice(i, 1);
+        placeFood();
+      }
+    }
+    // The Hollow wakes once you've fed, and it hunts
+    if(!hollow && score >= 3){
+      hollow = farCorner();
+      burst(hollow.x, hollow.y, false);
+      sparks.push({x:hollow.x*cell+cell/2, y:hollow.y*cell+cell/2-8, vx:0, vy:-2, life:10, text:'THE HOLLOW', color:'#8b79d9'});
+      buzz([15,30,15]);
+    } else if(hollow){
+      hollowStep++;
+      if(hollowStep % (snake.length >= 15 ? 2 : 3) === 0){
+        const dx = snake[0].x - hollow.x, dy = snake[0].y - hollow.y;
+        if(Math.abs(dx) >= Math.abs(dy) && dx !== 0) hollow.x += Math.sign(dx);
+        else if(dy !== 0) hollow.y += Math.sign(dy);
+      }
+      if(hollow.x === snake[0].x && hollow.y === snake[0].y){
+        if(ghostTicks > 0){
+          score += 5;
+          $('sn-score').textContent = score;
+          bump($('sn-score'));
+          Challenge.onScore('N', score);
+          sparks.push({x:hollow.x*cell+cell/2, y:hollow.y*cell+cell/2, vx:0, vy:-2.4, life:10, text:'BANISHED +5', color:'#8b79d9'});
+          hollow = farCorner();
+          buzz([30,40,30]);
+        } else {
+          deathBy = 'hollow';
+          over = true;
+          finish();
+          return;
+        }
+      }
     }
     draw();
   }
@@ -1404,7 +1815,9 @@ Shell.register('snake', (function(){
     cv.classList.add('shake-hard');
     setTimeout(()=>cv.classList.remove('shake-hard'), 400);
     const isBest = await Shell.reportBest('snake', score);
-    $('sn-over-title').textContent = score >= 15 ? 'LEGEND OF THE SWAMP' : 'THE SWAMP GOT YOU';
+    $('sn-over-title').textContent = deathBy === 'hollow'
+      ? 'THE HOLLOW TOOK YOU'
+      : (score >= 15 ? 'LEGEND OF THE SWAMP' : 'THE SWAMP GOT YOU');
     $('sn-over-msg').innerHTML = 'You swallowed <b>'+score+'</b> '+(score===1?'firefly':'fireflies')+'.';
     $('sn-newbest').style.display = isBest ? 'block' : 'none';
     $('sn-over').classList.add('show');
@@ -1419,23 +1832,34 @@ Shell.register('snake', (function(){
     ctx.fillStyle = 'rgba(255,255,255,.03)';
     for(let y=0;y<N;y++)for(let x=0;x<N;x++)
       if((x+y)%2===0) ctx.fillRect(x*cell, y*cell, cell, cell);
-    // firefly (spirit fireflies burn pale and won't wait around)
-    if(food.special){
-      const pulse = (food.ttl % 6) < 3 ? 0.42 : 0.32;
-      ctx.fillStyle = '#f2e7cf';
-      ctx.shadowColor = '#26e0ff'; ctx.shadowBlur = 20;
-      ctx.beginPath();
-      ctx.arc(food.x*cell+cell/2, food.y*cell+cell/2, cell*pulse, 0, Math.PI*2);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = '#e8a05a';
-      ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = 14;
-      ctx.beginPath();
-      ctx.arc(food.x*cell+cell/2, food.y*cell+cell/2, cell*0.3, 0, Math.PI*2);
-      ctx.fill();
+    // ghost mode aura around the arena
+    if(ghostTicks > 0){
+      ctx.strokeStyle = 'rgba(38,224,255,'+(ghostTicks < 6 ? .15 : .35)+')';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2, 2, px-4, px-4);
+      ctx.lineWidth = 1;
+    }
+    // fireflies (spirit fireflies burn pale and won't wait around)
+    for(const f of foods){
+      if(f.special){
+        const pulse = (f.ttl % 6) < 3 ? 0.42 : 0.32;
+        ctx.fillStyle = '#f2e7cf';
+        ctx.shadowColor = '#26e0ff'; ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(f.x*cell+cell/2, f.y*cell+cell/2, cell*pulse, 0, Math.PI*2);
+        ctx.fill();
+      } else {
+        ctx.fillStyle = '#e8a05a';
+        ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(f.x*cell+cell/2, f.y*cell+cell/2, cell*0.3, 0, Math.PI*2);
+        ctx.fill();
+      }
     }
     ctx.shadowBlur = 0;
-    // the ribbon, bone-white fading into the dark
+    // the ribbon, bone-white fading into the dark (translucent while phasing)
+    const ghost = ghostTicks > 0;
+    ctx.globalAlpha = ghost ? (ghostTicks < 6 && tickN % 2 === 0 ? 0.3 : 0.55) : 1;
     for(let i=snake.length-1;i>=0;i--){
       const s = snake[i];
       const t = i/Math.max(1,snake.length-1);
@@ -1454,6 +1878,28 @@ Shell.register('snake', (function(){
     ctx.arc(ex + dir.y*o - dir.x*0 + (dir.x!==0? dir.x*o*0.6 : o), ey + (dir.y!==0? dir.y*o*0.6 : o) - 0, cell*0.07, 0, Math.PI*2);
     ctx.arc(ex + (dir.x!==0? dir.x*o*0.6 : -o), ey + (dir.y!==0? dir.y*o*0.6 : -o), cell*0.07, 0, Math.PI*2);
     ctx.fill();
+    ctx.globalAlpha = 1;
+    // The Hollow, drifting closer
+    if(hollow){
+      const hx = hollow.x*cell+cell/2, hy = hollow.y*cell+cell/2;
+      const breathe = (tickN % 8) < 4 ? 0.46 : 0.42;
+      ctx.fillStyle = '#141026';
+      ctx.shadowColor = '#8b79d9'; ctx.shadowBlur = 18;
+      ctx.beginPath(); ctx.arc(hx, hy, cell*breathe, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#8b79d9';
+      ctx.beginPath();
+      ctx.arc(hx - cell*0.13, hy - cell*0.05, cell*0.06, 0, Math.PI*2);
+      ctx.arc(hx + cell*0.13, hy - cell*0.05, cell*0.06, 0, Math.PI*2);
+      ctx.fill();
+    }
+    // combo meter
+    if(combo >= 2 && tickN - lastEatTick <= 28 && !over){
+      ctx.fillStyle = '#e8a05a';
+      ctx.font = '700 '+Math.max(12, cell*0.5)+'px "Space Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('COMBO ×'+combo, 8, 20);
+    }
     // sparks and score pops
     for(const s of sparks){
       s.x += s.vx; s.y += s.vy; s.life--;
@@ -1536,6 +1982,379 @@ Shell.register('snake', (function(){
 })());
 </script>
 
+<script>
+/* ================================================================
+   GAME 5: WISP FLIGHT
+================================================================ */
+Shell.register('flight', (function(){
+  const $ = id => document.getElementById(id);
+  const GRAV = 0.42, FLAP = -7.4, PW = 56, R = 13;
+  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT;
+
+  function sizeCanvas(){
+    const body = cv.parentElement;
+    dpr = window.devicePixelRatio || 1;
+    const w = Math.min(body.clientWidth, 460);
+    const h = body.clientHeight - 8;
+    cv.width = w*dpr; cv.height = h*dpr;
+    cv.style.width = w+'px'; cv.style.height = h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function W(){ return cv.width/dpr; }
+  function H(){ return cv.height/dpr; }
+  function wx(){ return Math.min(120, W()*0.28); }
+
+  function reset(){
+    over = false; started = false; score = 0; shakeT = 0; ghostT = 0;
+    wy = H()*0.45; vy = 0;
+    pillars = []; trail = []; fx = [];
+    $('fl-score').textContent = '0';
+    $('fl-over').classList.remove('show');
+  }
+  function flap(){
+    if(over || !running) return;
+    started = true;
+    vy = FLAP;
+    buzz(12);
+  }
+  function spawnPillar(){
+    const h = H();
+    const gapH = Math.max(118, 172 - score*1.8);
+    const gapY = 60 + Math.random()*(h - 42 - 120 - gapH);
+    const p = {x: W()+20, gapY, gapH, passed:false};
+    if(Math.random() < 0.3) p.fly = {y: gapY + gapH/2, got:false, spirit: score >= 5 && Math.random() < 0.35};
+    pillars.push(p);
+  }
+  function addText(x, y, text){ fx.push({x, y, vx:0, vy:-1.6, life:22, text}); }
+  function scoreUp(gain){
+    score += gain;
+    $('fl-score').textContent = score;
+    bump($('fl-score'));
+    Challenge.onScore('F', score);
+  }
+  function die(){
+    over = true;
+    shakeT = 9;
+    buzz([70,60,70]);
+    for(let i=0;i<14;i++){
+      const a = Math.random()*Math.PI*2, sp = 1+Math.random()*3;
+      fx.push({x:wx(), y:wy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:22});
+    }
+    setTimeout(finish, 750);
+  }
+  async function finish(){
+    if(!running) return;
+    const isBest = await Shell.reportBest('flight', score);
+    $('fl-over-msg').innerHTML = 'You scored <b>'+score+'</b> drifting the brambles.';
+    $('fl-newbest').style.display = isBest ? 'block' : 'none';
+    $('fl-over').classList.add('show');
+    Challenge.onGameOver('F', score, 'fl-chslot');
+  }
+
+  function draw(){
+    if(!running) return;
+    const w = W(), h = H(), x = wx();
+    ctx.clearRect(0,0,w,h);
+    ctx.save();
+    if(shakeT > 0){ ctx.translate((Math.random()-.5)*9, (Math.random()-.5)*9); shakeT--; }
+
+    // moon
+    ctx.globalAlpha = .5;
+    ctx.fillStyle = '#f2e7cf';
+    ctx.shadowColor = 'rgba(242,231,207,.8)'; ctx.shadowBlur = 20;
+    ctx.beginPath(); ctx.arc(w-58, 68, 24, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+
+    // physics
+    if(started && !over){
+      if(ghostT > 0) ghostT--;
+      vy = Math.min(9, vy + GRAV);
+      wy += vy;
+      if(!pillars.length || pillars[pillars.length-1].x < w - 235) spawnPillar();
+      const spd = 2.6 + Math.min(1.4, score*0.03);
+      for(const p of pillars) p.x -= spd;
+      pillars = pillars.filter(p=>p.x > -PW-30);
+      for(const p of pillars){
+        if(!p.passed && p.x + PW < x - R){
+          p.passed = true;
+          const c = p.gapY + p.gapH/2;
+          if(Math.abs(wy - c) < p.gapH*0.15){ scoreUp(2); addText(x, wy-16, 'CLEAN +2'); buzz(20); }
+          else { scoreUp(1); buzz(12); }
+        }
+        if(p.fly && !p.fly.got && Math.abs(p.x + PW/2 - x) < R+10 && Math.abs(p.fly.y - wy) < R+10){
+          p.fly.got = true;
+          scoreUp(3);
+          if(p.fly.spirit){ ghostT = 190; addText(x, wy-30, 'GHOST MODE'); }
+          addText(x, wy-16, '+3');
+          buzz(25);
+        }
+        if(ghostT <= 0 && p.x < x + R - 2 && p.x + PW > x - R + 2 &&
+           (wy - R + 3 < p.gapY || wy + R - 3 > p.gapY + p.gapH)){ die(); break; }
+      }
+      if(!over && wy + R > h - 42) die();
+      if(wy < R){ wy = R; vy = Math.max(0, vy); }
+    } else if(!started){
+      wy = H()*0.45 + Math.sin(Date.now()/300)*6;
+    }
+
+    // brambles
+    for(const p of pillars){
+      ctx.fillStyle = '#0d1420';
+      ctx.fillRect(p.x, 0, PW, p.gapY);
+      ctx.fillRect(p.x, p.gapY + p.gapH, PW, h - 42 - (p.gapY + p.gapH));
+      ctx.fillStyle = 'rgba(139,121,217,.22)';
+      ctx.fillRect(p.x, p.gapY - 5, PW, 5);
+      ctx.fillRect(p.x, p.gapY + p.gapH, PW, 5);
+      if(p.fly && !p.fly.got){
+        ctx.fillStyle = p.fly.spirit ? '#f2e7cf' : '#e8a05a';
+        ctx.shadowColor = p.fly.spirit ? '#26e0ff' : '#e8a05a'; ctx.shadowBlur = p.fly.spirit ? 16 : 12;
+        ctx.beginPath(); ctx.arc(p.x + PW/2, p.fly.y, p.fly.spirit ? 7 : 6, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // the black water
+    ctx.fillStyle = 'rgba(10,46,50,.6)';
+    ctx.fillRect(0, h-42, w, 42);
+    ctx.fillStyle = 'rgba(38,224,255,.09)';
+    ctx.fillRect(0, h-42, w, 3);
+
+    // the wisp and its trail
+    if(!over){
+      trail.push({x, y:wy});
+      if(trail.length > 10) trail.shift();
+      trail.forEach((t,i)=>{
+        ctx.globalAlpha = (i/trail.length)*0.25;
+        ctx.fillStyle = '#f2e7cf';
+        ctx.beginPath();
+        ctx.arc(t.x - (trail.length-i)*2.4, t.y, Math.max(1, R*0.65*(i/trail.length)), 0, Math.PI*2);
+        ctx.fill();
+      });
+      const phasing = ghostT > 0;
+      ctx.globalAlpha = phasing ? (ghostT < 40 && Math.floor(ghostT/5) % 2 === 0 ? 0.3 : 0.55) : 1;
+      ctx.shadowColor = phasing ? '#26e0ff' : '#f2e7cf'; ctx.shadowBlur = 16;
+      ctx.fillStyle = '#f8f1de';
+      ctx.beginPath(); ctx.arc(x, wy, R, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#05070d';
+      ctx.beginPath();
+      ctx.arc(x+4, wy-3, 2.2, 0, Math.PI*2);
+      ctx.arc(x+9, wy-3, 2.2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    // floating text and death sparks
+    for(const s of fx){
+      s.x += s.vx; s.y += s.vy; s.life--;
+      ctx.globalAlpha = Math.max(0, s.life/22);
+      ctx.fillStyle = '#e8a05a';
+      if(s.text){
+        ctx.font = '700 14px "Space Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.text, s.x, s.y);
+        ctx.textAlign = 'left';
+      } else {
+        ctx.fillStyle = '#f2e7cf';
+        ctx.fillRect(s.x-1.5, s.y-1.5, 3, 3);
+      }
+    }
+    ctx.globalAlpha = 1;
+    fx = fx.filter(s=>s.life>0);
+
+    if(!started && !over){
+      ctx.font = '700 20px "Cormorant Garamond", serif';
+      ctx.fillStyle = 'rgba(242,231,207,.85)';
+      ctx.textAlign = 'center';
+      ctx.fillText('TAP TO DRIFT', w/2, h*0.3);
+      ctx.textAlign = 'left';
+    }
+    ctx.restore();
+    raf = requestAnimationFrame(draw);
+  }
+
+  function onTap(e){ e.preventDefault(); flap(); }
+  function onKey(e){
+    if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    if(e.code === 'Space'){ e.preventDefault(); flap(); }
+  }
+  function onResize(){ if(running) sizeCanvas(); }
+
+  return {
+    mount(){
+      cv = $('fl-canvas'); ctx = cv.getContext('2d');
+      running = true;
+      sizeCanvas();
+      reset();
+      cv.addEventListener('pointerdown', onTap);
+      window.addEventListener('keydown', onKey);
+      window.addEventListener('resize', onResize);
+      $('fl-retry').onclick = ()=>reset();
+      Challenge.enterGame('F', 'fl-chban');
+      raf = requestAnimationFrame(draw);
+    },
+    unmount(){
+      running = false;
+      cancelAnimationFrame(raf);
+      cv.removeEventListener('pointerdown', onTap);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', onResize);
+      Challenge.leaveGame();
+      $('fl-over').classList.remove('show');
+    }
+  };
+})());
+</script>
+<script>
+/* ================================================================
+   GAME 6: FIREFLY RUSH
+================================================================ */
+Shell.register('rush', (function(){
+  const $ = id => document.getElementById(id);
+  let field, timers, running, over, score, lives, streak, spawnGap, sinceSwarm;
+
+  function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+  function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+
+  function drawLives(){
+    const el = $('ru-lifes');
+    el.innerHTML = '';
+    for(let i=0;i<3;i++){
+      const d = document.createElement('div');
+      d.className = 'ru-life' + (i < lives ? '' : ' gone');
+      d.textContent = '✦';
+      el.appendChild(d);
+    }
+  }
+  function popupAt(x, y, text, color){
+    const el = document.createElement('div');
+    el.className = 'popup';
+    el.textContent = text;
+    el.style.left = x+'px'; el.style.top = y+'px';
+    if(color) el.style.color = color;
+    field.appendChild(el);
+    later(()=>el.remove(), 850);
+  }
+  function hurt(x, y, note){
+    lives--;
+    drawLives();
+    streak = 0;
+    popupAt(x, y, note, 'var(--coral)');
+    field.classList.remove('hurt'); void field.offsetWidth; field.classList.add('hurt');
+    buzz([50,40,50]);
+    if(lives <= 0){ end(); }
+  }
+  async function end(){
+    over = true;
+    clearTimers();
+    field.querySelectorAll('.fly').forEach(f=>f.remove());
+    const isBest = await Shell.reportBest('rush', score);
+    $('ru-over-msg').innerHTML = 'You caught <b>'+score+'</b> '+(score===1?'firefly':'fireflies')+'.';
+    $('ru-newbest').style.display = isBest ? 'block' : 'none';
+    $('ru-over').classList.add('show');
+    Challenge.onGameOver('R', score, 'ru-chslot');
+    buzz([70,60,70]);
+  }
+
+  function spawnOne(forceKind, noHurt){
+    if(over || !running) return;
+    const r = Math.random();
+    const kind = forceKind || (r < 0.10 ? 'hollow' : (r < 0.20 ? 'spirit' : 'amber'));
+    const life = noHurt ? 1600 : (kind === 'spirit' ? 950 : (kind === 'hollow' ? 1700 : Math.max(800, 1400 - score*8)));
+    const el = document.createElement('div');
+    el.className = 'fly ' + kind;
+    const fw = field.clientWidth, fh = field.clientHeight;
+    const px = 40 + Math.random()*(fw - 80);
+    const py = 50 + Math.random()*(fh - 130);
+    el.style.left = px+'px'; el.style.top = py+'px';
+    el.style.animationDuration = life+'ms';
+    let done = false;
+    el.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      if(done || over) return;
+      done = true;
+      el.remove();
+      if(kind === 'hollow'){
+        hurt(px, py, 'THE HOLLOW! −1 ✦');
+        return;
+      }
+      const gain = kind === 'spirit' ? 3 : 1;
+      score += gain;
+      streak++;
+      $('ru-score').textContent = score;
+      bump($('ru-score'));
+      Challenge.onScore('R', score);
+      popupAt(px, py-8, '+'+gain, kind === 'spirit' ? 'var(--cyan)' : null);
+      buzz(kind === 'spirit' ? [20,25,20] : 15);
+      if(streak > 0 && streak % 10 === 0){
+        score += 5;
+        $('ru-score').textContent = score;
+        Challenge.onScore('R', score);
+        popupAt(px, py-34, 'HOT STREAK +5');
+        buzz([25,25,25]);
+      }
+    });
+    field.appendChild(el);
+    later(()=>{
+      if(done || over) return;
+      done = true;
+      el.remove();
+      if(kind === 'amber' && !noHurt) hurt(px, py, 'FADED −1 ✦');
+    }, life);
+  }
+
+  function swarm(){
+    if(over || !running) return;
+    const el = document.createElement('div');
+    el.className = 'popup';
+    el.textContent = '✨ SWARM ✨';
+    el.style.left = '50%'; el.style.top = '40%';
+    el.style.fontSize = '24px';
+    field.appendChild(el);
+    later(()=>el.remove(), 850);
+    buzz([20,30,20,30,20]);
+    for(let i=0;i<7;i++) later(()=>spawnOne('amber', true), i*70);
+  }
+
+  function spawnLoop(){
+    if(over || !running) return;
+    sinceSwarm++;
+    if(sinceSwarm >= 22){ sinceSwarm = 0; swarm(); }
+    else spawnOne();
+    spawnGap = Math.max(380, 900 - score*9);
+    later(spawnLoop, spawnGap * (0.8 + Math.random()*0.4));
+  }
+
+  function reset(){
+    over = false; score = 0; lives = 3; streak = 0; spawnGap = 900; sinceSwarm = 0;
+    clearTimers();
+    field.querySelectorAll('.fly,.popup').forEach(f=>f.remove());
+    $('ru-score').textContent = '0';
+    $('ru-over').classList.remove('show');
+    drawLives();
+    later(spawnLoop, 500);
+  }
+
+  return {
+    mount(){
+      field = $('ru-field');
+      timers = [];
+      running = true;
+      $('ru-retry').onclick = ()=>reset();
+      Challenge.enterGame('R', 'ru-chban');
+      reset();
+    },
+    unmount(){
+      running = false; over = true;
+      clearTimers();
+      field.querySelectorAll('.fly,.popup').forEach(f=>f.remove());
+      Challenge.leaveGame();
+      $('ru-over').classList.remove('show');
+    }
+  };
+})());
+</script>
+
 <div id="ch-modal"><div class="ch-card" id="ch-card"></div></div>
 
 <script>
@@ -1543,8 +2362,8 @@ Shell.register('snake', (function(){
    CHALLENGE SYSTEM: signed score codes you can text to a rival
 ================================================================ */
 const Challenge = (function(){
-  const G2GAME  = {P:'pigment', S:'stack', N:'snake'};
-  const G2TITLE = {P:'Phantom Paint', S:'Ghost Stack', N:'Specter Snake'};
+  const G2GAME  = {P:'pigment', S:'stack', N:'snake', F:'flight', R:'rush'};
+  const G2TITLE = {P:'Phantom Paint', S:'Ghost Stack', N:'Specter Snake', F:'Wisp Flight', R:'Firefly Rush'};
   let active = null, chip = null, chipGame = null;
 
   Shell.store.get('challenge').then(v=>{ if(v && !active) active = v; refreshHubBtn(); });
@@ -1561,7 +2380,7 @@ const Challenge = (function(){
     return core+'-'+chk(core);
   }
   function decode(code){
-    const m = (code||'').trim().toUpperCase().match(/^([PSN])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
+    const m = (code||'').trim().toUpperCase().match(/^([PSNFR])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
     if(!m) return null;
     if(chk(m[1]+'-'+m[2]+'-'+m[3]) !== m[4]) return null;
     return {g:m[1], score:+m[2], name:m[3]};
@@ -1597,6 +2416,7 @@ const Challenge = (function(){
   function leaveGame(){ chip = null; chipGame = null; }
 
   function onScore(g, s){
+    if(typeof Dare !== 'undefined') Dare.onScore(g, s);
     if(chip && active && active.g === g && g === chipGame && s > active.score){
       chip.className = 'ch-chip on beaten';
       chip.textContent = '🏆 '+active.score+' BEATEN!';
@@ -1733,6 +2553,86 @@ const Challenge = (function(){
   window.addEventListener('hashchange', consumeHash);
 
   return { enterGame, leaveGame, onScore, onGameOver };
+})();
+</script>
+<script>
+/* ================================================================
+   TONIGHT'S DARE: one deterministic challenge per night, with streaks
+================================================================ */
+const Dare = (function(){
+  const DEFS = [
+    {g:'P', name:'Phantom Paint', game:'pigment', targets:[600, 900, 1200]},
+    {g:'S', name:'Ghost Stack',   game:'stack',   targets:[8, 12, 16]},
+    {g:'N', name:'Specter Snake', game:'snake',   targets:[10, 15, 20]},
+    {g:'F', name:'Wisp Flight',   game:'flight',  targets:[6, 10, 14]},
+    {g:'R', name:'Firefly Rush',  game:'rush',    targets:[15, 22, 30]},
+    {g:'D', name:'Spirit Duel',   game:'tw',      targets:[1]}
+  ];
+  let done = false, streak = 0;
+
+  function dayKey(){
+    const d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function seedFrom(s){ let h = 7; for(const c of s) h = (h*31 + c.charCodeAt(0)) >>> 0; return h; }
+  function todays(){
+    const seed = seedFrom(dayKey());
+    const def = DEFS[seed % DEFS.length];
+    const target = def.targets[Math.floor(seed/7) % def.targets.length];
+    return {g:def.g, name:def.name, game:def.game, target};
+  }
+  function render(){
+    const el = document.getElementById('dare-card');
+    if(!el) return;
+    const t = todays();
+    const what = t.g === 'D' ? 'Beat the Ghost in Spirit Duel' : 'Score '+t.target+' in '+t.name;
+    el.innerHTML = (done ? '🏮 ' : '🕯️ ') + '<b>TONIGHT’S DARE</b> · ' + what +
+      (done ? ' · <span class="dare-done">LIT!</span>' : '') +
+      (streak > 1 ? ' · 🔥 '+streak : '');
+    el.classList.toggle('lit', done);
+    el.onclick = ()=>{ if(document.getElementById('hub').classList.contains('active')) Shell.openGame(t.game); };
+  }
+  async function refresh(){
+    done = !!(await Shell.store.get('dare-'+dayKey()));
+    streak = (await Shell.store.get('dare-streak')) || 0;
+    const last = await Shell.store.get('dare-last');
+    if(last && !done){
+      const diff = (new Date(dayKey()) - new Date(last)) / 86400000;
+      if(diff > 1) streak = 0;
+    }
+    render();
+  }
+  function banner(){
+    const b = document.createElement('div');
+    b.className = 'dare-banner';
+    b.textContent = '🏮 DARE COMPLETE!' + (streak > 1 ? ' 🔥 '+streak+' NIGHTS RUNNING' : '');
+    document.body.appendChild(b);
+    setTimeout(()=>b.classList.add('show'), 30);
+    setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(), 500); }, 3400);
+  }
+  async function complete(){
+    if(done) return;
+    done = true;
+    const today = dayKey();
+    const last = await Shell.store.get('dare-last');
+    const diff = last ? (new Date(today) - new Date(last)) / 86400000 : 99;
+    streak = (diff === 1) ? ((await Shell.store.get('dare-streak')) || 0) + 1 : 1;
+    Shell.store.set('dare-'+today, true);
+    Shell.store.set('dare-last', today);
+    Shell.store.set('dare-streak', streak);
+    banner();
+    render();
+    buzz([60,50,60,50,90]);
+  }
+  function onScore(g, score){
+    const t = todays();
+    if(!done && t.g === g && t.g !== 'D' && score >= t.target) complete();
+  }
+  function duelWin(beatCpu){
+    if(!done && todays().g === 'D' && beatCpu) complete();
+  }
+  refresh();
+  return { onScore, duelWin, refresh };
 })();
 </script>
 </body>
