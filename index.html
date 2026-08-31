@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tupelo Ghost">
 <meta property="og:title" content="Tupelo Ghost Arcade">
-<meta property="og:description" content="Seven haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
+<meta property="og:description" content="Eight haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
 <meta property="og:url" content="https://tupeloghost.github.io/Pocket-Arcade/">
-<meta name="description" content="Seven haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
+<meta name="description" content="Eight haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -219,37 +219,37 @@
   .tw-side.bottom{background:linear-gradient(180deg, rgba(255,122,46,.10), transparent 60%);}
   .tw-side.winflash{background:rgba(80,220,130,.28) !important;}
   .tw-side.loseflash{background:rgba(255,60,60,.22) !important;}
-  .tw-badge{position:absolute; top:8px; left:12px; display:flex; align-items:center; gap:7px; font-weight:900; font-size:13px; letter-spacing:.5px;}
-  .tw-badge .sw{width:12px;height:12px;border-radius:50%;}
+  .tw-badge{position:absolute; top:8px; left:12px; display:flex; align-items:center; gap:7px; font-weight:900; font-size:15px; letter-spacing:.5px;}
+  .tw-badge .sw{width:14px;height:14px;border-radius:50%;}
   .tw-pips{position:absolute; top:10px; right:12px; display:flex; gap:4px;}
   .pip{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.2);}
   .pip.on{border:none; box-shadow:0 0 7px currentColor;}
   .tw-arena{width:100%; max-width:430px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; position:relative;}
   .wisp-chase{
-    position:absolute; font-size:42px; padding:8px; z-index:3; cursor:pointer;
+    position:absolute; font-size:56px; padding:10px; z-index:3; cursor:pointer;
     transform:translate(-50%,-50%);
     filter:drop-shadow(0 0 12px rgba(242,231,207,.85));
   }
-  .orb.mashy{font-size:36px; color:var(--text); font-family:'Space Mono', monospace; font-weight:700;}
+  .orb.mashy{font-size:48px; color:var(--text); font-family:'Space Mono', monospace; font-weight:700;}
   .x2badge{
     position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:4;
     color:var(--gold); font-weight:700; font-size:13px; letter-spacing:1.5px;
     text-shadow:0 0 12px rgba(232,160,90,.7); pointer-events:none;
   }
   .msg{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:clamp(20px,6vw,32px); line-height:1.15; letter-spacing:1.5px;}
-  .submsg{color:var(--dim); font-weight:800; font-size:13.5px; margin-top:-4px;}
+  .submsg{color:var(--text); opacity:.75; font-weight:800; font-size:16px; margin-top:-4px; line-height:1.4;}
   #tw-mid{
     flex:none; height:40px; width:100%; display:flex; align-items:center; justify-content:center; gap:12px;
     background:rgba(0,0,0,.42); border-top:1.5px solid rgba(255,255,255,.1); border-bottom:1.5px solid rgba(255,255,255,.1);
-    font-weight:900; font-size:12px; letter-spacing:2px; color:var(--dim); z-index:5;
+    font-weight:900; font-size:14px; letter-spacing:2px; color:var(--dim); z-index:5;
   }
   #tw-mid b{color:var(--gold);}
   #tw-mid .backbtn{padding:4px 12px; font-size:12px;}
   .orb{
-    width:min(30vw,130px); height:min(30vw,130px); border-radius:50%;
+    width:min(40vw,160px); height:min(40vw,160px); border-radius:50%;
     background:#141a28; border:4px solid rgba(120,140,170,.25);
     display:flex; align-items:center; justify-content:center;
-    font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:17px; color:var(--dim); transition:transform .1s;
+    font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:22px; color:var(--dim); transition:transform .1s;
   }
   .orb.hot{
     background:radial-gradient(circle at 35% 30%, #ffd9a0, var(--coral) 70%);
@@ -258,19 +258,19 @@
   }
   @keyframes throb{50%{transform:scale(1.07)}}
   .orb:active{transform:scale(.94);}
-  .optrow{display:flex; flex-wrap:wrap; gap:10px; justify-content:center;}
+  .optrow{display:flex; flex-wrap:wrap; gap:13px; justify-content:center;}
   .opt{
-    min-width:58px; height:58px; padding:0 12px; border-radius:16px;
-    border:2.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.08);
-    font-size:30px; display:flex; align-items:center; justify-content:center;
+    min-width:74px; height:74px; padding:0 14px; border-radius:18px;
+    border:2.5px solid rgba(255,255,255,.22); background:rgba(255,255,255,.09);
+    font-size:42px; display:flex; align-items:center; justify-content:center;
     font-weight:900; color:var(--text); transition:transform .08s;
   }
   .opt:active{transform:scale(.92);}
-  .opt.big{font-size:25px; min-width:80px; font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase;}
-  .targetbox{font-size:46px; line-height:1;}
-  .mathq{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:clamp(24px,7vw,38px); letter-spacing:2px;}
-  .oddgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
-  .oddgrid .opt{font-size:34px; width:70px; height:70px; min-width:0; padding:0;}
+  .opt.big{font-size:31px; min-width:112px; font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase;}
+  .targetbox{font-size:64px; line-height:1;}
+  .mathq{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:clamp(32px,10vw,48px); letter-spacing:2px;}
+  .oddgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .oddgrid .opt{font-size:46px; width:88px; height:88px; min-width:0; padding:0;}
   .tw-winhalf{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:17px; letter-spacing:2px; padding:9px 20px; border-radius:999px;}
   .flip{transform:rotate(180deg);}
   #scr-tw.solo .tw-side.top, #scr-tw.solo .flip{transform:none;}
@@ -324,10 +324,38 @@
   .gb-candle.w0{text-shadow:0 0 12px var(--coral);}
   .gb-candle.w1{text-shadow:0 0 12px var(--cyan);}
   .gb-zone{flex:1; display:flex; flex-direction:column; gap:3px; padding:4px; min-height:56px; overflow:hidden;}
-  .gb-zone.mine{justify-content:flex-end;}
-  .gb-lanename{text-align:center; font-size:9px; letter-spacing:1px; color:var(--dim); font-weight:700; padding:3px 0; border-top:1px solid rgba(120,140,170,.15); border-bottom:1px solid rgba(120,140,170,.15);}
-  .gb-totals{font-size:12px; color:var(--text); margin-top:1px;}
-  .gb-totals b{color:var(--gold);}
+  .gb-zone.opp{background:rgba(38,224,255,.05);}
+  .gb-zone.mine{justify-content:flex-end; background:rgba(255,122,46,.055);}
+  .gb-mid{
+    display:flex; flex-direction:column; align-items:center; gap:1px; padding:3px 0;
+    border-top:1px solid rgba(120,140,170,.15); border-bottom:1px solid rgba(120,140,170,.15);
+  }
+  .gb-lanename{text-align:center; font-size:8.5px; letter-spacing:1px; color:var(--dim); font-weight:700;}
+  .tot{font-size:13px; font-weight:700; line-height:1.1; transition:transform .15s;}
+  .tot.them{color:var(--cyan);}
+  .tot.you{color:var(--coral);}
+  .tot.lead{text-shadow:0 0 9px currentColor; transform:scale(1.2);}
+  .gb-side{width:min(96vw,460px); font-size:9.5px; letter-spacing:1.2px; font-weight:700; padding:4px 4px 2px;}
+  .gb-side.them{color:var(--cyan);}
+  .gb-side.you{color:var(--coral);}
+  .gb-empty{
+    font-size:8.5px; font-weight:700; color:var(--gold); text-align:center;
+    padding:9px 2px; margin:2px; border:1px dashed rgba(232,160,90,.45); border-radius:8px;
+    letter-spacing:.5px;
+  }
+  #gb-toast{
+    position:absolute; top:26%; left:0; right:0; text-align:center; z-index:6; pointer-events:none;
+    font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase;
+    font-size:24px; letter-spacing:2px; color:var(--gold); opacity:0;
+    text-shadow:0 0 14px rgba(232,160,90,.6);
+  }
+  #gb-toast.pop{animation:toast .9s ease-out;}
+  .smallbtn.glow{
+    border-color:var(--gold); color:var(--gold);
+    box-shadow:0 0 12px rgba(232,160,90,.45);
+    animation:throb 1.1s ease-in-out infinite;
+  }
+  .hcard.pulse{border-color:rgba(232,160,90,.7); box-shadow:0 0 12px rgba(232,160,90,.35); animation:throb 1.4s ease-in-out infinite;}
   .mini{background:rgba(20,26,40,.92); border:1px solid rgba(255,122,46,.35); border-radius:8px; padding:3px 5px; font-size:9.5px; line-height:1.25; position:relative; text-align:left;}
   .mini.them{border-color:rgba(38,224,255,.4);}
   .mini .pw{position:absolute; right:4px; top:3px; font-weight:700; color:var(--gold);}
@@ -407,6 +435,16 @@
   }
   .howto-ico{font-size:44px; line-height:1;}
   .howto-card h2{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:26px; letter-spacing:2px; margin:0;}
+  .demo-cv{
+    width:300px; height:150px; max-width:100%;
+    border-radius:14px; background:rgba(0,0,0,.32);
+    border:1px solid rgba(120,140,170,.22);
+  }
+  .demo-cap{
+    margin:2px 0 0; color:var(--dim); font-weight:700; font-size:12.5px;
+    line-height:1.5; max-width:300px; text-align:center;
+  }
+  .demo-cap b{color:var(--text);}
   .rules{text-align:left; display:flex; flex-direction:column; gap:9px; font-size:12.5px; color:var(--dim); font-weight:700; line-height:1.5; width:100%;}
   .rules div{display:flex; gap:9px; align-items:flex-start;}
   .rules b{color:var(--text);}
@@ -414,6 +452,14 @@
   #pg-moonlabel{width:min(94vw,430px); font-size:9px; letter-spacing:2px; color:var(--dim); font-weight:700; margin-bottom:3px;}
   #gb-hint{width:min(96vw,460px); font-size:11.5px; color:var(--dim); font-weight:700; text-align:center; min-height:15px; padding-bottom:2px;}
   #gb-hint b{color:var(--gold);}
+
+  @media (max-width:430px){
+    .gb-title{font-size:17px; letter-spacing:1px;}
+    .gamebar{gap:8px; padding:10px 12px;}
+  }
+  .blob.cannext .body{
+    box-shadow:inset -5px -7px 0 rgba(0,0,0,.18), 0 0 0 3px rgba(232,160,90,.6), 0 0 12px rgba(232,160,90,.4);
+  }
 
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
 </style>
@@ -433,13 +479,14 @@
 <div class="mote" style="left:96%; color:#e8a05a; animation-duration:28s; animation-delay:10s; width:3px; height:3px;"></div>
 
 <div id="hub" class="screen active">
+  <button class="backbtn" id="mute-btn" style="position:absolute; top:14px; right:14px; padding:6px 12px; font-size:15px; z-index:5;">🔊</button>
   <div class="hub-head">
     <h1>TUPELO<span>GHOST</span></h1>
     <div class="marquee">
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
     </div>
-    <p>MIDNIGHT ARCADE · SEVEN HAUNTS · NO COINS NEEDED</p>
+    <p>MIDNIGHT ARCADE · EIGHT HAUNTS · NO COINS NEEDED</p>
     <div class="epi">The arcade at the end of the dirt road. It only opens after dark.</div>
   </div>
   <button class="chbtn dare" id="dare-card"></button>
@@ -448,7 +495,7 @@
       <div class="ico">🎨</div>
       <div class="info">
         <div class="name">PHANTOM PAINT</div>
-        <div class="desc">Brew the target colors and chain fast. The moonlight is draining.</div>
+        <div class="desc">Mix paint blobs to make the target colors before time runs out.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">PUZZLE</span><span class="tag best">BEST <b id="best-pigment">–</b></span></div>
       </div>
     </button>
@@ -456,7 +503,7 @@
       <div class="ico">⚡</div>
       <div class="info">
         <div class="name">SPIRIT DUEL</div>
-        <div class="desc">Duel the Ghost solo, or pass and play a friend. The quicker spirit steals the point.</div>
+        <div class="desc">Quick-fire mini-games. Play a friend on one screen, or duel the Ghost solo.</div>
         <div class="meta"><span class="tag players">2P</span><span class="tag">DUEL</span><span class="tag">FIRST TO 7</span></div>
       </div>
     </button>
@@ -464,7 +511,7 @@
       <div class="ico">🌙</div>
       <div class="info">
         <div class="name">GHOST STACK</div>
-        <div class="desc">Drop the drifting blocks. The ghost salvages every sliver you lose: reclaim it, or spend it to cheat death.</div>
+        <div class="desc">Drop blocks to build a tower. Miss the edge and lose a piece, but the ghost saves your scraps.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">TIMING</span><span class="tag best">BEST <b id="best-stack">–</b></span></div>
       </div>
     </button>
@@ -472,7 +519,7 @@
       <div class="ico">🐍</div>
       <div class="info">
         <div class="name">SPECTER SNAKE</div>
-        <div class="desc">Swallow fireflies and dodge The Hollow that hunts you. Never cross yourself.</div>
+        <div class="desc">Classic snake with a hunter: eat fireflies, dodge the Hollow, don’t hit yourself.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">CLASSIC</span><span class="tag best">BEST <b id="best-snake">–</b></span></div>
       </div>
     </button>
@@ -480,15 +527,23 @@
       <div class="ico">👻</div>
       <div class="info">
         <div class="name">WISP FLIGHT</div>
-        <div class="desc">Tap to keep the little ghost aloft. Thread the bramble gaps above the black water.</div>
+        <div class="desc">Tap to fly the little ghost through the gaps. One touch ends the run.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">ENDLESS</span><span class="tag best">BEST <b id="best-flight">–</b></span></div>
+      </div>
+    </button>
+    <button class="gcard" data-game="shade" style="--accent:var(--coral)">
+      <div class="ico">🏮</div>
+      <div class="info">
+        <div class="name">SHADE SHOOTER</div>
+        <div class="desc">Slide your lantern and blast the diving shades. Waves keep coming, keep getting bigger.</div>
+        <div class="meta"><span class="tag players">1P</span><span class="tag">SHOOTER</span><span class="tag best">BEST <b id="best-shade">–</b></span></div>
       </div>
     </button>
     <button class="gcard" data-game="gambit" style="--accent:#f2e7cf">
       <div class="ico">🃏</div>
       <div class="info">
         <div class="name">GHOST GAMBIT</div>
-        <div class="desc">A card duel over three candles. Collect new cards by playing every machine in the arcade.</div>
+        <div class="desc">A card battle over three candles. Win new cards by playing the other games.</div>
         <div class="meta"><span class="tag players">1-2P</span><span class="tag">CARDS</span><span class="tag best">OWNED <b id="best-gambit">–</b></span></div>
       </div>
     </button>
@@ -496,7 +551,7 @@
       <div class="ico">✨</div>
       <div class="info">
         <div class="name">FIREFLY RUSH</div>
-        <div class="desc">Catch the fireflies before they fade. Never, ever tap The Hollow.</div>
+        <div class="desc">Tap fireflies before they vanish. Don’t tap the purple ones.</div>
         <div class="meta"><span class="tag players">1P</span><span class="tag">FRENZY</span><span class="tag best">BEST <b id="best-rush">–</b></span></div>
       </div>
     </button>
@@ -534,13 +589,33 @@
   <div class="game-body">
     <div id="ru-field"></div>
     <div class="ru-lifes" id="ru-lifes"></div>
-    <div class="st-tip">Amber = catch · Pale = +3 · Violet = never touch</div>
+    <div class="st-tip">Orange = tap · White = +3 · Purple = never</div>
     <div class="gover" id="ru-over">
       <h2>THE DARK WENT QUIET</h2>
       <p id="ru-over-msg"></p>
       <div class="newbest" id="ru-newbest" style="display:none">★ NEW BEST ★</div>
       <button class="bigbtn" id="ru-retry" style="margin-top:14px;">RUSH AGAIN</button>
       <div class="ch-slot" id="ru-chslot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SHADE SHOOTER ================= -->
+<div id="scr-shade" class="screen">
+  <div class="gamebar">
+    <button class="backbtn" data-back>← Arcade</button>
+    <div class="gb-title">SHADE SHOOTER</div><span class="ch-chip" id="sh-chban"></span>
+    <div class="gb-right"><span id="sh-score">0</span></div>
+  </div>
+  <div class="game-body">
+    <canvas id="sh-canvas" style="touch-action:none;"></canvas>
+    <div class="st-tip">Slide your finger to move. The lantern fires by itself.</div>
+    <div class="gover" id="sh-over">
+      <h2>THE SHADES TOOK YOUR LIGHT</h2>
+      <p id="sh-over-msg"></p>
+      <div class="newbest" id="sh-newbest" style="display:none">★ NEW BEST ★</div>
+      <button class="bigbtn" id="sh-retry" style="margin-top:14px;">RELIGHT THE LANTERN</button>
+      <div class="ch-slot" id="sh-chslot"></div>
     </div>
   </div>
 </div>
@@ -553,18 +628,17 @@
     <button class="smallbtn" id="gb-collbtn" style="padding:6px 14px; font-size:12px;">CARDS</button>
   </div>
   <div class="game-body" style="padding:0 10px;">
+    <div class="gb-side them" id="gb-side-them">👻 THE GHOST’S SIDE</div>
     <div id="gb-board"></div>
+    <div class="gb-side you" id="gb-side-you">🔥 YOUR SIDE · YOUR CARDS GO IN THE BOTTOM HALF</div>
+    <div id="gb-toast"></div>
     <div id="gb-hud"><span id="gb-info"></span><button class="smallbtn" id="gb-end">END TURN</button></div>
     <div id="gb-hint"></div>
     <div id="gb-hand"></div>
     <div class="gover" id="gb-mode">
       <h2>GHOST GAMBIT</h2>
-      <div class="rules" style="max-width:320px; margin-bottom:6px;">
-        <div><span class="em">⚡</span><span>Six rounds. Each round your <b>energy equals the round number</b>.</span></div>
-        <div><span class="em">🃏</span><span><b>Tap a card, then tap a haunt</b> to play it there.</span></div>
-        <div><span class="em">🕯️</span><span>Highest power claims each candle. <b>Take 2 of 3</b> to win.</span></div>
-        <div><span class="em">✨</span><span>Win new cards by <b>scoring in the other machines</b>.</span></div>
-      </div>
+      <canvas id="gb-demo" width="600" height="300" class="demo-cv"></canvas>
+      <p class="demo-cap" style="margin-bottom:6px;"><b>Tap a card, then a zone.</b> Energy grows each round (1⚡ then 2⚡…). Orange is you, blue is them: the bigger total wins each candle. <b>Take 2 of 3.</b></p>
       <button class="bigbtn" id="gb-vs-ghost">DUEL THE GHOST 👻</button>
       <button class="bigbtn" id="gb-vs-friend" style="background:linear-gradient(135deg, var(--cyan), var(--B)); margin-top:10px;">PASS &amp; PLAY VS A FRIEND</button>
       <button class="smallbtn ghost" id="gb-coll2" style="margin-top:10px;">VIEW COLLECTION</button>
@@ -653,10 +727,8 @@
     </div>
     <div class="gover" id="tw-mode">
       <h2>SPIRIT DUEL</h2>
-      <div class="rules" style="max-width:300px; margin-bottom:6px;">
-        <div><span class="em">⚡</span><span>The <b>same trial</b> appears on both halves. First correct tap takes the point.</span></div>
-        <div><span class="em">👑</span><span><b>First to 7 wins.</b> Watch for ⚡ rounds worth double.</span></div>
-      </div>
+      <canvas id="tw-demo" width="600" height="300" class="demo-cv"></canvas>
+      <p class="demo-cap" style="margin-bottom:6px;">Same mini-game on both halves. <b>First right answer takes the point.</b> First to 7 wins.</p>
       <button class="bigbtn" id="tw-vs-ghost">DUEL THE GHOST 👻</button>
       <button class="bigbtn" id="tw-vs-friend" style="background:linear-gradient(135deg, var(--cyan), var(--B)); margin-top:10px;">PASS &amp; PLAY VS A FRIEND</button>
     </div>
@@ -693,7 +765,7 @@
   </div>
   <div class="game-body" style="justify-content:center;">
     <canvas id="sn-canvas"></canvas>
-    <div class="sn-tip">Swipe to steer. Move quiet.</div>
+    <div class="sn-tip">Swipe anywhere to steer</div>
     <div class="gover" id="sn-over">
       <h2 id="sn-over-title">THE SWAMP GOT YOU</h2>
       <p id="sn-over-msg"></p>
@@ -740,7 +812,7 @@ const Shell = (function(){
   }
 
   async function refreshBests(){
-    for(const k of ['pigment','stack','snake','flight','rush']){
+    for(const k of ['pigment','stack','snake','flight','rush','shade']){
       const v = await store.get('best-'+k);
       const el = document.getElementById('best-'+k);
       if(el) el.textContent = (v == null) ? '–' : v;
@@ -782,6 +854,65 @@ const Shell = (function(){
 
 function buzz(p){ if(navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
 function bump(el){ if(!el) return; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+
+/* Soft synth: warm little tones, no audio files. Pitch rises with combos. */
+const Snd = (function(){
+  let ctx, master, muted = false;
+  Shell.store.get('muted').then(v=>{ muted = !!v; ui(); });
+  function ui(){
+    const b = document.getElementById('mute-btn');
+    if(b) b.textContent = muted ? '🔇' : '🔊';
+  }
+  function toggle(){
+    muted = !muted;
+    Shell.store.set('muted', muted);
+    ui();
+    if(!muted) note(660, .14, 'triangle', .5);
+  }
+  function ensure(){
+    if(!ctx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return false;
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = 0.15;
+      master.connect(ctx.destination);
+    }
+    if(ctx.state === 'suspended') ctx.resume();
+    return true;
+  }
+  function note(freq, dur, type, vol, slideTo){
+    if(muted) return;
+    try{
+      if(!ensure()) return;
+      const t = ctx.currentTime;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'triangle';
+      o.frequency.setValueAtTime(freq, t);
+      if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol || .8, t + .02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(master);
+      o.start(t); o.stop(t + dur + .06);
+    }catch(e){}
+  }
+  const SCALE = [523, 587, 659, 698, 784, 880, 988, 1047, 1175];
+  const btn = document.getElementById('mute-btn');
+  if(btn) btn.addEventListener('click', toggle);
+  return {
+    pick(step){ note(SCALE[Math.max(0, Math.min(SCALE.length-1, step||0))], .2, 'triangle', .8); },
+    drop(){ note(150, .13, 'sine', .7); },
+    perfect(n){
+      note(SCALE[Math.min(8, 2+(n||0))], .16, 'triangle', .8);
+      setTimeout(()=>note(SCALE[Math.min(8, 4+(n||0))], .22, 'triangle', .7), 70);
+    },
+    swell(){ note(240, .6, 'sine', .5, 480); },
+    bad(){ note(220, .42, 'sine', .55, 70); },
+    win(){ [0,2,4,7].forEach((s,i)=>setTimeout(()=>note(SCALE[s], .26, 'triangle', .6), i*85)); },
+    tap(){ note(392, .09, 'sine', .35); }
+  };
+})();
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 </script>
 <script>
@@ -917,9 +1048,30 @@ Shell.register('pigment', (function(){
       $('pg-over').classList.add('show');
       Challenge.onGameOver('P', score, 'pg-chslot');
       buzz([70,60,70]);
+      Snd.bad();
     }, 250);
   }
+  function clearNext(){
+    board.querySelectorAll('.blob.cannext').forEach(b=>b.classList.remove('cannext'));
+  }
+  function markNeighbors(){
+    clearNext();
+    if(!selected) return;
+    const selB = grid[selected.r][selected.c];
+    if(!selB) return;
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(d=>{
+      const r = selected.r + d[0], c = selected.c + d[1];
+      if(r < 0 || c < 0 || r >= SIZE || c >= SIZE) return;
+      const nb = grid[r][c];
+      if(!nb) return;
+      const nbMixType = PRIMARIES.includes(nb.color) || nb.color === 'W';
+      const wPair = selB.color === 'W' && nb.color === 'W';
+      const works = nbMixType && !wPair && (MIX[selB.color + nb.color] || selB.color === 'W' || nb.color === 'W');
+      if(works) nb.el.classList.add('cannext');
+    });
+  }
   function deselect(){
+    clearNext();
     if(selected){
       const bl = grid[selected.r][selected.c];
       if(bl) bl.el.classList.remove('selected');
@@ -958,6 +1110,7 @@ Shell.register('pigment', (function(){
         $('pg-over-btn').onclick = ()=>{ level++; $('pg-over').classList.remove('show'); startLevel(); };
         $('pg-over').classList.add('show');
         buzz([60,50,60]);
+        Snd.win();
       }, 420);
       return true;
     }
@@ -976,6 +1129,7 @@ Shell.register('pigment', (function(){
           $('pg-over-btn').onclick = ()=>{ level=1; score=0; $('pg-over').classList.remove('show'); startLevel(); };
           $('pg-over').classList.add('show');
           Challenge.onGameOver('P', score, 'pg-chslot');
+          Snd.bad();
         }, 420);
         return true;
       }
@@ -984,33 +1138,38 @@ Shell.register('pigment', (function(){
     return false;
   }
 
+  function collect(blob){
+    need--;
+    const now = Date.now();
+    chain = (now - lastCollect < 4000) ? chain + 1 : 1;
+    lastCollect = now;
+    const gain = 100*level + (chain-1)*50*level;
+    score += gain;
+    const p = posOf(blob.r, blob.c), cs = cellSize();
+    splash(p.left+cs/2, p.top+cs/2, COLORS[blob.color].hex);
+    popup(p.left+cs/2, p.top+4, '+'+gain+(chain>1 ? ' ×'+chain : ''));
+    timeLeft = Math.min(timeMax, timeLeft + 6);
+    drawMoon();
+    if(chain % 3 === 0){
+      moves++;
+      popup(p.left+cs/2, p.top+30, '+1 MOVE ✦');
+      bump($('pg-moves'));
+    }
+    remove(blob); hud(); bump($('pg-score')); buzz(chain>1 ? [30,30,30] : 40);
+    Snd.pick(chain-1);
+    hint(need>0
+      ? (chain>1 ? 'CHAIN ×'+chain+'! Keep it rolling, <b>'+need+'</b> to go.' : 'Lovely! <b>'+need+'</b> more to go.')
+      : 'A perfect haunting.');
+  }
+
   function onTap(blob){
     if(busy || over) return;
     if(grid[blob.r][blob.c] !== blob) return;
 
     if(blob.color === target){
       deselect(); busy = true;
-      need--;
-      const now = Date.now();
-      chain = (now - lastCollect < 4000) ? chain + 1 : 1;
-      lastCollect = now;
-      const gain = 100*level + (chain-1)*50*level;
-      score += gain;
-      const p = posOf(blob.r, blob.c), cs = cellSize();
-      splash(p.left+cs/2, p.top+cs/2, COLORS[blob.color].hex);
-      popup(p.left+cs/2, p.top+4, '+'+gain+(chain>1 ? ' ×'+chain : ''));
-      timeLeft = Math.min(timeMax, timeLeft + 6);
-      drawMoon();
-      if(chain % 3 === 0){
-        moves++;
-        popup(p.left+cs/2, p.top+30, '+1 MOVE ✦');
-        bump($('pg-moves'));
-      }
-      remove(blob); hud(); bump($('pg-score')); buzz(chain>1 ? [30,30,30] : 40);
-      hint(need>0
-        ? (chain>1 ? 'CHAIN ×'+chain+'! Keep it rolling, <b>'+need+'</b> to go.' : 'Lovely! <b>'+need+'</b> more to go.')
-        : 'A perfect haunting.');
-      later(()=>{ gravity(); busy=false; hud(); checkEnd(); }, 300);
+      collect(blob);
+      later(()=>{ gravity(); busy=false; hud(); checkEnd(); }, 180);
       return;
     }
     if(!PRIMARIES.includes(blob.color) && blob.color !== 'W'){
@@ -1018,14 +1177,15 @@ Shell.register('pigment', (function(){
       deselect(); busy = true; moves--;
       remove(blob); hud();
       hint('Washed away the '+COLORS[blob.color].name.toLowerCase()+'. (−1 move)');
-      later(()=>{ gravity(); busy=false; hud(); checkEnd(); }, 300);
+      later(()=>{ gravity(); busy=false; hud(); checkEnd(); }, 180);
       return;
     }
     if(!selected){
       if(moves<=0){ shakeEl(blob.el); checkEnd(); return; }
       selected = {r:blob.r, c:blob.c};
       blob.el.classList.add('selected');
-      hint('Now tap a <b>neighbor</b> of a different color to mix.');
+      markNeighbors();
+      hint('Now tap one of the <b>glowing neighbors</b> to mix.');
       return;
     }
     const sel = grid[selected.r][selected.c];
@@ -1053,15 +1213,23 @@ Shell.register('pigment', (function(){
         blob.el.classList.remove('pop'); void blob.el.offsetWidth; blob.el.classList.add('pop');
         splash(p.left+cs/2, p.top+cs/2, COLORS[result].hex);
         hud();
-        hint(result===target
-          ? 'You brewed <b>'+COLORS[result].name+'</b>! Tap it to collect ✨'
-          : 'That made '+COLORS[result].name.toLowerCase()+'. Tap it to wash it away, or leave it.');
-        later(()=>{ gravity(); busy=false; hud(); checkEnd(); }, 260);
-      }, 200);
+        if(result === target){
+          // brewed the target: it collects itself in one satisfying beat
+          later(()=>{
+            collect(blob);
+            later(()=>{ gravity(); busy=false; hud(); checkEnd(); }, 180);
+          }, 160);
+        } else {
+          Snd.tap();
+          hint('That made '+COLORS[result].name.toLowerCase()+'. Tap it to wash it away, or leave it.');
+          later(()=>{ gravity(); busy=false; hud(); checkEnd(); }, 170);
+        }
+      }, 140);
     } else {
       deselect();
       selected = {r:blob.r, c:blob.c};
       blob.el.classList.add('selected');
+      markNeighbors();
     }
   }
 
@@ -1089,7 +1257,7 @@ Shell.register('pigment', (function(){
     hint('Level '+level+': brew <b>'+need+' '+COLORS[target].name+'</b>. Mix '
       +COLORS[COLORS[target].mix[0]].name.toLowerCase()+' + '
       +COLORS[COLORS[target].mix[1]].name.toLowerCase()
-      +'! Pale <b>wisps</b> mix with any paint.');
+      +'! White wisps mix with anything.');
   }
 
   function onResize(){
@@ -1158,6 +1326,7 @@ Shell.register('tw', (function(){
     const loser = 1-winner;
     const pts = doubleRound ? 2 : 1;
     scores[winner] += pts; drawPips(); buzz(doubleRound ? [60,50,60] : 60);
+    Snd.pick(doubleRound ? 6 : 4);
     if(cpu){ cpuSkill = Math.max(500, Math.min(2400, cpuSkill + (winner === 1 ? 140 : -110))); }
     sidesEl[winner].classList.add('winflash');
     sidesEl[loser].classList.add('loseflash');
@@ -1168,12 +1337,12 @@ Shell.register('tw', (function(){
       sidesEl[loser].classList.remove('loseflash');
       if(scores[winner] >= WIN) endGame(winner);
       else nextRound();
-    }, 1300);
+    }, 1050);
   }
 
   function gReflex(){
     $('tw-midtext').innerHTML = 'DON’T TAP EARLY';
-    fillBoth('<div class="orb">WAIT…</div><div class="submsg">Tap only when it catches fire</div>');
+    fillBoth('<div class="orb">WAIT…</div><div class="submsg">Tap only when it lights up. Too early loses!</div>');
     cpuInfo = {kind:'reflex', sel:'.orb'};
     let hot = false;
     for(let p=0;p<2;p++) bindTaps(p, '.orb', pp=>{
@@ -1248,7 +1417,7 @@ Shell.register('tw', (function(){
     fillBoth('<div class="mathq" style="color:'+ink[1]+'">'+word[0]+'</div>'+
       '<div class="submsg">Ignore the word. Tap the color it’s painted in!</div>'+
       '<div class="optrow">'+order.map(c=>'<div class="opt" data-v="'+c[0]+'">'+
-        '<span style="display:block;width:28px;height:28px;border-radius:50%;background:'+c[1]+'"></span></div>').join('')+'</div>');
+        '<span style="display:block;width:42px;height:42px;border-radius:50%;background:'+c[1]+'"></span></div>').join('')+'</div>');
     cpuInfo = {kind:'pick', sel:'.opt[data-v="'+ink[0]+'"]'};
     for(let p=0;p<2;p++) bindTaps(p, '.opt', (pp,el)=>{
       if(locked) return;
@@ -1261,7 +1430,7 @@ Shell.register('tw', (function(){
     const em = ['⭐','🦋','🕯️','🍄','✨'][Math.floor(Math.random()*5)];
     const n = 5 + Math.floor(Math.random()*5);
     const nums = shuffle([n, n-1, n+1, n+2]);
-    fillBoth('<div style="font-size:26px;line-height:1.35;max-width:230px;letter-spacing:2px;">'+em.repeat(n)+'</div>'+
+    fillBoth('<div style="font-size:36px;line-height:1.35;max-width:300px;letter-spacing:2px;">'+em.repeat(n)+'</div>'+
       '<div class="submsg">Count fast. First correct tap wins!</div>'+
       '<div class="optrow">'+nums.map(v=>'<div class="opt big" data-v="'+v+'">'+v+'</div>').join('')+'</div>');
     cpuInfo = {kind:'pick', sel:'.opt[data-v="'+n+'"]', slow:1.5};
@@ -1392,6 +1561,7 @@ Shell.register('tw', (function(){
     wt.style.background = winner===1 ? PCOL[1] : 'rgba(255,255,255,.1)';
     $('tw-over').classList.add('show');
     buzz([80,60,80]);
+    Snd.win();
   }
 
   function reset(){
@@ -1427,9 +1597,11 @@ Shell.register('tw', (function(){
       };
       fillBoth('');
       $('tw-mode').classList.add('show');
+      this._demoStop = HowTo.attach('tw-demo', 'duel');
     },
     unmount(){
       active = false; clearTimers();
+      if(this._demoStop){ this._demoStop(); this._demoStop = null; }
       fillBoth('');
       $('tw-over').classList.remove('show');
       $('tw-mode').classList.remove('show');
@@ -1443,7 +1615,7 @@ Shell.register('tw', (function(){
 ================================================================ */
 Shell.register('stack', (function(){
   const $ = id => document.getElementById(id);
-  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash, puffs, zoneIdx, bestH, crossedBest, lastLand, salvage;
+  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash, puffs, zoneIdx, bestH, crossedBest, lastLand, salvage, slowT;
   const SAVE_COST = 40, SALVAGE_CAP = 60;
 
   const ZONES = [
@@ -1477,7 +1649,7 @@ Shell.register('stack', (function(){
   function reset(){
     blocks = [{x: W()/2 - 70, w: 140}];
     score = 0; over = false; speed = 3.0; dir = 1; streak = 0;
-    debris = []; flash = 0; puffs = []; zoneIdx = 0; crossedBest = false; lastLand = null; salvage = 0;
+    debris = []; flash = 0; puffs = []; zoneIdx = 0; crossedBest = false; lastLand = null; salvage = 0; slowT = 0;
     $('st-score').textContent = '0';
     $('st-over').classList.remove('show');
     spawn();
@@ -1506,11 +1678,13 @@ Shell.register('stack', (function(){
         flash = 1;
         toast('THE GHOST CAUGHT IT!');
         buzz([50,40,60]);
+        Snd.swell();
         spawn();
         return;
       }
       over = true;
       moving = null;
+      Snd.bad();
       setTimeout(finish, 650);
       return;
     }
@@ -1518,6 +1692,7 @@ Shell.register('stack', (function(){
     if(perfect){
       streak++;
       flash = 1;
+      slowT = 55; // a breath of slow motion so perfects can chain
       let w2 = prev.w, x2 = prev.x, grow = 0;
       if(prev.w < 140){
         if(salvage > 0){
@@ -1534,6 +1709,7 @@ Shell.register('stack', (function(){
       blocks.push({x: x2, w: w2});
       toast(grow > 0 ? 'PERFECT! RECLAIMED +'+grow : (streak >= 2 ? 'PERFECT x'+streak+'!' : 'PERFECT!'));
       buzz(streak >= 2 ? [30,40,30] : 30);
+      Snd.perfect(streak);
     } else {
       streak = 0;
       blocks.push({x: left, w: overlap});
@@ -1541,6 +1717,7 @@ Shell.register('stack', (function(){
       const ci = blocks.length - 1;
       if(moving.x < left) debris.push({x:moving.x, w:left-moving.x, y:rowY, vy:0, rot:0, vr:-0.08, ci});
       if(moving.x + moving.w > right) debris.push({x:right, w:(moving.x+moving.w)-right, y:rowY, vy:0, rot:0, vr:0.08, ci});
+      Snd.drop();
     }
     lastLand = {i: blocks.length-1, t: performance.now()};
     const landed = blocks[blocks.length-1];
@@ -1557,12 +1734,12 @@ Shell.register('stack', (function(){
     let announced = false;
     if(!crossedBest && bestH > 0 && score > bestH){
       crossedBest = true; announced = true;
-      toast('PAST YOUR BEST!'); flash = 1; buzz([40,60,40]);
+      toast('PAST YOUR BEST!'); flash = 1; buzz([40,60,40]); Snd.win();
     }
     const z = Math.min(ZONES.length-1, Math.floor(score/12));
     if(z !== zoneIdx){
       zoneIdx = z;
-      if(!announced && ZONES[z].name){ toast(ZONES[z].name); flash = Math.max(flash, .7); buzz([30,40,30]); }
+      if(!announced && ZONES[z].name){ toast(ZONES[z].name); flash = Math.max(flash, .7); buzz([30,40,30]); Snd.swell(); }
     }
     Challenge.onScore('S', score);
     speed = Math.min(7.5, 3.0 + score*0.16);
@@ -1693,7 +1870,9 @@ Shell.register('stack', (function(){
 
     // moving block
     if(!over && moving){
-      moving.x += dir*speed;
+      const sp = slowT > 0 ? speed*0.5 : speed;
+      if(slowT > 0) slowT--;
+      moving.x += dir*sp;
       if(moving.x < -10){ moving.x = -10; dir = 1; }
       if(moving.x + moving.w > w+10){ moving.x = w+10-moving.w; dir = -1; }
       const i = blocks.length;
@@ -1790,7 +1969,7 @@ Shell.register('stack', (function(){
 Shell.register('snake', (function(){
   const $ = id => document.getElementById(id);
   const N = 17;
-  let cv, ctx, dpr, cell, tick, curMs, snake, dirQ, dir, foods, score, over, running, touchStart, sparks, combo, lastEatTick, tickN, ghostTicks, hollow, hollowStep, deathBy;
+  let cv, ctx, dpr, cell, tick, curMs, snake, dirQ, dir, foods, score, over, running, touchStart, sparks, combo, lastEatTick, tickN, ghostTicks, hollow, hollowStep, deathBy, bestN, crossedBN;
 
   function sizeCanvas(){
     dpr = window.devicePixelRatio || 1;
@@ -1834,11 +2013,11 @@ Shell.register('snake', (function(){
     dir = {x:1,y:0}; dirQ = [];
     score = 0; over = false; sparks = [];
     combo = 0; lastEatTick = -999; tickN = 0; ghostTicks = 0;
-    foods = []; hollow = null; hollowStep = 0; deathBy = null;
+    foods = []; hollow = null; hollowStep = 0; deathBy = null; crossedBN = false;
     $('sn-score').textContent = '0';
     $('sn-over').classList.remove('show');
     placeFood(); placeFood();
-    schedule(115);
+    schedule(190);
   }
   function schedule(ms){
     curMs = ms;
@@ -1858,9 +2037,9 @@ Shell.register('snake', (function(){
       const nd = dirQ.shift();
       if(!(nd.x === -dir.x && nd.y === -dir.y)) dir = nd;
     }
-    const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+    const head = {x: (snake[0].x + dir.x + N) % N, y: (snake[0].y + dir.y + N) % N};
     const hitSelf = ghostTicks <= 0 && snake.some(s=>s.x===head.x && s.y===head.y);
-    if(head.x<0 || head.y<0 || head.x>=N || head.y>=N || hitSelf){
+    if(hitSelf){
       over = true;
       finish();
       return;
@@ -1878,11 +2057,17 @@ Shell.register('snake', (function(){
       bump($('sn-score'));
       Challenge.onScore('N', score);
       buzz(f.special ? [25,30,25] : 25);
-      if(f.special) ghostTicks = 34;
+      Snd.pick(combo-1);
+      if(f.special){ ghostTicks = 34; Snd.swell(); }
+      if(!crossedBN && bestN > 0 && score > bestN){
+        crossedBN = true;
+        sparks.push({x:head.x*cell+cell/2, y:head.y*cell+cell/2-30, vx:0, vy:-1.6, life:12, text:'PAST YOUR BEST!', color:'#e8a05a'});
+        Snd.win(); buzz([40,60,40]);
+      }
       burst(head.x, head.y, f.special, gain, combo);
       foods.splice(fi, 1);
       placeFood();
-      schedule(Math.max(65, 115 - (snake.length-3)*3));
+      schedule(Math.max(75, 190 - (snake.length-3)*6));
     } else {
       snake.pop();
     }
@@ -1895,14 +2080,14 @@ Shell.register('snake', (function(){
       }
     }
     // The Hollow wakes once you've fed, and it hunts
-    if(!hollow && score >= 3){
+    if(!hollow && score >= 8){
       hollow = farCorner();
       burst(hollow.x, hollow.y, false);
       sparks.push({x:hollow.x*cell+cell/2, y:hollow.y*cell+cell/2-8, vx:0, vy:-2, life:10, text:'THE HOLLOW', color:'#8b79d9'});
       buzz([15,30,15]);
     } else if(hollow){
       hollowStep++;
-      if(hollowStep % (snake.length >= 15 ? 2 : 3) === 0){
+      if(hollowStep % (snake.length >= 22 ? 2 : 3) === 0){
         const dx = snake[0].x - hollow.x, dy = snake[0].y - hollow.y;
         if(Math.abs(dx) >= Math.abs(dy) && dx !== 0) hollow.x += Math.sign(dx);
         else if(dy !== 0) hollow.y += Math.sign(dy);
@@ -1916,6 +2101,7 @@ Shell.register('snake', (function(){
           sparks.push({x:hollow.x*cell+cell/2, y:hollow.y*cell+cell/2, vx:0, vy:-2.4, life:10, text:'BANISHED +5', color:'#8b79d9'});
           hollow = farCorner();
           buzz([30,40,30]);
+          Snd.win();
         } else {
           deathBy = 'hollow';
           over = true;
@@ -1931,7 +2117,9 @@ Shell.register('snake', (function(){
     clearInterval(tick);
     cv.classList.add('shake-hard');
     setTimeout(()=>cv.classList.remove('shake-hard'), 400);
+    Snd.bad();
     const isBest = await Shell.reportBest('snake', score);
+    if(score > bestN) bestN = score;
     $('sn-over-title').textContent = deathBy === 'hollow'
       ? 'THE HOLLOW TOOK YOU'
       : (score >= 15 ? 'LEGEND OF THE SWAMP' : 'THE SWAMP GOT YOU');
@@ -2073,10 +2261,13 @@ Shell.register('snake', (function(){
     mount(){
       cv = $('sn-canvas'); ctx = cv.getContext('2d');
       running = true;
+      bestN = 0;
+      Shell.store.get('best-snake').then(v=>{ bestN = v || 0; });
       sizeCanvas();
       HowTo.show('snake', ()=>{ reset(); draw(); });
-      cv.addEventListener('touchstart', onTouchStart, {passive:true});
-      cv.addEventListener('touchend', onTouchEnd, {passive:true});
+      const scr = document.getElementById('scr-snake');
+      scr.addEventListener('touchstart', onTouchStart, {passive:true});
+      scr.addEventListener('touchend', onTouchEnd, {passive:true});
       window.addEventListener('keydown', onKey);
       window.addEventListener('resize', onResize);
       document.addEventListener('visibilitychange', onVis);
@@ -2086,8 +2277,9 @@ Shell.register('snake', (function(){
     unmount(){
       running = false;
       clearInterval(tick);
-      cv.removeEventListener('touchstart', onTouchStart);
-      cv.removeEventListener('touchend', onTouchEnd);
+      const scr = document.getElementById('scr-snake');
+      scr.removeEventListener('touchstart', onTouchStart);
+      scr.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVis);
@@ -2104,8 +2296,8 @@ Shell.register('snake', (function(){
 ================================================================ */
 Shell.register('flight', (function(){
   const $ = id => document.getElementById(id);
-  const GRAV = 0.42, FLAP = -7.4, PW = 56, R = 13;
-  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT;
+  const GRAV = 0.24, FLAP = -5.6, PW = 48, R = 13;
+  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy;
 
   function sizeCanvas(){
     const body = cv.parentElement;
@@ -2121,7 +2313,7 @@ Shell.register('flight', (function(){
   function wx(){ return Math.min(120, W()*0.28); }
 
   function reset(){
-    over = false; started = false; score = 0; shakeT = 0; ghostT = 0;
+    over = false; started = false; score = 0; shakeT = 0; ghostT = 0; spawned = 0; crossedBF = false; mercy = true;
     wy = H()*0.45; vy = 0;
     pillars = []; trail = []; fx = [];
     $('fl-score').textContent = '0';
@@ -2132,13 +2324,15 @@ Shell.register('flight', (function(){
     started = true;
     vy = FLAP;
     buzz(12);
+    Snd.tap();
   }
   function spawnPillar(){
     const h = H();
-    const gapH = Math.max(118, 172 - score*1.8);
+    spawned++;
+    const gapH = Math.max(165, 215 - score*0.7) + (spawned <= 8 ? 30 : 0);
     const gapY = 60 + Math.random()*(h - 42 - 120 - gapH);
     const p = {x: W()+20, gapY, gapH, passed:false};
-    if(Math.random() < 0.3) p.fly = {y: gapY + gapH/2, got:false, spirit: score >= 5 && Math.random() < 0.35};
+    if(Math.random() < 0.55) p.fly = {y: gapY + gapH/2, got:false, spirit: score >= 5 && Math.random() < 0.3};
     pillars.push(p);
   }
   function addText(x, y, text){ fx.push({x, y, vx:0, vy:-1.6, life:22, text}); }
@@ -2147,11 +2341,27 @@ Shell.register('flight', (function(){
     $('fl-score').textContent = score;
     bump($('fl-score'));
     Challenge.onScore('F', score);
+    if(!crossedBF && bestF > 0 && score > bestF){
+      crossedBF = true;
+      addText(wx(), wy - 46, 'PAST YOUR BEST!');
+      Snd.win(); buzz([40,60,40]);
+    }
   }
   function die(){
+    if(mercy){
+      mercy = false;
+      ghostT = 130;
+      vy = -4;
+      if(wy > H() - 70) wy = H() - 80;
+      addText(wx(), Math.max(30, wy - 34), 'FORGIVEN · ONE MORE');
+      Snd.swell();
+      buzz([30,40,30]);
+      return;
+    }
     over = true;
     shakeT = 9;
     buzz([70,60,70]);
+    Snd.bad();
     for(let i=0;i<14;i++){
       const a = Math.random()*Math.PI*2, sp = 1+Math.random()*3;
       fx.push({x:wx(), y:wy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:22});
@@ -2161,6 +2371,7 @@ Shell.register('flight', (function(){
   async function finish(){
     if(!running) return;
     const isBest = await Shell.reportBest('flight', score);
+    if(score > bestF) bestF = score;
     $('fl-over-msg').innerHTML = 'You scored <b>'+score+'</b> drifting the brambles.';
     $('fl-newbest').style.display = isBest ? 'block' : 'none';
     $('fl-over').classList.add('show');
@@ -2184,28 +2395,29 @@ Shell.register('flight', (function(){
     // physics
     if(started && !over){
       if(ghostT > 0) ghostT--;
-      vy = Math.min(9, vy + GRAV);
+      vy = Math.min(6, vy + GRAV);
       wy += vy;
-      if(!pillars.length || pillars[pillars.length-1].x < w - 235) spawnPillar();
-      const spd = 2.6 + Math.min(1.4, score*0.03);
+      if(!pillars.length || pillars[pillars.length-1].x < w - 285) spawnPillar();
+      const spd = 2.05 + Math.min(0.8, score*0.01);
       for(const p of pillars) p.x -= spd;
       pillars = pillars.filter(p=>p.x > -PW-30);
       for(const p of pillars){
         if(!p.passed && p.x + PW < x - R){
           p.passed = true;
           const c = p.gapY + p.gapH/2;
-          if(Math.abs(wy - c) < p.gapH*0.15){ scoreUp(2); addText(x, wy-16, 'CLEAN +2'); buzz(20); }
-          else { scoreUp(1); buzz(12); }
+          if(Math.abs(wy - c) < p.gapH*0.15){ scoreUp(3); addText(x, wy-16, 'CLEAN +3'); buzz(20); Snd.pick(3); }
+          else { scoreUp(1); buzz(12); Snd.pick(0); }
         }
-        if(p.fly && !p.fly.got && Math.abs(p.x + PW/2 - x) < R+10 && Math.abs(p.fly.y - wy) < R+10){
+        if(p.fly && !p.fly.got && Math.abs(p.x + PW/2 - x) < R+11 && Math.abs(p.fly.y - wy) < R+11){
           p.fly.got = true;
-          scoreUp(3);
-          if(p.fly.spirit){ ghostT = 190; addText(x, wy-30, 'GHOST MODE'); }
-          addText(x, wy-16, '+3');
+          scoreUp(5);
+          if(p.fly.spirit){ ghostT = 190; addText(x, wy-30, 'GHOST MODE'); Snd.swell(); }
+          else Snd.pick(5);
+          addText(x, wy-16, '+5');
           buzz(25);
         }
-        if(ghostT <= 0 && p.x < x + R - 2 && p.x + PW > x - R + 2 &&
-           (wy - R + 3 < p.gapY || wy + R - 3 > p.gapY + p.gapH)){ die(); break; }
+        if(ghostT <= 0 && p.x < x + R - 4 && p.x + PW > x - R + 4 &&
+           (wy - R + 5 < p.gapY || wy + R - 5 > p.gapY + p.gapH)){ die(); break; }
       }
       if(!over && wy + R > h - 42) die();
       if(wy < R){ wy = R; vy = Math.max(0, vy); }
@@ -2300,6 +2512,8 @@ Shell.register('flight', (function(){
     mount(){
       cv = $('fl-canvas'); ctx = cv.getContext('2d');
       running = true;
+      bestF = 0;
+      Shell.store.get('best-flight').then(v=>{ bestF = v || 0; });
       sizeCanvas();
       reset();
       cv.addEventListener('pointerdown', onTap);
@@ -2328,7 +2542,7 @@ Shell.register('flight', (function(){
 ================================================================ */
 Shell.register('rush', (function(){
   const $ = id => document.getElementById(id);
-  let field, timers, running, over, score, lives, streak, spawnGap, sinceSwarm;
+  let field, timers, running, over, score, lives, streak, spawnGap, sinceSwarm, catches, bestR, crossedBR;
 
   function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
   function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
@@ -2359,6 +2573,7 @@ Shell.register('rush', (function(){
     popupAt(x, y, note, 'var(--coral)');
     field.classList.remove('hurt'); void field.offsetWidth; field.classList.add('hurt');
     buzz([50,40,50]);
+    Snd.bad();
     if(lives <= 0){ end(); }
   }
   async function end(){
@@ -2366,11 +2581,13 @@ Shell.register('rush', (function(){
     clearTimers();
     field.querySelectorAll('.fly').forEach(f=>f.remove());
     const isBest = await Shell.reportBest('rush', score);
+    if(score > bestR) bestR = score;
     $('ru-over-msg').innerHTML = 'You caught <b>'+score+'</b> '+(score===1?'firefly':'fireflies')+'.';
     $('ru-newbest').style.display = isBest ? 'block' : 'none';
     $('ru-over').classList.add('show');
     Challenge.onGameOver('R', score, 'ru-chslot');
     buzz([70,60,70]);
+    Snd.bad();
   }
 
   function spawnOne(forceKind, noHurt){
@@ -2398,11 +2615,25 @@ Shell.register('rush', (function(){
       const gain = kind === 'spirit' ? 3 : 1;
       score += gain;
       streak++;
+      catches++;
+      if(catches % 20 === 0 && lives < 3){
+        lives++;
+        drawLives();
+        popupAt(px, py-52, '✦ LIFE RESTORED');
+        buzz([25,30,25]);
+        Snd.win();
+      }
       $('ru-score').textContent = score;
       bump($('ru-score'));
       Challenge.onScore('R', score);
       popupAt(px, py-8, '+'+gain, kind === 'spirit' ? 'var(--cyan)' : null);
       buzz(kind === 'spirit' ? [20,25,20] : 15);
+      Snd.pick(Math.min(8, streak-1));
+      if(!crossedBR && bestR > 0 && score > bestR){
+        crossedBR = true;
+        popupAt(px, py-70, 'PAST YOUR BEST!');
+        Snd.win(); buzz([40,60,40]);
+      }
       if(streak > 0 && streak % 10 === 0){
         score += 5;
         $('ru-score').textContent = score;
@@ -2430,6 +2661,7 @@ Shell.register('rush', (function(){
     field.appendChild(el);
     later(()=>el.remove(), 850);
     buzz([20,30,20,30,20]);
+    Snd.win();
     for(let i=0;i<7;i++) later(()=>spawnOne('amber', true), i*70);
   }
 
@@ -2443,13 +2675,15 @@ Shell.register('rush', (function(){
   }
 
   function reset(){
-    over = false; score = 0; lives = 3; streak = 0; spawnGap = 900; sinceSwarm = 0;
+    over = false; score = 0; lives = 3; streak = 0; spawnGap = 900; sinceSwarm = 0; catches = 0; crossedBR = false;
     clearTimers();
     field.querySelectorAll('.fly,.popup').forEach(f=>f.remove());
     $('ru-score').textContent = '0';
     $('ru-over').classList.remove('show');
     drawLives();
-    later(spawnLoop, 500);
+    // a welcoming opening burst so the dark is never empty
+    for(let i=0;i<3;i++) later(()=>spawnOne('amber', true), 350 + i*180);
+    later(spawnLoop, 900);
   }
 
   return {
@@ -2457,6 +2691,8 @@ Shell.register('rush', (function(){
       field = $('ru-field');
       timers = [];
       running = true;
+      bestR = 0;
+      Shell.store.get('best-rush').then(v=>{ bestR = v || 0; });
       $('ru-retry').onclick = ()=>reset();
       Challenge.enterGame('R', 'ru-chban');
       HowTo.show('rush', reset);
@@ -2472,6 +2708,300 @@ Shell.register('rush', (function(){
 })());
 </script>
 
+<script>
+/* ================================================================
+   GAME 8: SHADE SHOOTER (ghostly Galaga)
+================================================================ */
+Shell.register('shade', (function(){
+  const $ = id => document.getElementById(id);
+  let cv, ctx, dpr, raf, running, over, score, lives, wave, px, targetX, shots, foes, pows, fxs, frames, spreadT, fireCd, formY, invulnT, bestS, crossedBS;
+
+  function sizeCanvas(){
+    const body = cv.parentElement;
+    dpr = window.devicePixelRatio || 1;
+    const w = Math.min(body.clientWidth, 460);
+    const h = body.clientHeight - 8;
+    cv.width = w*dpr; cv.height = h*dpr;
+    cv.style.width = w+'px'; cv.style.height = h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function W(){ return cv.width/dpr; }
+  function H(){ return cv.height/dpr; }
+
+  function addFx(x, y, text, color){ fxs.push({x, y, vx:0, vy:-1.4, life:26, text, color}); }
+  function burst(x, y, color){
+    for(let i=0;i<9;i++){
+      const a = Math.random()*Math.PI*2, sp = 1 + Math.random()*2.6;
+      fxs.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:16, color});
+    }
+  }
+
+  function nextWave(){
+    wave++;
+    foes = [];
+    const cols = 6, rows = Math.min(4, 1 + Math.ceil(wave/2));
+    const sp = Math.min(58, (W()-50)/(cols-1));
+    const ox = (W() - sp*(cols-1))/2;
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      foes.push({slotX: ox + c*sp, slotY: 46 + r*46, x:0, y:-40, dive:0, t:0});
+    }
+    formY = -rows*46 - 20;
+    if(wave > 1){ addFx(W()/2, H()*0.35, 'WAVE '+wave, '#e8a05a'); Snd.swell(); buzz([25,30,25]); }
+  }
+
+  function reset(){
+    over = false; score = 0; lives = 3; wave = 0; crossedBS = false;
+    shots = []; pows = []; fxs = []; frames = 0; spreadT = 0; fireCd = 20; invulnT = 0;
+    px = W()/2; targetX = px;
+    $('sh-score').textContent = '0';
+    $('sh-over').classList.remove('show');
+    nextWave();
+  }
+
+  function popFoe(f){
+    const gain = f.dive ? 3 : 1;
+    score += gain;
+    $('sh-score').textContent = score;
+    bump($('sh-score'));
+    Challenge.onScore('H', score);
+    burst(f.x, f.y, '#8b79d9');
+    addFx(f.x, f.y-8, '+'+gain, '#e8a05a');
+    Snd.pick(f.dive ? 4 : 1);
+    buzz(12);
+    if(!crossedBS && bestS > 0 && score > bestS){
+      crossedBS = true;
+      addFx(W()/2, H()*0.4, 'PAST YOUR BEST!', '#e8a05a');
+      Snd.win(); buzz([40,60,40]);
+    }
+    if(Math.random() < 0.09) pows.push({x:f.x, y:f.y, vy:1.7});
+  }
+
+  function hitPlayer(){
+    if(invulnT > 0) return;
+    lives--;
+    invulnT = 100;
+    burst(px, H()-64, '#f2e7cf');
+    cv.classList.add('shake-hard');
+    setTimeout(()=>cv.classList.remove('shake-hard'), 400);
+    buzz([60,50,60]);
+    Snd.bad();
+    if(lives <= 0){
+      over = true;
+      setTimeout(finish, 700);
+    }
+  }
+
+  async function finish(){
+    if(!running) return;
+    const isBest = await Shell.reportBest('shade', score);
+    if(score > bestS) bestS = score;
+    $('sh-over-msg').innerHTML = 'You banished <b>'+score+'</b> shades and reached wave <b>'+wave+'</b>.';
+    $('sh-newbest').style.display = isBest ? 'block' : 'none';
+    $('sh-over').classList.add('show');
+    Challenge.onGameOver('H', score, 'sh-chslot');
+  }
+
+  function draw(){
+    if(!running) return;
+    const w = W(), h = H(), py = h - 64;
+    ctx.clearRect(0,0,w,h);
+    frames++;
+
+    // moon
+    ctx.globalAlpha = .4; ctx.fillStyle = '#f2e7cf';
+    ctx.shadowColor = 'rgba(242,231,207,.7)'; ctx.shadowBlur = 18;
+    ctx.beginPath(); ctx.arc(w-52, 60, 20, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+
+    if(!over){
+      // movement + firing
+      px += (targetX - px) * 0.3;
+      px = Math.max(18, Math.min(w-18, px));
+      if(--fireCd <= 0){
+        shots.push({x:px, y:py-16, vx:0});
+        if(spreadT > 0){ shots.push({x:px-6, y:py-12, vx:-1.8}); shots.push({x:px+6, y:py-12, vx:1.8}); }
+        fireCd = 17;
+      }
+      if(spreadT > 0) spreadT--;
+      if(invulnT > 0) invulnT--;
+
+      // formation drifts down and sways
+      formY += 0.06 + wave*0.012;
+      const sway = Math.sin(frames*0.018)*22;
+
+      // divers peel off
+      if(frames % Math.max(60, 150 - wave*12) === 0){
+        const idle = foes.filter(f=>!f.dive);
+        if(idle.length){
+          const f = idle[Math.floor(Math.random()*idle.length)];
+          f.dive = 1; f.t = 0;
+          f.sx = f.slotX + sway; f.sy = f.slotY + formY; f.tx = px;
+        }
+      }
+      for(const f of foes){
+        if(f.dive){
+          f.t += 0.011 + wave*0.0012;
+          f.x = f.sx + (f.tx - f.sx)*f.t + Math.sin(f.t*9)*26;
+          f.y = f.sy + (h + 40 - f.sy)*f.t*f.t;
+          if(f.y > h + 30){ f.dive = 0; }
+        } else {
+          f.x = f.slotX + sway;
+          f.y = f.slotY + formY;
+        }
+      }
+
+      // shots fly, shades pop
+      for(const s of shots){ s.y -= 7.5; s.x += s.vx; }
+      shots = shots.filter(s=>s.y > -20);
+      for(const s of shots){
+        for(const f of foes){
+          if(!f.dead && Math.abs(s.x-f.x) < 15 && Math.abs(s.y-f.y) < 15){
+            s.dead = 1; f.dead = 1; popFoe(f); break;
+          }
+        }
+      }
+      shots = shots.filter(s=>!s.dead);
+      foes = foes.filter(f=>!f.dead);
+
+      // powerups fall
+      for(const p of pows){
+        p.y += p.vy;
+        if(Math.abs(p.x-px) < 22 && Math.abs(p.y-py) < 24){
+          p.dead = 1; spreadT = 480;
+          addFx(px, py-30, 'SPREAD SHOT', '#26e0ff');
+          Snd.swell(); buzz([25,30,25]);
+        }
+      }
+      pows = pows.filter(p=>!p.dead && p.y < h+20);
+
+      // shades reach you
+      for(const f of foes){
+        if(Math.abs(f.x-px) < 19 && Math.abs(f.y-py) < 21){ hitPlayer(); if(f.dive){ f.dive = 0; } burst(f.x, f.y, '#8b79d9'); f.dead = 1; break; }
+        if(!f.dive && f.y > h - 110){ hitPlayer(); formY -= 150; break; }
+      }
+      foes = foes.filter(f=>!f.dead);
+      if(!foes.length && !over) nextWave();
+    }
+
+    // shots
+    ctx.fillStyle = '#f2e7cf';
+    ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = 8;
+    for(const s of shots) ctx.fillRect(s.x-1.5, s.y-7, 3, 10);
+    ctx.shadowBlur = 0;
+
+    // shades
+    for(const f of foes){
+      if(f.y < -30) continue;
+      ctx.fillStyle = '#141026';
+      ctx.shadowColor = '#8b79d9'; ctx.shadowBlur = f.dive ? 18 : 10;
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.dive ? 14 : 12, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = f.dive ? '#ff7a2e' : '#8b79d9';
+      ctx.beginPath();
+      ctx.arc(f.x-4.5, f.y-1.5, 2.1, 0, Math.PI*2);
+      ctx.arc(f.x+4.5, f.y-1.5, 2.1, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // powerups
+    for(const p of pows){
+      ctx.fillStyle = '#f2e7cf';
+      ctx.shadowColor = '#26e0ff'; ctx.shadowBlur = 14;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // the lantern
+    if(!over){
+      const py2 = H() - 64;
+      ctx.globalAlpha = invulnT > 0 && (frames % 8 < 4) ? 0.35 : 1;
+      ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = 18;
+      ctx.fillStyle = '#e8a05a';
+      ctx.beginPath();
+      ctx.moveTo(px, py2-16); ctx.lineTo(px+12, py2+8); ctx.lineTo(px-12, py2+8);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff3d6';
+      ctx.beginPath(); ctx.arc(px, py2-2, 4.5, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+
+    // hud on canvas
+    ctx.font = '700 13px "Space Mono", monospace';
+    ctx.fillStyle = 'rgba(232,160,90,.9)';
+    ctx.textAlign = 'left';
+    ctx.fillText('✦'.repeat(Math.max(0,lives)), 10, 22);
+    ctx.fillStyle = 'rgba(242,231,207,.55)';
+    ctx.textAlign = 'right';
+    ctx.fillText('WAVE '+wave, w-10, 22);
+    ctx.textAlign = 'left';
+    if(spreadT > 0){
+      ctx.fillStyle = 'rgba(38,224,255,.7)';
+      ctx.fillText('SPREAD '+Math.ceil(spreadT/60), 10, 40);
+    }
+
+    // floating text + sparks
+    for(const s of fxs){
+      s.x += s.vx; s.y += s.vy; s.life--;
+      ctx.globalAlpha = Math.max(0, s.life/22);
+      ctx.fillStyle = s.color || '#f2e7cf';
+      if(s.text){
+        ctx.font = '700 14px "Space Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.text, s.x, s.y);
+        ctx.textAlign = 'left';
+      } else ctx.fillRect(s.x-1.5, s.y-1.5, 3, 3);
+    }
+    ctx.globalAlpha = 1;
+    fxs = fxs.filter(s=>s.life>0);
+
+    raf = requestAnimationFrame(draw);
+  }
+
+  function pointTo(e){
+    const rect = cv.getBoundingClientRect();
+    const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    targetX = cx;
+  }
+  function onKey(e){
+    if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); targetX = Math.max(18, targetX - 34); }
+    if(e.key === 'ArrowRight'){ e.preventDefault(); targetX = Math.min(W()-18, targetX + 34); }
+  }
+  function onResize(){ if(running) sizeCanvas(); }
+
+  return {
+    mount(){
+      cv = $('sh-canvas'); ctx = cv.getContext('2d');
+      running = true;
+      bestS = 0;
+      Shell.store.get('best-shade').then(v=>{ bestS = v || 0; });
+      sizeCanvas();
+      over = true; foes = []; shots = []; pows = []; fxs = []; lives = 3; wave = 0; spreadT = 0; invulnT = 0; frames = 0; px = W()/2; targetX = px;
+      cv.addEventListener('pointerdown', pointTo);
+      cv.addEventListener('pointermove', pointTo);
+      cv.addEventListener('touchmove', pointTo, {passive:true});
+      window.addEventListener('keydown', onKey);
+      window.addEventListener('resize', onResize);
+      $('sh-retry').onclick = ()=>reset();
+      Challenge.enterGame('H', 'sh-chban');
+      raf = requestAnimationFrame(draw);
+      HowTo.show('shade', reset);
+    },
+    unmount(){
+      running = false;
+      cancelAnimationFrame(raf);
+      cv.removeEventListener('pointerdown', pointTo);
+      cv.removeEventListener('pointermove', pointTo);
+      cv.removeEventListener('touchmove', pointTo);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', onResize);
+      Challenge.leaveGame();
+      $('sh-over').classList.remove('show');
+    }
+  };
+})());
+</script>
 <script>
 /* ================================================================
    GAME 7: GHOST GAMBIT (card duel + arcade-wide collection)
@@ -2500,16 +3030,19 @@ const Gambit = (function(){
     f2:{id:'f2', name:'Night Glider',       cost:4, pow:6, ab:null,     suit:'F'},
     r1:{id:'r1', name:'Lantern Keeper',     cost:3, pow:3, ab:'lantern', l:2, suit:'R'},
     r2:{id:'r2', name:'Firefly Queen',      cost:4, pow:4, ab:'swarm',  suit:'R'},
+    h1:{id:'h1', name:'The Lamplighter',    cost:2, pow:2, ab:'lantern', l:1, suit:'H'},
+    h2:{id:'h2', name:'Shade Eater',        cost:4, pow:5, ab:'dread',  suit:'H'},
     d1:{id:'d1', name:'The Ghost',          cost:5, pow:7, ab:'loner',  suit:'D'}
   };
   const STARTERS = ['s1','s2','s3','s4','s5','s6','s7','s8'];
-  const TH = {P:500, S:10, N:10, F:6, R:15};
+  const TH = {P:500, S:10, N:10, F:6, R:15, H:15};
   const HINTS = {
     P:'Score 500+ in Phantom Paint to lure it out.',
     S:'Stack 10+ in Ghost Stack to lure it out.',
     N:'Score 10+ in Specter Snake to lure it out.',
     F:'Score 6+ in Wisp Flight to lure it out.',
     R:'Catch 15+ in Firefly Rush to lure it out.',
+    H:'Score 15+ in Shade Shooter to lure it out.',
     D:'Beat the Ghost in Spirit Duel to win his card.'
   };
   function abText(c){
@@ -2555,6 +3088,7 @@ const Gambit = (function(){
       slot.prepend(d);
     }
     buzz([40,30,70]);
+    Snd.win();
   }
   async function duelWin(beatCpu){
     if(!beatCpu) return;
@@ -2604,17 +3138,28 @@ Shell.register('gambit', (function(){
       const lane = $('gb-lane'+li);
       const t = laneTotals(li);
       lane.querySelector('.gb-zone.opp').innerHTML = board[li][1].map(id=>miniHTML(id,true)).join('');
-      lane.querySelector('.gb-zone.mine').innerHTML = board[li][0].map(id=>miniHTML(id,false)).join('');
-      lane.querySelector('.gb-totals').innerHTML =
-        (t[1] > t[0] ? t[1] : '<b>'+t[1]+'</b>') + ' · ' + (t[0] > t[1] ? '<b>'+t[0]+'</b>' : t[0]);
+      lane.querySelector('.gb-zone.mine').innerHTML =
+        board[li][0].map(id=>miniHTML(id,false)).join('') ||
+        (sel && !(cpu && turnSide === 1) ? '<div class="gb-empty">PLACE HERE</div>' : '');
+      const them = lane.querySelector('.tot.them'), you = lane.querySelector('.tot.you');
+      them.textContent = t[1];
+      you.textContent = t[0];
+      them.classList.toggle('lead', t[1] > t[0]);
+      you.classList.toggle('lead', t[0] > t[1]);
+      if(!over){
+        const candle = lane.querySelector('.gb-candle');
+        candle.style.textShadow = t[0] > t[1] ? '0 0 12px var(--coral)'
+          : (t[1] > t[0] ? '0 0 12px var(--cyan)' : 'none');
+      }
     }
   }
   function renderHand(){
     const hand = $('gb-hand');
     if(turnSide === 1 && cpu){ hand.innerHTML = ''; return; }
+    const firstMoves = round === 1 && !board.some(l=>l[turnSide].length);
     hand.innerHTML = hands[turnSide].map(id=>{
       const c = C[id];
-      return '<div class="hcard'+(id===sel?' sel':'')+(c.cost>energy?' cant':'')+'" data-id="'+id+'">'+
+      return '<div class="hcard'+(id===sel?' sel':'')+(c.cost>energy?' cant':'')+(firstMoves && c.cost<=energy && id!==sel ? ' pulse':'')+'" data-id="'+id+'">'+
         '<span class="cost">'+c.cost+'</span><span class="pw">'+c.pow+'</span>'+
         '<div class="nm">'+c.name+'</div><div class="ab">'+(c.ab?Gambit.abText(c):'')+'</div></div>';
     }).join('');
@@ -2626,24 +3171,33 @@ Shell.register('gambit', (function(){
         sel = (sel === id) ? null : (C[id].cost <= energy ? id : sel);
         renderHand();
         renderHint();
+        renderBoard();
         document.querySelectorAll('.gb-lane').forEach(l=>l.classList.toggle('target', !!sel));
       });
     });
   }
   function renderInfo(){
+    const spent = Math.max(0, round - energy);
     $('gb-info').innerHTML = 'ROUND <b>'+round+'</b>/6 · '+
-      '<span style="color:'+(turnSide===0?'var(--coral)':'var(--cyan)')+'">'+pname(turnSide)+'</span>'+
-      ' · ENERGY <b>'+energy+'</b>';
+      '<span style="color:'+(turnSide===0?'var(--coral)':'var(--cyan)')+'">'+pname(turnSide)+'</span> · '+
+      '<span style="color:var(--grape)">'+'⚡'.repeat(energy)+'</span>'+
+      '<span style="opacity:.25">'+'⚡'.repeat(spent)+'</span>';
+  }
+  function announce(txt){
+    const el = $('gb-toast');
+    el.textContent = txt;
+    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
   }
   function renderHint(){
     const h = $('gb-hint');
     if(over){ h.textContent = ''; return; }
-    if(cpu && turnSide === 1){ h.textContent = 'The Ghost is playing its cards…'; return; }
-    if(sel){ h.innerHTML = 'Now <b>tap a haunt</b> above to place it.'; return; }
+    if(cpu && turnSide === 1){ h.textContent = 'The Ghost is playing its cards…'; $('gb-end').classList.remove('glow'); return; }
+    if(sel){ h.innerHTML = 'Now <b>tap a zone</b> above to place it.'; $('gb-end').classList.remove('glow'); return; }
     const playable = hands[turnSide].some(id=>C[id].cost <= energy);
     h.innerHTML = playable
-      ? '<b>Tap a card</b> below, then a haunt. END TURN when done.'
-      : 'Nothing left to afford. Tap <b>END TURN</b>.';
+      ? '<b>Tap a card</b> below, then tap a zone. Press END TURN when done.'
+      : 'You can’t afford any more cards. Press <b>END TURN</b>.';
+    $('gb-end').classList.toggle('glow', !playable);
   }
   function renderAll(){ renderBoard(); renderHand(); renderInfo(); renderHint(); }
 
@@ -2657,6 +3211,7 @@ Shell.register('gambit', (function(){
     document.querySelectorAll('.gb-lane').forEach(l=>l.classList.remove('target'));
     renderAll();
     buzz(12);
+    Snd.tap();
   }
 
   function draw(s){
@@ -2668,7 +3223,10 @@ Shell.register('gambit', (function(){
     energy = round;
     sel = null;
     if(cpu && s === 1){ renderAll(); later(aiPlay, 700); }
-    else renderAll();
+    else {
+      renderAll();
+      announce('ROUND '+round+' · '+(cpu ? 'YOUR TURN' : pname(s)+'’S TURN'));
+    }
   }
 
   function endTurn(){
@@ -2743,6 +3301,7 @@ Shell.register('gambit', (function(){
 
   function finishMatch(){
     over = true;
+    announce('THE CANDLES ARE JUDGED');
     let won = [0,0];
     for(let li=0;li<3;li++){
       const t = laneTotals(li);
@@ -2761,6 +3320,9 @@ Shell.register('gambit', (function(){
     $('gb-over-msg').textContent = msg;
     later(()=>$('gb-over').classList.add('show'), 1000);
     buzz([70,50,90]);
+    if(won[0] === won[1]) Snd.swell();
+    else if(cpu && won[1] > won[0]) Snd.bad();
+    else Snd.win();
   }
 
   async function startMatch(vsCpu){
@@ -2769,6 +3331,8 @@ Shell.register('gambit', (function(){
     clearTimers();
     $('gb-mode').classList.remove('show');
     $('gb-over').classList.remove('show');
+    $('gb-side-them').textContent = cpu ? '👻 THE GHOST’S SIDE' : '👻 HAUNT’S SIDE (top player)';
+    $('gb-side-you').textContent = cpu ? '🔥 YOUR SIDE · YOUR CARDS GO IN THE BOTTOM HALF' : '🔥 EMBER’S SIDE (bottom player)';
     board = [[[],[]],[[],[]],[[],[]]];
     const ownedIds = (await Gambit.getOwned()).slice();
     const all = Object.keys(C);
@@ -2786,7 +3350,7 @@ Shell.register('gambit', (function(){
       '<div class="gb-lane" id="gb-lane'+li+'" data-lane="'+li+'">'+
         '<div class="gb-candle">🕯️</div>'+
         '<div class="gb-zone opp"></div>'+
-        '<div class="gb-lanename">'+nm+'<div class="gb-totals">0 · 0</div></div>'+
+        '<div class="gb-mid"><span class="tot them">0</span><span class="gb-lanename">'+nm+'</span><span class="tot you">0</span></div>'+
         '<div class="gb-zone mine"></div>'+
       '</div>').join('');
     document.querySelectorAll('.gb-lane').forEach(el=>{
@@ -2822,9 +3386,11 @@ Shell.register('gambit', (function(){
       $('gb-coll2').onclick = showCollection;
       $('gb-collclose').onclick = ()=>$('gb-coll').classList.remove('show');
       $('gb-mode').classList.add('show');
+      this._demoStop = HowTo.attach('gb-demo', 'gambit');
     },
     unmount(){
       running = false; over = true;
+      if(this._demoStop){ this._demoStop(); this._demoStop = null; }
       clearTimers();
       ['gb-mode','gb-curtain','gb-over','gb-coll'].forEach(id=>$(id).classList.remove('show'));
       Gambit.refreshOwned();
@@ -2836,59 +3402,347 @@ Shell.register('gambit', (function(){
 <div id="howto"><div class="howto-card">
   <div class="howto-ico" id="howto-ico"></div>
   <h2 id="howto-title"></h2>
-  <div class="rules" id="howto-lines"></div>
-  <button class="bigbtn" id="howto-play" style="margin-top:6px;">PLAY</button>
+  <canvas id="howto-canvas" width="600" height="300" class="demo-cv"></canvas>
+  <p id="howto-cap" class="demo-cap"></p>
+  <button class="bigbtn" id="howto-play" style="margin-top:2px;">PLAY</button>
 </div></div>
 
 <script>
 /* ================================================================
-   HOW TO PLAY: one clear card before each game begins
+   HOW TO PLAY: a little living demo before each game begins
 ================================================================ */
 const HowTo = (function(){
-  const DATA = {
-    pigment: {ico:'🎨', title:'Phantom Paint', lines:[
-      ['🫧','<b>Tap two neighboring paints</b> to mix them. Red + yellow, yellow + blue, blue + red.'],
-      ['🎯','Brew the <b>target color</b> shown at the top, then <b>tap it to collect</b>.'],
-      ['👻','Pale <b>wisps</b> mix with any paint and always make the target.'],
-      ['🌙','The <b>moonlight bar</b> is draining. Collecting adds time. Each mix costs a move.']
-    ]},
-    stack: {ico:'🌙', title:'Ghost Stack', lines:[
-      ['👆','<b>Tap to drop</b> the sliding block onto the tower.'],
-      ['🔪','Anything hanging over the edge is <b>sliced off</b>.'],
-      ['🫙','Slices fill the <b>salvage jar</b>. A perfect drop reclaims them as width.'],
-      ['👻','A <b>full jar</b> saves you from one total miss.']
-    ]},
-    snake: {ico:'🐍', title:'Specter Snake', lines:[
-      ['👆','<b>Swipe to steer</b> (or arrows / WASD).'],
-      ['✨','Eat fireflies to grow. Eat <b>fast</b> to chain a combo, up to ×5.'],
-      ['👻','Pale <b>spirit fireflies</b> grant ghost mode: pass through your own tail.'],
-      ['🌑','<b>The Hollow</b> hunts you once you feed. In ghost mode, run through it to banish it for +5.']
-    ]},
-    flight: {ico:'👻', title:'Wisp Flight', lines:[
-      ['👆','<b>Tap to drift upward.</b> Gravity does the rest.'],
-      ['🎯','Slip through the gaps. A <b>dead-center pass scores +2</b>.'],
-      ['✨','Grab fireflies for <b>+3</b>. Pale ones let you phase through brambles.'],
-      ['🌊','The black water below is <b>always</b> fatal.']
-    ]},
-    rush: {ico:'✨', title:'Firefly Rush', lines:[
-      ['👆','<b>Tap fireflies</b> before they fade. Each one that fades costs a life ✦.'],
-      ['💫','Pale <b>spirit fireflies</b> are +3 but vanish fastest.'],
-      ['🌑','Violet orbs are <b>Hollows</b>. Tapping one costs a life.'],
-      ['🔥','Three lives. It only gets faster. Every 10 straight catches pays +5.']
-    ]}
+  /* --- tiny drawing kit for the demos --- */
+  function fing(c, x, y, dip){
+    c.font = '24px system-ui';
+    c.textAlign = 'center';
+    c.fillText('👆', x, y + 26 - (dip ? 5 : 0));
+    c.textAlign = 'left';
+  }
+  function rip(c, x, y, p){
+    if(p <= 0 || p >= 1) return;
+    c.strokeStyle = 'rgba(242,231,207,'+(0.9*(1-p))+')';
+    c.lineWidth = 2.5;
+    c.beginPath(); c.arc(x, y, 6 + p*22, 0, 6.3); c.stroke();
+  }
+  function orb(c, x, y, r, color, glow){
+    if(glow){ c.shadowColor = glow; c.shadowBlur = 12; }
+    c.fillStyle = color;
+    c.beginPath(); c.arc(x, y, r, 0, 6.3); c.fill();
+    c.shadowBlur = 0;
+  }
+  function txt(c, x, y, s, col, size){
+    c.font = '700 '+(size||13)+'px "Space Mono", monospace';
+    c.fillStyle = col || '#e8a05a';
+    c.textAlign = 'center';
+    c.fillText(s, x, y);
+    c.textAlign = 'left';
+  }
+  function ease(a, b, p){
+    p = Math.max(0, Math.min(1, p));
+    p = p*p*(3-2*p);
+    return a + (b-a)*p;
+  }
+  function ph(t, a, b){ return (t-a)/(b-a); }
+  function sparkle(c, x, y, p, col){
+    if(p <= 0 || p >= 1) return;
+    for(let i=0;i<7;i++){
+      const a = i*0.9, d = 6 + p*22;
+      c.globalAlpha = 1-p;
+      c.fillStyle = col || '#e8a05a';
+      c.fillRect(x + Math.cos(a)*d - 1.5, y + Math.sin(a)*d - 1.5, 3, 3);
+    }
+    c.globalAlpha = 1;
+  }
+
+  const DEMOS = {
+    pigment(c, t){
+      const tt = t % 250;
+      orb(c, 150, 20, 8, '#ff8c1a', '#ff8c1a');
+      txt(c, 150, 40, 'MAKE THIS', '#9a937e', 8);
+      const mp = ph(tt, 130, 158);
+      const rx = ease(112, 150, mp), yx = ease(188, 150, mp);
+      if(tt < 158){
+        orb(c, rx, 90, 16, '#ff4d6d');
+        if(tt > 50){ c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = 3; c.beginPath(); c.arc(rx, 90, 20, 0, 6.3); c.stroke(); }
+        orb(c, yx, 90, 16, '#ffd31d', tt > 60 && tt < 130 ? '#e8a05a' : null);
+      } else if(tt < 230){
+        orb(c, 150, 90, 17, '#ff8c1a', '#ff8c1a');
+        sparkle(c, 150, 90, ph(tt, 158, 205));
+        c.globalAlpha = Math.max(0, 1 - ph(tt, 165, 225));
+        txt(c, 150, ease(66, 46, ph(tt, 165, 225)), '+100');
+        c.globalAlpha = 1;
+      }
+      if(tt > 18 && tt < 62){ fing(c, 112, 92, tt > 38 && tt < 50); rip(c, 112, 90, ph(tt, 40, 62)); }
+      if(tt > 80 && tt < 126){ fing(c, 188, 92, tt > 102 && tt < 114); rip(c, 188, 90, ph(tt, 104, 126)); }
+    },
+
+    stack(c, t){
+      const tt = t % 250;
+      c.fillStyle = 'rgba(255,255,255,.08)';
+      c.fillRect(0, 130, 300, 20);
+      c.fillStyle = '#d98a4a';
+      c.fillRect(110, 112, 80, 18);
+      const frozenX = 150 + Math.sin(105*0.05)*70 - 40;
+      if(tt < 105){
+        const mx = 150 + Math.sin(tt*0.05)*70 - 40;
+        c.fillStyle = '#c96a52';
+        c.fillRect(mx, 84, 80, 18);
+      } else {
+        const dropP = ph(tt, 105, 118);
+        const my = ease(84, 94, dropP);
+        const left = Math.max(frozenX, 110), right = Math.min(frozenX+80, 190);
+        if(dropP < 1){
+          c.fillStyle = '#c96a52';
+          c.fillRect(frozenX, my, 80, 18);
+        } else {
+          c.fillStyle = '#c96a52';
+          c.fillRect(left, 94, right-left, 18);
+          const fallP = ph(tt, 118, 190);
+          if(fallP < 1 && frozenX < left){
+            c.globalAlpha = 1 - fallP;
+            c.fillRect(frozenX - fallP*14, 94 + fallP*70, left-frozenX, 18);
+            c.globalAlpha = 1;
+          }
+          c.globalAlpha = Math.max(0, 1 - ph(tt, 130, 210));
+          txt(c, 150, ease(80, 58, ph(tt, 120, 210)), '+1');
+          c.globalAlpha = 1;
+        }
+      }
+      if(tt > 80 && tt < 130){ fing(c, 255, 110, tt > 100 && tt < 112); rip(c, 255, 112, ph(tt, 102, 128)); }
+    },
+
+    snake(c, t){
+      const tt = t % 250;
+      const s = Math.min(tt, 200) * 1.35;
+      function pos(d){
+        if(d < 0) d = 0;
+        return d < 126 ? [40 + d, 100] : [166, 100 - (d - 126)];
+      }
+      orb(c, 150, 20, 6, '#e8a05a', '#e8a05a');
+      txt(c, 150, 38, 'EAT THESE', '#9a937e', 8);
+      const eaten = s > 178;
+      if(!eaten) orb(c, 166, 45, 7, '#e8a05a', '#e8a05a');
+      else { sparkle(c, 166, 45, ph(s, 178, 250)); if(s < 250) txt(c, 166, 30, '+1'); }
+      for(let i=3;i>=0;i--){
+        const p = pos(s - i*16);
+        c.fillStyle = i === 0 ? '#fdf8ec' : 'hsl(45, 30%, '+(75-i*10)+'%)';
+        if(i === 0){ c.shadowColor = '#26e0ff'; c.shadowBlur = 10; }
+        c.beginPath(); c.arc(p[0], p[1], 8, 0, 6.3); c.fill();
+        c.shadowBlur = 0;
+      }
+      if(tt > 55 && tt < 100){
+        const fy = ease(122, 82, ph(tt, 60, 92));
+        fing(c, 235, fy, false);
+        c.strokeStyle = 'rgba(242,231,207,.5)';
+        c.lineWidth = 2;
+        c.beginPath(); c.moveTo(235, 128); c.lineTo(235, fy + 8); c.stroke();
+      }
+    },
+
+    flight(c, t){
+      const tt = t % 240;
+      const px = 300 - tt*1.7;
+      c.fillStyle = '#0d1420';
+      c.fillRect(px, 0, 34, 48);
+      c.fillRect(px, 108, 34, 42);
+      c.fillStyle = 'rgba(139,121,217,.25)';
+      c.fillRect(px, 44, 34, 4);
+      c.fillRect(px, 108, 34, 4);
+      const flyGone = px + 17 < 86;
+      if(!flyGone) orb(c, px + 17, 78, 6, '#e8a05a', '#e8a05a');
+      else { sparkle(c, 92, 78, ph(tt, 126, 190)); c.globalAlpha = Math.max(0,1-ph(tt,130,210)); txt(c, 95, ease(64, 44, ph(tt, 130, 210)), '+5'); c.globalAlpha = 1; }
+      const wy = 78 + Math.sin(tt*0.08)*12;
+      c.shadowColor = '#f2e7cf'; c.shadowBlur = 12;
+      orb(c, 80, wy, 10, '#f8f1de');
+      c.shadowBlur = 0;
+      c.fillStyle = '#05070d';
+      c.beginPath(); c.arc(83, wy-2, 1.8, 0, 6.3); c.arc(87, wy-2, 1.8, 0, 6.3); c.fill();
+      c.fillStyle = 'rgba(10,46,50,.6)';
+      c.fillRect(0, 140, 300, 10);
+      [30, 105, 180].forEach(tp=>{
+        if(tt > tp && tt < tp + 34){ fing(c, 250, 118, tt < tp + 12); rip(c, 250, 118, ph(tt, tp+4, tp+30)); }
+      });
+    },
+
+    rush(c, t){
+      const tt = t % 290;
+      function fly(x, y, born, tapAt, col, glow, label){
+        if(tt < born) return;
+        if(tt < tapAt){
+          const grow = Math.min(1, ph(tt, born, born+12));
+          orb(c, x, y, 13*grow, col, glow);
+        } else {
+          sparkle(c, x, y, ph(tt, tapAt, tapAt+45), glow);
+          c.globalAlpha = Math.max(0, 1 - ph(tt, tapAt, tapAt+60));
+          txt(c, x, y - 18 - ph(tt, tapAt, tapAt+60)*14, label);
+          c.globalAlpha = 1;
+        }
+        if(tt > tapAt - 34 && tt < tapAt + 6){ fing(c, x, y+2, tt > tapAt - 12); rip(c, x, y, ph(tt, tapAt-10, tapAt+8)); }
+      }
+      fly(80, 60, 15, 75, '#e8a05a', '#e8a05a', '+1');
+      fly(210, 95, 90, 150, '#f2e7cf', '#26e0ff', '+3');
+      if(tt > 175){
+        orb(c, 130, 105, 13, '#141026', '#8b79d9');
+        c.fillStyle = '#8b79d9';
+        c.beginPath(); c.arc(125, 103, 2.2, 0, 6.3); c.arc(135, 103, 2.2, 0, 6.3); c.fill();
+        if(tt > 195 && tt < 265){
+          const fx = ease(190, 152, ph(tt, 195, 225));
+          const back = tt > 235 ? ease(152, 195, ph(tt, 235, 260)) : fx;
+          fing(c, back, 108, false);
+          if(tt > 220){ txt(c, 130, 78, '✕ NEVER', '#ff4d6d', 15); }
+        }
+      }
+    },
+
+    shade(c, t){
+      const tt = t % 200;
+      const sway = Math.sin(tt*0.04)*16;
+      for(let i=0;i<4;i++){
+        const sx = 75 + i*50 + sway, alive = !(i === 1 && tt % 100 > 62);
+        if(alive){
+          orb(c, sx, 38, 11, '#141026', '#8b79d9');
+          c.fillStyle = '#8b79d9';
+          c.beginPath(); c.arc(sx-4, 36, 1.9, 0, 6.3); c.arc(sx+4, 36, 1.9, 0, 6.3); c.fill();
+        } else if(tt % 100 < 78){
+          sparkle(c, sx, 38, ph(tt % 100, 62, 78), '#8b79d9');
+          txt(c, sx, 22, '+1');
+        }
+      }
+      const lx = 150 + Math.sin(tt*0.03)*55;
+      for(const off of [0, 33, 66]){
+        const age = (tt + off) % 33;
+        const sy = 108 - age*2.2;
+        if(sy > 46){
+          c.fillStyle = '#f2e7cf';
+          c.shadowColor = '#e8a05a'; c.shadowBlur = 6;
+          c.fillRect(150 + Math.sin((tt-((108-sy)/2.2))*0.03)*55 - 1.5, sy, 3, 8);
+          c.shadowBlur = 0;
+        }
+      }
+      c.shadowColor = '#e8a05a'; c.shadowBlur = 12;
+      c.fillStyle = '#e8a05a';
+      c.beginPath(); c.moveTo(lx, 102); c.lineTo(lx+10, 122); c.lineTo(lx-10, 122); c.closePath(); c.fill();
+      c.shadowBlur = 0;
+      fing(c, lx, 126, false);
+    },
+
+    duel(c, t){
+      const tt = t % 240;
+      c.fillStyle = 'rgba(38,224,255,.06)'; c.fillRect(0, 0, 300, 73);
+      c.fillStyle = 'rgba(255,122,46,.07)'; c.fillRect(0, 77, 300, 73);
+      c.fillStyle = 'rgba(0,0,0,.5)'; c.fillRect(0, 73, 300, 4);
+      for(const half of [0, 1]){
+        const cy = half ? 112 : 38;
+        txt(c, 60, cy + 5, '🍄', null, 20);
+        const opts = ['🍄','🌙','⭐'];
+        opts.forEach((o, i)=>{
+          txt(c, 140 + i*45, cy + 5, o, null, 17);
+        });
+      }
+      if(tt > 60 && tt < 120){ fing(c, 140, 112, tt > 88); rip(c, 140, 112, ph(tt, 90, 118)); }
+      if(tt > 65 && tt < 110){ fing(c, 230, 38, false); }
+      if(tt > 100 && tt < 210){
+        c.globalAlpha = Math.max(0, 1 - ph(tt, 150, 210));
+        c.fillStyle = 'rgba(80,220,130,.14)';
+        c.fillRect(0, 77, 300, 73);
+        txt(c, 150, 135, '+1 POINT · FASTEST WINS', '#ff7a2e', 12);
+        c.globalAlpha = 1;
+      }
+    },
+
+    gambit(c, t){
+      const tt = t % 260;
+      c.strokeStyle = 'rgba(120,140,170,.35)';
+      c.lineWidth = 1.5;
+      c.strokeRect(115, 14, 70, 118);
+      c.fillStyle = 'rgba(38,224,255,.06)'; c.fillRect(116, 15, 68, 50);
+      c.fillStyle = 'rgba(255,122,46,.07)'; c.fillRect(116, 80, 68, 51);
+      txt(c, 150, 10, '🕯️', null, 12);
+      c.fillStyle = 'rgba(20,26,40,.95)';
+      c.fillRect(126, 22, 48, 20);
+      c.strokeStyle = 'rgba(38,224,255,.5)'; c.strokeRect(126, 22, 48, 20);
+      txt(c, 150, 36, '2', '#26e0ff', 11);
+      const played = tt > 130;
+      txt(c, 133, 76, played ? '2' : '2', '#26e0ff', 12);
+      txt(c, 167, 76, played ? '3' : '0', played ? '#ff7a2e' : 'rgba(255,122,46,.5)', played ? 14 : 12);
+      const cardX = played ? 150 : ease(60, 60, 0), cardY = 118;
+      if(tt < 130){
+        const sel = tt > 55;
+        c.fillStyle = 'rgba(28,34,52,.96)';
+        const cx2 = 45, cy2 = 100;
+        c.fillRect(cx2, cy2, 40, 44);
+        c.strokeStyle = sel ? '#e8a05a' : 'rgba(120,140,170,.4)';
+        c.strokeRect(cx2, cy2, 40, 44);
+        orb(c, cx2+2, cy2+2, 7, '#8b79d9');
+        txt(c, cx2+3, cy2+6, '2', '#fff', 9);
+        txt(c, cx2+29, cy2+38, '3', '#e8a05a', 13);
+        if(tt > 25 && tt < 70){ fing(c, cx2+20, cy2+24, tt > 45); rip(c, cx2+20, cy2+22, ph(tt, 47, 68)); }
+        if(tt > 85 && tt < 132){ fing(c, 150, 100, tt > 108); rip(c, 150, 100, ph(tt, 110, 130)); }
+      } else {
+        c.fillStyle = 'rgba(28,34,52,.96)';
+        c.fillRect(130, 88, 40, 40);
+        c.strokeStyle = 'rgba(255,122,46,.5)'; c.strokeRect(130, 88, 40, 40);
+        txt(c, 159, 120, '3', '#e8a05a', 13);
+        c.shadowColor = '#ff7a2e'; c.shadowBlur = 10;
+        txt(c, 150, 10, '🕯️', null, 12);
+        c.shadowBlur = 0;
+        c.globalAlpha = Math.max(0, 1 - ph(tt, 170, 250));
+        txt(c, 235, 70, 'BIGGER TOTAL', '#e8a05a', 10);
+        txt(c, 235, 84, 'WINS THE CANDLE', '#e8a05a', 10);
+        c.globalAlpha = 1;
+      }
+    }
   };
+
+  function runLoop(cv, key, visCheck){
+    const c = cv.getContext('2d');
+    let t = 0, stopped = false;
+    (function loop(){
+      if(stopped) return;
+      if(!visCheck()){ setTimeout(loop, 350); return; }
+      c.setTransform(2, 0, 0, 2, 0, 0);
+      c.clearRect(0, 0, 300, 150);
+      try{ DEMOS[key](c, t++); }catch(e){}
+      requestAnimationFrame(loop);
+    })();
+    return ()=>{ stopped = true; };
+  }
+  function attach(cvId, key){
+    const cv = document.getElementById(cvId);
+    if(!cv) return ()=>{};
+    return runLoop(cv, key, ()=>{
+      const g = cv.closest('.gover');
+      return g && g.classList.contains('show') && cv.closest('.screen').classList.contains('active');
+    });
+  }
+
+  const DATA = {
+    pigment: {ico:'🎨', title:'Phantom Paint', cap:'<b>Tap a blob, then a glowing neighbor</b>, to mix the target color. The moonlight bar is your timer.'},
+    stack:   {ico:'🌙', title:'Ghost Stack',   cap:'<b>Tap to drop the block.</b> Overhangs get sliced off, so aim for perfect.'},
+    snake:   {ico:'🐍', title:'Specter Snake', cap:'<b>Swipe anywhere to steer.</b> The edges wrap around. Eat fireflies, dodge the purple Hollow.'},
+    flight:  {ico:'👻', title:'Wisp Flight',   cap:'<b>Tap to fly up.</b> Slip through the gaps. Your first crash is forgiven.'},
+    shade:   {ico:'🏮', title:'Shade Shooter', cap:'<b>Slide to move.</b> The lantern fires by itself. Don’t let the shades reach you.'},
+    rush:    {ico:'✨', title:'Firefly Rush',  cap:'<b>Tap fireflies before they fade.</b> Never tap the purple ones. 3 lives.'}
+  };
+  let stopDemo = null;
   function show(key, onPlay){
     const d = DATA[key];
     if(!d){ onPlay(); return; }
     document.getElementById('howto-ico').textContent = d.ico;
     document.getElementById('howto-title').textContent = d.title;
-    document.getElementById('howto-lines').innerHTML =
-      d.lines.map(l=>'<div><span class="em">'+l[0]+'</span><span>'+l[1]+'</span></div>').join('');
+    document.getElementById('howto-cap').innerHTML = d.cap;
     document.getElementById('howto').classList.add('show');
+    if(stopDemo) stopDemo();
+    stopDemo = runLoop(document.getElementById('howto-canvas'), key,
+      ()=>document.getElementById('howto').classList.contains('show'));
     document.getElementById('howto-play').onclick = ()=>{ hide(); onPlay(); };
   }
-  function hide(){ document.getElementById('howto').classList.remove('show'); }
-  return { show, hide };
+  function hide(){
+    document.getElementById('howto').classList.remove('show');
+    if(stopDemo){ stopDemo(); stopDemo = null; }
+  }
+  return { show, hide, attach };
 })();
 </script>
 
@@ -2899,8 +3753,8 @@ const HowTo = (function(){
    CHALLENGE SYSTEM: signed score codes you can text to a rival
 ================================================================ */
 const Challenge = (function(){
-  const G2GAME  = {P:'pigment', S:'stack', N:'snake', F:'flight', R:'rush'};
-  const G2TITLE = {P:'Phantom Paint', S:'Ghost Stack', N:'Specter Snake', F:'Wisp Flight', R:'Firefly Rush'};
+  const G2GAME  = {P:'pigment', S:'stack', N:'snake', F:'flight', R:'rush', H:'shade'};
+  const G2TITLE = {P:'Phantom Paint', S:'Ghost Stack', N:'Specter Snake', F:'Wisp Flight', R:'Firefly Rush', H:'Shade Shooter'};
   let active = null, chip = null, chipGame = null;
 
   Shell.store.get('challenge').then(v=>{ if(v && !active) active = v; refreshHubBtn(); });
@@ -2917,7 +3771,7 @@ const Challenge = (function(){
     return core+'-'+chk(core);
   }
   function decode(code){
-    const m = (code||'').trim().toUpperCase().match(/^([PSNFR])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
+    const m = (code||'').trim().toUpperCase().match(/^([PSNFRH])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
     if(!m) return null;
     if(chk(m[1]+'-'+m[2]+'-'+m[3]) !== m[4]) return null;
     return {g:m[1], score:+m[2], name:m[3]};
@@ -3104,6 +3958,7 @@ const Dare = (function(){
     {g:'N', name:'Specter Snake', game:'snake',   targets:[10, 15, 20]},
     {g:'F', name:'Wisp Flight',   game:'flight',  targets:[6, 10, 14]},
     {g:'R', name:'Firefly Rush',  game:'rush',    targets:[15, 22, 30]},
+    {g:'H', name:'Shade Shooter', game:'shade',   targets:[15, 25, 40]},
     {g:'D', name:'Spirit Duel',   game:'tw',      targets:[1]}
   ];
   let done = false, streak = 0;
@@ -3161,6 +4016,7 @@ const Dare = (function(){
     banner();
     render();
     buzz([60,50,60,50,90]);
+    Snd.win();
   }
   function onScore(g, score){
     const t = todays();
