@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tupelo Ghost">
 <meta property="og:title" content="Tupelo Ghost Arcade">
-<meta property="og:description" content="Seven haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
+<meta property="og:description" content="Six haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
 <meta property="og:url" content="https://tupeloghost.github.io/Pocket-Arcade/">
-<meta name="description" content="Seven haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
+<meta name="description" content="Six haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -291,73 +291,6 @@
   .sn-tip{margin-top:12px; color:var(--dim); font-weight:800; font-size:13px; text-align:center;}
 
 
-  /* ============ GHOST GAMBIT ============ */
-  #gb-board{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:min(96vw,460px); flex:1; min-height:0; margin-top:2px;}
-  .gb-lane{display:flex; flex-direction:column; border:1.5px solid rgba(120,140,170,.2); border-radius:16px; background:rgba(0,0,0,.22); overflow:hidden; cursor:pointer;}
-  .gb-lane.target{border-color:var(--gold); box-shadow:0 0 12px rgba(232,160,90,.35);}
-  .gb-candle{text-align:center; font-size:17px; padding:3px 0 0; min-height:24px;}
-  .gb-candle.w0{text-shadow:0 0 12px var(--coral);}
-  .gb-candle.w1{text-shadow:0 0 12px var(--cyan);}
-  .gb-zone{flex:1; display:flex; flex-direction:column; gap:3px; padding:4px; min-height:56px; overflow:hidden;}
-  .gb-zone.opp{background:rgba(38,224,255,.05);}
-  .gb-zone.mine{justify-content:flex-end; background:rgba(255,122,46,.055);}
-  .gb-mid{
-    display:flex; flex-direction:column; align-items:center; gap:1px; padding:3px 0;
-    border-top:1px solid rgba(120,140,170,.15); border-bottom:1px solid rgba(120,140,170,.15);
-  }
-  .gb-lanename{text-align:center; font-size:8.5px; letter-spacing:1px; color:var(--dim); font-weight:700;}
-  .tot{font-size:13px; font-weight:700; line-height:1.1; transition:transform .15s;}
-  .tot.them{color:var(--cyan);}
-  .tot.you{color:var(--coral);}
-  .tot.lead{text-shadow:0 0 9px currentColor; transform:scale(1.2);}
-  .gb-side{width:min(96vw,460px); font-size:9.5px; letter-spacing:1.2px; font-weight:700; padding:4px 4px 2px;}
-  .gb-side.them{color:var(--cyan);}
-  .gb-side.you{color:var(--coral);}
-  .gb-empty{
-    font-size:8.5px; font-weight:700; color:var(--gold); text-align:center;
-    padding:9px 2px; margin:2px; border:1px dashed rgba(232,160,90,.45); border-radius:8px;
-    letter-spacing:.5px;
-  }
-  #gb-toast{
-    position:absolute; top:26%; left:0; right:0; text-align:center; z-index:6; pointer-events:none;
-    font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase;
-    font-size:24px; letter-spacing:2px; color:var(--gold); opacity:0;
-    text-shadow:0 0 14px rgba(232,160,90,.6);
-  }
-  #gb-toast.pop{animation:toast .9s ease-out;}
-  .smallbtn.glow{
-    border-color:var(--gold); color:var(--gold);
-    box-shadow:0 0 12px rgba(232,160,90,.45);
-    animation:throb 1.1s ease-in-out infinite;
-  }
-  .hcard.pulse{border-color:rgba(232,160,90,.7); box-shadow:0 0 12px rgba(232,160,90,.35); animation:throb 1.4s ease-in-out infinite;}
-  .mini{background:rgba(20,26,40,.92); border:1px solid rgba(255,122,46,.35); border-radius:8px; padding:3px 5px; font-size:9.5px; line-height:1.25; position:relative; text-align:left;}
-  .mini.them{border-color:rgba(38,224,255,.4);}
-  .mini .pw{position:absolute; right:4px; top:3px; font-weight:700; color:var(--gold);}
-  .mini .nm{font-weight:700; padding-right:12px;}
-  .mini .ab{color:var(--dim); font-size:8.5px;}
-  #gb-hud{display:flex; align-items:center; gap:10px; width:min(96vw,460px); padding:8px 2px 4px;}
-  #gb-info{font-weight:700; font-size:13px; flex:1; color:var(--text);}
-  #gb-info b{color:var(--gold);}
-  #gb-hand{display:flex; gap:8px; width:min(96vw,460px); overflow-x:auto; padding:8px 2px 14px; min-height:100px; align-items:flex-start;}
-  .hcard{
-    flex:0 0 86px; background:linear-gradient(160deg, rgba(28,34,52,.96), rgba(13,17,28,.96));
-    border:1.5px solid rgba(120,140,170,.35); border-radius:12px; padding:7px 8px;
-    cursor:pointer; position:relative; text-align:left; transition:transform .12s, border-color .12s, box-shadow .12s;
-  }
-  .hcard .cost{position:absolute; top:-7px; left:-7px; width:21px; height:21px; border-radius:50%; background:var(--grape); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.4);}
-  .hcard .pw{position:absolute; bottom:4px; right:8px; font-size:16px; font-weight:700; color:var(--gold);}
-  .hcard .nm{font-size:10.5px; font-weight:700; line-height:1.25; min-height:27px;}
-  .hcard .ab{font-size:8.5px; color:var(--dim); margin-top:3px; padding-right:16px;}
-  .hcard.sel{transform:translateY(-8px); border-color:var(--gold); box-shadow:0 0 14px rgba(232,160,90,.45);}
-  .hcard.cant{opacity:.4;}
-  #gb-collgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:8px; overflow-y:auto; max-height:56vh; width:min(92vw,430px);}
-  .ccard{background:rgba(20,26,40,.92); border:1.5px solid rgba(232,160,90,.4); border-radius:12px; padding:8px; font-size:10px; text-align:left;}
-  .ccard.no{opacity:.5; border-color:rgba(120,140,170,.3); border-style:dashed;}
-  .ccard .nm{font-weight:700; font-size:11px;}
-  .ccard .st{color:var(--dim); font-size:9px; margin-top:3px; line-height:1.35;}
-  .ccard .pp{color:var(--gold); font-weight:700;}
-
   /* ============ CHALLENGES ============ */
   .ch-chip{display:none; align-items:center; gap:5px; font-weight:900; font-size:13px; letter-spacing:.5px; padding:5px 12px; border-radius:999px; border:1.5px solid var(--gold); color:var(--gold); white-space:nowrap; background:rgba(232,160,90,.1);}
   .ch-chip.on{display:inline-flex;}
@@ -388,6 +321,9 @@
   .smallbtn.ghost{background:transparent; border-color:transparent; color:var(--dim);}
   #ch-modal{position:fixed; inset:0; z-index:90; background:rgba(5,7,13,.88); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; padding:20px;}
   #ch-modal.show{display:flex;}
+  #vs-modal{position:fixed; inset:0; z-index:92; background:rgba(5,7,13,.88); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; padding:20px;}
+  #vs-modal.show{display:flex;}
+  #vs-card .vs-big{font-size:30px; font-weight:700;}
   .ch-card{background:var(--card); border:2px solid rgba(255,255,255,.14); border-radius:24px; padding:24px 22px; width:min(88vw,360px); display:flex; flex-direction:column; gap:12px; text-align:center;}
   .ch-card h2{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:27px; margin:0; letter-spacing:1.5px;}
   .ch-card p{margin:0; color:var(--dim); font-weight:800; font-size:14px; line-height:1.4;}
@@ -434,8 +370,6 @@
   .rules b{color:var(--text);}
   .rules .em{flex:none; width:20px; text-align:center;}
   #pg-moonlabel{width:min(94vw,430px); font-size:9px; letter-spacing:2px; color:var(--dim); font-weight:700; margin-bottom:3px;}
-  #gb-hint{width:min(96vw,460px); font-size:11.5px; color:var(--dim); font-weight:700; text-align:center; min-height:15px; padding-bottom:2px;}
-  #gb-hint b{color:var(--gold);}
 
   @media (max-width:430px){
     .gb-title{font-size:17px; letter-spacing:1px;}
@@ -470,7 +404,7 @@
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
     </div>
-    <p>MIDNIGHT ARCADE · SEVEN HAUNTS · NO COINS NEEDED</p>
+    <p>MIDNIGHT ARCADE · SIX HAUNTS · NO COINS NEEDED</p>
     <div class="epi">The arcade at the end of the dirt road. It only opens after dark.</div>
   </div>
   <button class="chbtn dare" id="dare-card"></button>
@@ -523,17 +457,9 @@
         <div class="meta"><span class="tag players">1P</span><span class="tag">SHOOTER</span><span class="tag best">BEST <b id="best-shade">–</b></span></div>
       </div>
     </button>
-    <button class="gcard" data-game="gambit" style="--accent:#f2e7cf">
-      <div class="ico">🃏</div>
-      <div class="info">
-        <div class="name">GHOST GAMBIT</div>
-        <div class="desc">A card battle over three candles. Win new cards by playing the other games.</div>
-        <div class="meta"><span class="tag players">1-2P</span><span class="tag">CARDS</span><span class="tag best">OWNED <b id="best-gambit">–</b></span></div>
-      </div>
-    </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.1</div>
+  <div class="verstamp">v2026.09.09.3</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -572,49 +498,6 @@
       <div class="newbest" id="sh-newbest" style="display:none">★ NEW BEST ★</div>
       <button class="bigbtn" id="sh-retry" style="margin-top:14px;">RELIGHT THE LANTERN</button>
       <div class="ch-slot" id="sh-chslot"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= GHOST GAMBIT ================= -->
-<div id="scr-gambit" class="screen">
-  <div class="gamebar">
-    <button class="backbtn" data-back>← Arcade</button>
-    <div class="gb-title">GHOST GAMBIT</div>
-    <button class="smallbtn" id="gb-collbtn" style="padding:6px 14px; font-size:12px;">CARDS</button>
-  </div>
-  <div class="game-body" style="padding:0 10px;">
-    <div class="gb-side them" id="gb-side-them">👻 THE GHOST’S SIDE</div>
-    <div id="gb-board"></div>
-    <div class="gb-side you" id="gb-side-you">🔥 YOUR SIDE · YOUR CARDS GO IN THE BOTTOM HALF</div>
-    <div id="gb-toast"></div>
-    <div id="gb-hud"><span id="gb-info"></span><button class="smallbtn" id="gb-end">END TURN</button></div>
-    <div id="gb-hint"></div>
-    <div id="gb-hand"></div>
-    <div class="gover" id="gb-mode">
-      <h2>GHOST GAMBIT</h2>
-      <canvas id="gb-demo" width="600" height="300" class="demo-cv"></canvas>
-      <p class="demo-cap" style="margin-bottom:6px;"><b>Tap a card, then a zone.</b> Energy grows each round (1⚡ then 2⚡…). Orange is you, blue is them: the bigger total wins each candle. <b>Take 2 of 3.</b></p>
-      <button class="bigbtn" id="gb-vs-ghost">DUEL THE GHOST 👻</button>
-      <button class="bigbtn" id="gb-vs-friend" style="background:linear-gradient(135deg, var(--cyan), var(--B)); margin-top:10px;">PASS &amp; PLAY VS A FRIEND</button>
-      <button class="smallbtn ghost" id="gb-coll2" style="margin-top:10px;">VIEW COLLECTION</button>
-    </div>
-    <div class="gover" id="gb-curtain">
-      <h2 id="gb-curtain-title"></h2>
-      <p>No peeking at the other hand.</p>
-      <button class="bigbtn" id="gb-curtain-go">READY</button>
-    </div>
-    <div class="gover" id="gb-over">
-      <h2 id="gb-over-title"></h2>
-      <p id="gb-over-msg"></p>
-      <button class="bigbtn" id="gb-rematch" style="margin-top:10px;">REMATCH</button>
-      <button class="smallbtn ghost" id="gb-switch">CHANGE MODE</button>
-    </div>
-    <div class="gover" id="gb-coll" style="padding:18px;">
-      <h2 style="margin-bottom:4px;">THE COLLECTION</h2>
-      <p id="gb-collcount" style="margin:0 0 10px;"></p>
-      <div id="gb-collgrid"></div>
-      <button class="smallbtn" id="gb-collclose" style="margin-top:14px;">CLOSE</button>
     </div>
   </div>
 </div>
@@ -786,8 +669,8 @@ const Shell = (function(){
     show('hub');
     refreshBests();
     if(typeof Dare !== 'undefined') Dare.refresh();
-    if(typeof Gambit !== 'undefined') Gambit.refreshOwned();
     if(typeof HowTo !== 'undefined') HowTo.hide();
+    if(typeof Vs !== 'undefined') Vs.cancel();
   }
 
   document.querySelectorAll('.gcard').forEach(c=>{
@@ -1507,7 +1390,6 @@ Shell.register('tw', (function(){
 
   function endGame(winner){
     if(typeof Dare !== 'undefined') Dare.duelWin(cpu && winner === 0);
-    if(typeof Gambit !== 'undefined') Gambit.duelWin(cpu && winner === 0);
     const won = PNAME[winner]+' WINS '+scores[winner]+'–'+scores[1-winner]+'!';
     const lost = 'DEFEAT… REMATCH?';
     const wb = $('tw-winbottom'), wt = $('tw-wintop');
@@ -2787,400 +2669,6 @@ Shell.register('shade', (function(){
   };
 })());
 </script>
-<script>
-/* ================================================================
-   GAME 7: GHOST GAMBIT (card duel + arcade-wide collection)
-================================================================ */
-const Gambit = (function(){
-  const LANES = ['THE SWAMP','THE TOWER','THE MOON'];
-  const CARDS = {
-    s1:{id:'s1', name:'Little Wisp',        cost:1, pow:2, ab:'loner',  suit:'*'},
-    s2:{id:'s2', name:'Candle Moth',        cost:1, pow:1, ab:'swarm',  suit:'*'},
-    s3:{id:'s3', name:'Paper Moth',         cost:1, pow:1, ab:'lantern', l:2, suit:'*'},
-    s4:{id:'s4', name:'Swamp Frog',         cost:2, pow:2, ab:'swarm',  suit:'*'},
-    s5:{id:'s5', name:'Churchyard Cat',     cost:2, pow:3, ab:'loner',  suit:'*'},
-    s6:{id:'s6', name:'Bone Lantern',       cost:2, pow:3, ab:null,     suit:'*'},
-    s7:{id:'s7', name:'Will o’ the Wisp',   cost:3, pow:3, ab:'lantern', l:0, suit:'*'},
-    s8:{id:'s8', name:'Old Root',           cost:3, pow:5, ab:null,     suit:'*'},
-    p1:{id:'p1', name:'Turpentine Wisp',    cost:2, pow:2, ab:'loner',  suit:'P'},
-    p2:{id:'p2', name:'The Painter',        cost:4, pow:5, ab:'lantern', l:1, suit:'P'},
-    p3:{id:'p3', name:'Color Eater',        cost:5, pow:7, ab:null,     suit:'P'},
-    k1:{id:'k1', name:'Scaffold Sprite',    cost:1, pow:2, ab:'lantern', l:1, suit:'S'},
-    k2:{id:'k2', name:'The Mason',          cost:3, pow:4, ab:'swarm',  suit:'S'},
-    k3:{id:'k3', name:'Tower Gargoyle',     cost:6, pow:9, ab:null,     suit:'S'},
-    n1:{id:'n1', name:'River Ribbon',       cost:3, pow:4, ab:'loner',  suit:'N'},
-    n2:{id:'n2', name:'The Hollow',         cost:5, pow:6, ab:'dread',  suit:'N'},
-    n3:{id:'n3', name:'The Marsh King',     cost:6, pow:8, ab:'swarm',  suit:'N'},
-    f1:{id:'f1', name:'Bramble Crow',       cost:2, pow:3, ab:'dread',  suit:'F'},
-    f2:{id:'f2', name:'Night Glider',       cost:4, pow:6, ab:null,     suit:'F'},
-    h1:{id:'h1', name:'The Lamplighter',    cost:2, pow:2, ab:'lantern', l:1, suit:'H'},
-    h2:{id:'h2', name:'Shade Eater',        cost:4, pow:5, ab:'dread',  suit:'H'},
-    d1:{id:'d1', name:'The Ghost',          cost:5, pow:7, ab:'loner',  suit:'D'}
-  };
-  const STARTERS = ['s1','s2','s3','s4','s5','s6','s7','s8'];
-  const TH = {P:500, S:10, N:10, F:6, H:15};
-  const HINTS = {
-    P:'Score 500+ in Phantom Paint to lure it out.',
-    S:'Stack 10+ in Ghost Stack to lure it out.',
-    N:'Score 10+ in Specter Snake to lure it out.',
-    F:'Score 6+ in Wisp Flight to lure it out.',
-    H:'Score 15+ in Shade Shooter to lure it out.',
-    D:'Beat the Ghost in Spirit Duel to win his card.'
-  };
-  function abText(c){
-    if(c.ab === 'loner') return 'LONE: +3 if alone here';
-    if(c.ab === 'swarm') return 'PACK: +1 per ally here';
-    if(c.ab === 'lantern') return LANES[c.l].replace('THE ','')+': +3 there';
-    if(c.ab === 'dread') return 'HEX: foes here −1';
-    return '—'.replace('—','no gift');
-  }
-  let owned = null;
-  async function getOwned(){
-    if(owned) return owned;
-    owned = (await Shell.store.get('cards')) || null;
-    if(!owned){ owned = STARTERS.slice(); Shell.store.set('cards', owned); }
-    owned = owned.filter(id=>CARDS[id]);
-    return owned;
-  }
-  function save(){ Shell.store.set('cards', owned); }
-  async function refreshOwned(){
-    const o = await getOwned();
-    const el = document.getElementById('best-gambit');
-    if(el) el.textContent = o.length + '/' + Object.keys(CARDS).length;
-  }
-  function grantBanner(card){
-    const b = document.createElement('div');
-    b.className = 'dare-banner';
-    b.textContent = '🃏 NEW CARD · ' + card.name.toUpperCase();
-    document.body.appendChild(b);
-    setTimeout(()=>b.classList.add('show'), 30);
-    setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(), 500); }, 3200);
-  }
-  async function maybeDrop(g, score, slot){
-    const th = TH[g];
-    if(th == null || score < th) return;
-    const o = await getOwned();
-    const pool = Object.values(CARDS).filter(c=>c.suit === g && !o.includes(c.id));
-    if(!pool.length || Math.random() > 0.7) return;
-    const card = pool[Math.floor(Math.random()*pool.length)];
-    o.push(card.id); save();
-    if(slot){
-      const d = document.createElement('div');
-      d.className = 'ch-result win';
-      d.textContent = '🃏 NEW CARD · ' + card.name.toUpperCase();
-      slot.prepend(d);
-    }
-    buzz([40,30,70]);
-    Snd.win();
-  }
-  async function duelWin(beatCpu){
-    if(!beatCpu) return;
-    const o = await getOwned();
-    if(!o.includes('d1')){ o.push('d1'); save(); grantBanner(CARDS.d1); }
-  }
-  refreshOwned();
-  return { CARDS, LANES, STARTERS, HINTS, abText, getOwned, maybeDrop, duelWin, refreshOwned };
-})();
-
-Shell.register('gambit', (function(){
-  const $ = id => document.getElementById(id);
-  const C = Gambit.CARDS, LANES = Gambit.LANES;
-  let cpu, mode2p, round, turnSide, energy, hands, decks, board, sel, over, running, gtimers;
-
-  function later(fn, ms){ gtimers.push(setTimeout(fn, ms)); }
-  function clearTimers(){ gtimers.forEach(clearTimeout); gtimers = []; }
-  function pname(s){ return s === 0 ? 'EMBER' : (cpu ? 'THE GHOST' : 'HAUNT'); }
-
-  function laneTotals(li){
-    const t = [0,0];
-    for(let s=0;s<2;s++){
-      const mine = board[li][s], foes = board[li][1-s];
-      const hexes = foes.filter(id=>C[id].ab==='dread').length;
-      let sum = 0;
-      for(const id of mine){
-        const c = C[id];
-        let p = c.pow;
-        if(c.ab==='loner' && mine.length===1) p += 3;
-        if(c.ab==='swarm') p += (mine.length-1);
-        if(c.ab==='lantern' && c.l===li) p += 3;
-        p -= hexes;
-        sum += Math.max(0, p);
-      }
-      t[s] = sum;
-    }
-    return t;
-  }
-
-  function miniHTML(id, them){
-    const c = C[id];
-    return '<div class="mini'+(them?' them':'')+'"><span class="pw">'+c.pow+'</span><div class="nm">'+c.name+'</div>'+
-      (c.ab ? '<div class="ab">'+Gambit.abText(c)+'</div>' : '')+'</div>';
-  }
-  function renderBoard(){
-    for(let li=0;li<3;li++){
-      const lane = $('gb-lane'+li);
-      const t = laneTotals(li);
-      lane.querySelector('.gb-zone.opp').innerHTML = board[li][1].map(id=>miniHTML(id,true)).join('');
-      lane.querySelector('.gb-zone.mine').innerHTML =
-        board[li][0].map(id=>miniHTML(id,false)).join('') ||
-        (sel && !(cpu && turnSide === 1) ? '<div class="gb-empty">PLACE HERE</div>' : '');
-      const them = lane.querySelector('.tot.them'), you = lane.querySelector('.tot.you');
-      them.textContent = t[1];
-      you.textContent = t[0];
-      them.classList.toggle('lead', t[1] > t[0]);
-      you.classList.toggle('lead', t[0] > t[1]);
-      if(!over){
-        const candle = lane.querySelector('.gb-candle');
-        candle.style.textShadow = t[0] > t[1] ? '0 0 12px var(--coral)'
-          : (t[1] > t[0] ? '0 0 12px var(--cyan)' : 'none');
-      }
-    }
-  }
-  function renderHand(){
-    const hand = $('gb-hand');
-    if(turnSide === 1 && cpu){ hand.innerHTML = ''; return; }
-    const firstMoves = round === 1 && !board.some(l=>l[turnSide].length);
-    hand.innerHTML = hands[turnSide].map(id=>{
-      const c = C[id];
-      return '<div class="hcard'+(id===sel?' sel':'')+(c.cost>energy?' cant':'')+(firstMoves && c.cost<=energy && id!==sel ? ' pulse':'')+'" data-id="'+id+'">'+
-        '<span class="cost">'+c.cost+'</span><span class="pw">'+c.pow+'</span>'+
-        '<div class="nm">'+c.name+'</div><div class="ab">'+(c.ab?Gambit.abText(c):'')+'</div></div>';
-    }).join('');
-    hand.querySelectorAll('.hcard').forEach(el=>{
-      el.addEventListener('pointerdown', e=>{
-        e.preventDefault();
-        if(over || (cpu && turnSide === 1)) return;
-        const id = el.dataset.id;
-        sel = (sel === id) ? null : (C[id].cost <= energy ? id : sel);
-        renderHand();
-        renderHint();
-        renderBoard();
-        document.querySelectorAll('.gb-lane').forEach(l=>l.classList.toggle('target', !!sel));
-      });
-    });
-  }
-  function renderInfo(){
-    const spent = Math.max(0, round - energy);
-    $('gb-info').innerHTML = 'ROUND <b>'+round+'</b>/6 · '+
-      '<span style="color:'+(turnSide===0?'var(--coral)':'var(--cyan)')+'">'+pname(turnSide)+'</span> · '+
-      '<span style="color:var(--grape)">'+'⚡'.repeat(energy)+'</span>'+
-      '<span style="opacity:.25">'+'⚡'.repeat(spent)+'</span>';
-  }
-  function announce(txt){
-    const el = $('gb-toast');
-    el.textContent = txt;
-    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-  }
-  function renderHint(){
-    const h = $('gb-hint');
-    if(over){ h.textContent = ''; return; }
-    if(cpu && turnSide === 1){ h.textContent = 'The Ghost is playing its cards…'; $('gb-end').classList.remove('glow'); return; }
-    if(sel){ h.innerHTML = 'Now <b>tap a zone</b> above to place it.'; $('gb-end').classList.remove('glow'); return; }
-    const playable = hands[turnSide].some(id=>C[id].cost <= energy);
-    h.innerHTML = playable
-      ? '<b>Tap a card</b> below, then tap a zone. Press END TURN when done.'
-      : 'You can’t afford any more cards. Press <b>END TURN</b>.';
-    $('gb-end').classList.toggle('glow', !playable);
-  }
-  function renderAll(){ renderBoard(); renderHand(); renderInfo(); renderHint(); }
-
-  function playCard(id, li){
-    const c = C[id];
-    if(c.cost > energy) return;
-    energy -= c.cost;
-    hands[turnSide].splice(hands[turnSide].indexOf(id), 1);
-    board[li][turnSide].push(id);
-    sel = null;
-    document.querySelectorAll('.gb-lane').forEach(l=>l.classList.remove('target'));
-    renderAll();
-    buzz(12);
-    Snd.tap();
-  }
-
-  function draw(s){
-    if(decks[s].length && hands[s].length < 7) hands[s].push(decks[s].shift());
-  }
-
-  function beginTurn(s){
-    turnSide = s;
-    energy = round;
-    sel = null;
-    if(cpu && s === 1){ renderAll(); later(aiPlay, 700); }
-    else {
-      renderAll();
-      announce('ROUND '+round+' · '+(cpu ? 'YOUR TURN' : pname(s)+'’S TURN'));
-    }
-  }
-
-  function endTurn(){
-    if(over) return;
-    sel = null;
-    document.querySelectorAll('.gb-lane').forEach(l=>l.classList.remove('target'));
-    if(turnSide === 0){
-      if(cpu) beginTurn(1);
-      else curtain(1, ()=>beginTurn(1));
-    } else {
-      resolveRound();
-    }
-  }
-
-  function resolveRound(){
-    round++;
-    if(round > 6){ finishMatch(); return; }
-    draw(0); draw(1);
-    if(mode2p) curtain(0, ()=>beginTurn(0));
-    else beginTurn(0);
-  }
-
-  function curtain(nextSide, then){
-    $('gb-curtain-title').textContent = 'PASS TO '+pname(nextSide);
-    $('gb-curtain').classList.add('show');
-    $('gb-curtain-go').onclick = ()=>{
-      $('gb-curtain').classList.remove('show');
-      then();
-    };
-  }
-
-  function aiPlay(){
-    let e = round;
-    const hand = hands[1];
-    const plays = [];
-    let guard = 12;
-    while(guard--){
-      let best = null;
-      for(const id of hand){
-        const c = C[id];
-        if(c.cost > e) continue;
-        for(let li=0;li<3;li++){
-          const cur = laneTotals(li);
-          board[li][1].push(id);
-          const t = laneTotals(li);
-          board[li][1].pop();
-          const gain = t[1] - cur[1];
-          let v = gain + Math.random()*2.5;
-          const deficit = cur[0] - cur[1];
-          if(deficit > 0 && deficit < gain + 5) v += 3;
-          if(deficit < -9) v -= 2.5;
-          if(!best || v > best.v) best = {id, li, v};
-        }
-      }
-      if(!best) break;
-      e -= C[best.id].cost;
-      hand.splice(hand.indexOf(best.id), 1);
-      plays.push(best);
-    }
-    let i = 0;
-    (function step(){
-      if(!running || over) return;
-      if(i < plays.length){
-        board[plays[i].li][1].push(plays[i].id);
-        renderBoard();
-        buzz(10);
-        i++;
-        later(step, 700);
-      } else later(resolveRound, 650);
-    })();
-  }
-
-  function finishMatch(){
-    over = true;
-    announce('THE CANDLES ARE JUDGED');
-    let won = [0,0];
-    for(let li=0;li<3;li++){
-      const t = laneTotals(li);
-      const candle = $('gb-lane'+li).querySelector('.gb-candle');
-      if(t[0] > t[1]){ won[0]++; candle.textContent = '🏮'; candle.className = 'gb-candle w0'; }
-      else if(t[1] > t[0]){ won[1]++; candle.textContent = '🏮'; candle.className = 'gb-candle w1'; }
-    }
-    let title, msg;
-    if(won[0] === won[1]){ title = 'THE CANDLES SPLIT'; msg = 'A dead-even séance, '+won[0]+' candles apiece.'; }
-    else {
-      const w = won[0] > won[1] ? 0 : 1;
-      title = (cpu ? (w===0 ? 'YOU WIN THE SÉANCE' : 'THE GHOST TAKES THE TABLE') : pname(w)+' WINS THE SÉANCE');
-      msg = pname(w)+' claims '+won[w]+' of 3 candles.';
-    }
-    $('gb-over-title').textContent = title;
-    $('gb-over-msg').textContent = msg;
-    later(()=>$('gb-over').classList.add('show'), 1000);
-    buzz([70,50,90]);
-    if(won[0] === won[1]) Snd.swell();
-    else if(cpu && won[1] > won[0]) Snd.bad();
-    else Snd.win();
-  }
-
-  async function startMatch(vsCpu){
-    cpu = vsCpu; mode2p = !vsCpu;
-    over = false; round = 1; sel = null;
-    clearTimers();
-    $('gb-mode').classList.remove('show');
-    $('gb-over').classList.remove('show');
-    $('gb-side-them').textContent = cpu ? '👻 THE GHOST’S SIDE' : '👻 HAUNT’S SIDE (top player)';
-    $('gb-side-you').textContent = cpu ? '🔥 YOUR SIDE · YOUR CARDS GO IN THE BOTTOM HALF' : '🔥 EMBER’S SIDE (bottom player)';
-    board = [[[],[]],[[],[]],[[],[]]];
-    const ownedIds = (await Gambit.getOwned()).slice();
-    const all = Object.keys(C);
-    const myDeck = shuffle(ownedIds).slice(0,12);
-    const foeDeck = mode2p ? shuffle(ownedIds.slice()).slice(0,12) : shuffle(all.slice()).slice(0,12);
-    hands = [myDeck.splice(0,3), foeDeck.splice(0,3)];
-    decks = [myDeck, foeDeck];
-    buildBoardDOM();
-    if(mode2p) curtain(0, ()=>beginTurn(0));
-    else beginTurn(0);
-  }
-
-  function buildBoardDOM(){
-    $('gb-board').innerHTML = LANES.map((nm,li)=>
-      '<div class="gb-lane" id="gb-lane'+li+'" data-lane="'+li+'">'+
-        '<div class="gb-candle">🕯️</div>'+
-        '<div class="gb-zone opp"></div>'+
-        '<div class="gb-mid"><span class="tot them">0</span><span class="gb-lanename">'+nm+'</span><span class="tot you">0</span></div>'+
-        '<div class="gb-zone mine"></div>'+
-      '</div>').join('');
-    document.querySelectorAll('.gb-lane').forEach(el=>{
-      el.addEventListener('pointerdown', e=>{
-        if(over || !sel || (cpu && turnSide === 1)) return;
-        playCard(sel, +el.dataset.lane);
-      });
-    });
-  }
-
-  async function showCollection(){
-    const o = await Gambit.getOwned();
-    $('gb-collcount').textContent = o.length+' of '+Object.keys(C).length+' cards found';
-    $('gb-collgrid').innerHTML = Object.values(C).map(c=>{
-      const have = o.includes(c.id);
-      if(have) return '<div class="ccard"><div class="nm">'+c.name+'</div>'+
-        '<div class="st"><span class="pp">'+c.cost+'⚡ '+c.pow+'✦</span><br>'+(c.ab?Gambit.abText(c):'no gift')+'</div></div>';
-      return '<div class="ccard no"><div class="nm">???</div><div class="st">'+(Gambit.HINTS[c.suit]||'')+'</div></div>';
-    }).join('');
-    $('gb-coll').classList.add('show');
-  }
-
-  return {
-    mount(){
-      gtimers = []; running = true; over = true;
-      $('gb-board').innerHTML = ''; $('gb-hand').innerHTML = ''; $('gb-info').innerHTML = ''; $('gb-hint').innerHTML = '';
-      $('gb-vs-ghost').onclick = ()=>startMatch(true);
-      $('gb-vs-friend').onclick = ()=>startMatch(false);
-      $('gb-rematch').onclick = ()=>startMatch(!mode2p);
-      $('gb-switch').onclick = ()=>{ $('gb-over').classList.remove('show'); $('gb-mode').classList.add('show'); };
-      $('gb-end').onclick = ()=>{ if(!over && !(cpu && turnSide===1)) endTurn(); };
-      $('gb-collbtn').onclick = showCollection;
-      $('gb-coll2').onclick = showCollection;
-      $('gb-collclose').onclick = ()=>$('gb-coll').classList.remove('show');
-      $('gb-mode').classList.add('show');
-      this._demoStop = HowTo.attach('gb-demo', 'gambit');
-    },
-    unmount(){
-      running = false; over = true;
-      if(this._demoStop){ this._demoStop(); this._demoStop = null; }
-      clearTimers();
-      ['gb-mode','gb-curtain','gb-over','gb-coll'].forEach(id=>$(id).classList.remove('show'));
-      Gambit.refreshOwned();
-    }
-  };
-})());
-</script>
 
 <div id="howto"><div class="howto-card">
   <div class="howto-ico" id="howto-ico"></div>
@@ -3405,48 +2893,6 @@ const HowTo = (function(){
       }
     },
 
-    gambit(c, t){
-      const tt = t % 260;
-      c.strokeStyle = 'rgba(120,140,170,.35)';
-      c.lineWidth = 1.5;
-      c.strokeRect(115, 14, 70, 118);
-      c.fillStyle = 'rgba(38,224,255,.06)'; c.fillRect(116, 15, 68, 50);
-      c.fillStyle = 'rgba(255,122,46,.07)'; c.fillRect(116, 80, 68, 51);
-      txt(c, 150, 10, '🕯️', null, 12);
-      c.fillStyle = 'rgba(20,26,40,.95)';
-      c.fillRect(126, 22, 48, 20);
-      c.strokeStyle = 'rgba(38,224,255,.5)'; c.strokeRect(126, 22, 48, 20);
-      txt(c, 150, 36, '2', '#26e0ff', 11);
-      const played = tt > 130;
-      txt(c, 133, 76, played ? '2' : '2', '#26e0ff', 12);
-      txt(c, 167, 76, played ? '3' : '0', played ? '#ff7a2e' : 'rgba(255,122,46,.5)', played ? 14 : 12);
-      const cardX = played ? 150 : ease(60, 60, 0), cardY = 118;
-      if(tt < 130){
-        const sel = tt > 55;
-        c.fillStyle = 'rgba(28,34,52,.96)';
-        const cx2 = 45, cy2 = 100;
-        c.fillRect(cx2, cy2, 40, 44);
-        c.strokeStyle = sel ? '#e8a05a' : 'rgba(120,140,170,.4)';
-        c.strokeRect(cx2, cy2, 40, 44);
-        orb(c, cx2+2, cy2+2, 7, '#8b79d9');
-        txt(c, cx2+3, cy2+6, '2', '#fff', 9);
-        txt(c, cx2+29, cy2+38, '3', '#e8a05a', 13);
-        if(tt > 25 && tt < 70){ fing(c, cx2+20, cy2+24, tt > 45); rip(c, cx2+20, cy2+22, ph(tt, 47, 68)); }
-        if(tt > 85 && tt < 132){ fing(c, 150, 100, tt > 108); rip(c, 150, 100, ph(tt, 110, 130)); }
-      } else {
-        c.fillStyle = 'rgba(28,34,52,.96)';
-        c.fillRect(130, 88, 40, 40);
-        c.strokeStyle = 'rgba(255,122,46,.5)'; c.strokeRect(130, 88, 40, 40);
-        txt(c, 159, 120, '3', '#e8a05a', 13);
-        c.shadowColor = '#ff7a2e'; c.shadowBlur = 10;
-        txt(c, 150, 10, '🕯️', null, 12);
-        c.shadowBlur = 0;
-        c.globalAlpha = Math.max(0, 1 - ph(tt, 170, 250));
-        txt(c, 235, 70, 'BIGGER TOTAL', '#e8a05a', 10);
-        txt(c, 235, 84, 'WINS THE CANDLE', '#e8a05a', 10);
-        c.globalAlpha = 1;
-      }
-    }
   };
 
   function runLoop(cv, key, visCheck){
@@ -3505,6 +2951,7 @@ const HowTo = (function(){
 </script>
 
 <div id="ch-modal"><div class="ch-card" id="ch-card"></div></div>
+<div id="vs-modal"><div class="ch-card" id="vs-card"></div></div>
 
 <script>
 /* ================================================================
@@ -3590,6 +3037,10 @@ const Challenge = (function(){
 
   function onGameOver(g, score, slotId){
     const slot = document.getElementById(slotId);
+    if(typeof Vs !== 'undefined' && Vs.intercept(g, score)){
+      if(slot) slot.innerHTML = '';
+      return;
+    }
     if(!slot) return;
     let html = '';
     if(active && active.g === g){
@@ -3600,9 +3051,10 @@ const Challenge = (function(){
       if(chip) chip.className = 'ch-chip';
     }
     html += '<button class="smallbtn" data-chsend>⚔️ CHALLENGE A FRIEND</button>';
+    html += '<button class="smallbtn" data-vsstart>🤝 PASS &amp; PLAY DUEL</button>';
     slot.innerHTML = html;
     slot.querySelector('[data-chsend]').onclick = ()=>openCreate(g, score);
-    if(typeof Gambit !== 'undefined') Gambit.maybeDrop(g, score, slot);
+    slot.querySelector('[data-vsstart]').onclick = ()=>{ if(typeof Vs !== 'undefined') Vs.start(g); };
   }
 
   /* ---------- modal ---------- */
@@ -3715,10 +3167,93 @@ const Challenge = (function(){
       Shell.openGame(G2GAME[d.g]);
     }
   }
-  consumeHash();
+  setTimeout(consumeHash, 0);
   window.addEventListener('hashchange', consumeHash);
 
   return { enterGame, leaveGame, onScore, onGameOver, targetFor };
+})();
+</script>
+<script>
+/* ================================================================
+   PASS & PLAY DUEL: best-of-3 hot-seat series on any machine
+================================================================ */
+const Vs = (function(){
+  const RETRY = {P:'pg-over-btn', S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry'};
+  const NAMES = ['EMBER','HAUNT'];
+  const COLS = ['var(--coral)','var(--cyan)'];
+  let on = false, g = null, turn = 0, scores = [0,0], wins = [0,0], round = 1;
+
+  function el(id){ return document.getElementById(id); }
+  function hide(){ el('vs-modal').classList.remove('show'); }
+  function card(html, goFn){
+    el('vs-card').innerHTML = html;
+    el('vs-modal').classList.add('show');
+    const go = el('vs-go');
+    if(go) go.onclick = goFn;
+    const quit = el('vs-quit');
+    if(quit) quit.onclick = ()=>{ cancel(); };
+  }
+  function clickRetry(){
+    const b = el(RETRY[g]);
+    hide();
+    if(b) b.click();
+  }
+  function name(i){ return '<span style="color:'+COLS[i]+'"><b>'+NAMES[i]+'</b></span>'; }
+
+  function start(letter){
+    g = letter; on = true; turn = 0; scores = [0,0]; wins = [0,0]; round = 1;
+    card('<h2>PASS &amp; PLAY DUEL</h2>'+
+      '<p>Take turns playing a full run. Higher score takes the round. <b>First to 2 rounds wins.</b></p>'+
+      '<p>'+name(0)+' goes first.</p>'+
+      '<button class="bigbtn" id="vs-go">START ROUND 1</button>'+
+      '<button class="smallbtn ghost" id="vs-quit">CANCEL</button>',
+      clickRetry);
+  }
+
+  function intercept(letter, score){
+    if(!on || letter !== g) return false;
+    scores[turn] = score;
+    if(turn === 0){
+      turn = 1;
+      card('<h2>ROUND '+round+'</h2>'+
+        '<p>'+name(0)+' scored</p><div class="vs-big" style="color:'+COLS[0]+'">'+scores[0]+'</div>'+
+        '<p>Pass the phone to '+name(1)+'. Beat it!</p>'+
+        '<button class="bigbtn" id="vs-go">HAUNT&rsquo;S TURN</button>'+
+        '<button class="smallbtn ghost" id="vs-quit">END DUEL</button>',
+        clickRetry);
+      Snd.tap();
+    } else {
+      const w = scores[1] > scores[0] ? 1 : (scores[0] > scores[1] ? 0 : -1);
+      if(w >= 0) wins[w]++;
+      const done = wins[0] === 2 || wins[1] === 2;
+      const line = '<p>'+name(0)+' <b>'+scores[0]+'</b> &nbsp;&middot;&nbsp; '+name(1)+' <b>'+scores[1]+'</b></p>'+
+        '<p>Rounds: '+NAMES[0]+' '+wins[0]+' &middot; '+NAMES[1]+' '+wins[1]+'</p>';
+      if(done){
+        const champ = wins[0] === 2 ? 0 : 1;
+        card('<h2 style="color:'+COLS[champ]+'">'+NAMES[champ]+' WINS THE DUEL! 👑</h2>'+line+
+          '<button class="bigbtn" id="vs-go">REMATCH</button>'+
+          '<button class="smallbtn ghost" id="vs-quit">BACK TO THE ARCADE</button>',
+          ()=>start(g));
+        const quit = el('vs-quit');
+        if(quit) quit.onclick = ()=>{ cancel(); Shell.backToHub(); };
+        Snd.win(); buzz([60,50,60,50,90]);
+      } else {
+        const note = w >= 0
+          ? '<h2 style="color:'+COLS[w]+'">'+NAMES[w]+' TAKES ROUND '+round+'!</h2>'
+          : '<h2>ROUND '+round+' &middot; TIED</h2><p>No point. On to the next.</p>';
+        round++; turn = 0; scores = [0,0];
+        card(note+line+
+          '<button class="bigbtn" id="vs-go">ROUND '+round+' &middot; '+NAMES[0]+' FIRST</button>'+
+          '<button class="smallbtn ghost" id="vs-quit">END DUEL</button>',
+          clickRetry);
+        Snd.win();
+      }
+    }
+    return true;
+  }
+
+  function cancel(){ on = false; hide(); }
+  return { start, intercept, cancel };
 })();
 </script>
 <script>
