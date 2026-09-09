@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tupelo Ghost">
 <meta property="og:title" content="Tupelo Ghost Arcade">
-<meta property="og:description" content="Eight haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
+<meta property="og:description" content="Seven haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
 <meta property="og:url" content="https://tupeloghost.github.io/Pocket-Arcade/">
-<meta name="description" content="Eight haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, catch fireflies, glide through the swamp dark.">
+<meta name="description" content="Seven haunted machines, no coins needed. Mix phantom paints, duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -290,31 +290,6 @@
   #sn-canvas{display:block; border-radius:18px; border:2px solid rgba(255,255,255,.12); background:rgba(0,0,0,.3); touch-action:none;}
   .sn-tip{margin-top:12px; color:var(--dim); font-weight:800; font-size:13px; text-align:center;}
 
-  /* ============ FIREFLY RUSH ============ */
-  #ru-field{position:absolute; inset:0; overflow:hidden; touch-action:manipulation;}
-  .fly{
-    position:absolute; width:48px; height:48px; margin:-24px 0 0 -24px;
-    border-radius:50%; cursor:pointer; z-index:3;
-    animation:flylife linear forwards;
-  }
-  .fly.amber{background:radial-gradient(circle at 38% 32%, #ffe0b0, #e8a05a 65%); box-shadow:0 0 18px 5px rgba(232,160,90,.55);}
-  .fly.spirit{background:radial-gradient(circle at 38% 32%, #ffffff, #f2e7cf 60%); box-shadow:0 0 22px 6px rgba(38,224,255,.6);}
-  .fly.hollow{background:radial-gradient(circle at 50% 42%, #241a3e, #0e0a1c 72%); box-shadow:0 0 18px 5px rgba(139,121,217,.55);}
-  .fly.hollow::after{
-    content:''; position:absolute; top:38%; left:27%; width:8px; height:8px; border-radius:50%;
-    background:#8b79d9; box-shadow:14px 0 0 #8b79d9;
-  }
-  @keyframes flylife{
-    0%{transform:scale(.2); opacity:0}
-    12%{transform:scale(1.08); opacity:1}
-    22%{transform:scale(1)}
-    78%{transform:scale(.95); opacity:.95}
-    100%{transform:scale(.2); opacity:0}
-  }
-  .ru-lifes{position:absolute; top:8px; left:0; right:0; display:flex; gap:9px; justify-content:center; z-index:4; pointer-events:none;}
-  .ru-life{color:var(--gold); font-size:19px; text-shadow:0 0 10px rgba(232,160,90,.6); transition:opacity .3s;}
-  .ru-life.gone{opacity:.15;}
-  #ru-field.hurt{animation:shakeX .32s ease;}
 
   /* ============ GHOST GAMBIT ============ */
   #gb-board{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:min(96vw,460px); flex:1; min-height:0; margin-top:2px;}
@@ -494,7 +469,7 @@
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
     </div>
-    <p>MIDNIGHT ARCADE · EIGHT HAUNTS · NO COINS NEEDED</p>
+    <p>MIDNIGHT ARCADE · SEVEN HAUNTS · NO COINS NEEDED</p>
     <div class="epi">The arcade at the end of the dirt road. It only opens after dark.</div>
   </div>
   <button class="chbtn dare" id="dare-card"></button>
@@ -555,14 +530,6 @@
         <div class="meta"><span class="tag players">1-2P</span><span class="tag">CARDS</span><span class="tag best">OWNED <b id="best-gambit">–</b></span></div>
       </div>
     </button>
-    <button class="gcard" data-game="rush" style="--accent:var(--gold)">
-      <div class="ico">✨</div>
-      <div class="info">
-        <div class="name">FIREFLY RUSH</div>
-        <div class="desc">Tap fireflies before they vanish. Don’t tap the purple ones.</div>
-        <div class="meta"><span class="tag players">1P</span><span class="tag">FRENZY</span><span class="tag best">BEST <b id="best-rush">–</b></span></div>
-      </div>
-    </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
 </div>
@@ -583,27 +550,6 @@
       <div class="newbest" id="fl-newbest" style="display:none">★ NEW BEST ★</div>
       <button class="bigbtn" id="fl-retry" style="margin-top:14px;">DRIFT AGAIN</button>
       <div class="ch-slot" id="fl-chslot"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= FIREFLY RUSH ================= -->
-<div id="scr-rush" class="screen">
-  <div class="gamebar">
-    <button class="backbtn" data-back>← Arcade</button>
-    <div class="gb-title">FIREFLY RUSH</div><span class="ch-chip" id="ru-chban"></span>
-    <div class="gb-right"><span id="ru-score">0</span></div>
-  </div>
-  <div class="game-body">
-    <div id="ru-field"></div>
-    <div class="ru-lifes" id="ru-lifes"></div>
-    <div class="st-tip">Orange = tap · White = +3 · Purple = never</div>
-    <div class="gover" id="ru-over">
-      <h2>THE DARK WENT QUIET</h2>
-      <p id="ru-over-msg"></p>
-      <div class="newbest" id="ru-newbest" style="display:none">★ NEW BEST ★</div>
-      <button class="bigbtn" id="ru-retry" style="margin-top:14px;">RUSH AGAIN</button>
-      <div class="ch-slot" id="ru-chslot"></div>
     </div>
   </div>
 </div>
@@ -820,7 +766,7 @@ const Shell = (function(){
   }
 
   async function refreshBests(){
-    for(const k of ['pigment','stack','snake','flight','rush','shade']){
+    for(const k of ['pigment','stack','snake','flight','shade']){
       const v = await store.get('best-'+k);
       const el = document.getElementById('best-'+k);
       if(el) el.textContent = (v == null) ? '–' : v;
@@ -2544,177 +2490,6 @@ Shell.register('flight', (function(){
   };
 })());
 </script>
-<script>
-/* ================================================================
-   GAME 6: FIREFLY RUSH
-================================================================ */
-Shell.register('rush', (function(){
-  const $ = id => document.getElementById(id);
-  let field, timers, running, over, score, lives, streak, spawnGap, sinceSwarm, catches, bestR, crossedBR;
-
-  function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
-  function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
-
-  function drawLives(){
-    const el = $('ru-lifes');
-    el.innerHTML = '';
-    for(let i=0;i<3;i++){
-      const d = document.createElement('div');
-      d.className = 'ru-life' + (i < lives ? '' : ' gone');
-      d.textContent = '✦';
-      el.appendChild(d);
-    }
-  }
-  function popupAt(x, y, text, color){
-    const el = document.createElement('div');
-    el.className = 'popup';
-    el.textContent = text;
-    el.style.left = x+'px'; el.style.top = y+'px';
-    if(color) el.style.color = color;
-    field.appendChild(el);
-    later(()=>el.remove(), 850);
-  }
-  function hurt(x, y, note){
-    lives--;
-    drawLives();
-    streak = 0;
-    popupAt(x, y, note, 'var(--coral)');
-    field.classList.remove('hurt'); void field.offsetWidth; field.classList.add('hurt');
-    buzz([50,40,50]);
-    Snd.bad();
-    if(lives <= 0){ end(); }
-  }
-  async function end(){
-    over = true;
-    clearTimers();
-    field.querySelectorAll('.fly').forEach(f=>f.remove());
-    const isBest = await Shell.reportBest('rush', score);
-    if(score > bestR) bestR = score;
-    $('ru-over-msg').innerHTML = 'You caught <b>'+score+'</b> '+(score===1?'firefly':'fireflies')+'.';
-    $('ru-newbest').style.display = isBest ? 'block' : 'none';
-    $('ru-over').classList.add('show');
-    Challenge.onGameOver('R', score, 'ru-chslot');
-    buzz([70,60,70]);
-    Snd.bad();
-  }
-
-  function spawnOne(forceKind, noHurt){
-    if(over || !running) return;
-    const r = Math.random();
-    const kind = forceKind || (r < 0.10 ? 'hollow' : (r < 0.20 ? 'spirit' : 'amber'));
-    const life = noHurt ? 1600 : (kind === 'spirit' ? 950 : (kind === 'hollow' ? 1700 : Math.max(800, 1400 - score*8)));
-    const el = document.createElement('div');
-    el.className = 'fly ' + kind;
-    const fw = field.clientWidth, fh = field.clientHeight;
-    const px = 40 + Math.random()*(fw - 80);
-    const py = 50 + Math.random()*(fh - 130);
-    el.style.left = px+'px'; el.style.top = py+'px';
-    el.style.animationDuration = life+'ms';
-    let done = false;
-    el.addEventListener('pointerdown', e=>{
-      e.preventDefault();
-      if(done || over) return;
-      done = true;
-      el.remove();
-      if(kind === 'hollow'){
-        hurt(px, py, 'THE HOLLOW! −1 ✦');
-        return;
-      }
-      const gain = kind === 'spirit' ? 3 : 1;
-      score += gain;
-      streak++;
-      catches++;
-      if(catches % 20 === 0 && lives < 3){
-        lives++;
-        drawLives();
-        popupAt(px, py-52, '✦ LIFE RESTORED');
-        buzz([25,30,25]);
-        Snd.win();
-      }
-      $('ru-score').textContent = score;
-      bump($('ru-score'));
-      Challenge.onScore('R', score);
-      popupAt(px, py-8, '+'+gain, kind === 'spirit' ? 'var(--cyan)' : null);
-      buzz(kind === 'spirit' ? [20,25,20] : 15);
-      Snd.pick(Math.min(8, streak-1));
-      if(!crossedBR && bestR > 0 && score > bestR){
-        crossedBR = true;
-        popupAt(px, py-70, 'PAST YOUR BEST!');
-        Snd.win(); buzz([40,60,40]);
-      }
-      if(streak > 0 && streak % 10 === 0){
-        score += 5;
-        $('ru-score').textContent = score;
-        Challenge.onScore('R', score);
-        popupAt(px, py-34, 'HOT STREAK +5');
-        buzz([25,25,25]);
-      }
-    });
-    field.appendChild(el);
-    later(()=>{
-      if(done || over) return;
-      done = true;
-      el.remove();
-      if(kind === 'amber' && !noHurt) hurt(px, py, 'FADED −1 ✦');
-    }, life);
-  }
-
-  function swarm(){
-    if(over || !running) return;
-    const el = document.createElement('div');
-    el.className = 'popup';
-    el.textContent = '✨ SWARM ✨';
-    el.style.left = '50%'; el.style.top = '40%';
-    el.style.fontSize = '24px';
-    field.appendChild(el);
-    later(()=>el.remove(), 850);
-    buzz([20,30,20,30,20]);
-    Snd.win();
-    for(let i=0;i<7;i++) later(()=>spawnOne('amber', true), i*70);
-  }
-
-  function spawnLoop(){
-    if(over || !running) return;
-    sinceSwarm++;
-    if(sinceSwarm >= 22){ sinceSwarm = 0; swarm(); }
-    else spawnOne();
-    spawnGap = Math.max(380, 900 - score*9);
-    later(spawnLoop, spawnGap * (0.8 + Math.random()*0.4));
-  }
-
-  function reset(){
-    over = false; score = 0; lives = 3; streak = 0; spawnGap = 900; sinceSwarm = 0; catches = 0; crossedBR = false;
-    clearTimers();
-    field.querySelectorAll('.fly,.popup').forEach(f=>f.remove());
-    $('ru-score').textContent = '0';
-    $('ru-over').classList.remove('show');
-    drawLives();
-    // a welcoming opening burst so the dark is never empty
-    for(let i=0;i<3;i++) later(()=>spawnOne('amber', true), 350 + i*180);
-    later(spawnLoop, 900);
-  }
-
-  return {
-    mount(){
-      field = $('ru-field');
-      timers = [];
-      running = true;
-      bestR = 0;
-      Shell.store.get('best-rush').then(v=>{ bestR = v || 0; });
-      $('ru-retry').onclick = ()=>reset();
-      Challenge.enterGame('R', 'ru-chban');
-      HowTo.show('rush', reset);
-    },
-    unmount(){
-      running = false; over = true;
-      clearTimers();
-      field.querySelectorAll('.fly,.popup').forEach(f=>f.remove());
-      Challenge.leaveGame();
-      $('ru-over').classList.remove('show');
-    }
-  };
-})());
-</script>
 
 <script>
 /* ================================================================
@@ -3036,20 +2811,17 @@ const Gambit = (function(){
     n3:{id:'n3', name:'The Marsh King',     cost:6, pow:8, ab:'swarm',  suit:'N'},
     f1:{id:'f1', name:'Bramble Crow',       cost:2, pow:3, ab:'dread',  suit:'F'},
     f2:{id:'f2', name:'Night Glider',       cost:4, pow:6, ab:null,     suit:'F'},
-    r1:{id:'r1', name:'Lantern Keeper',     cost:3, pow:3, ab:'lantern', l:2, suit:'R'},
-    r2:{id:'r2', name:'Firefly Queen',      cost:4, pow:4, ab:'swarm',  suit:'R'},
     h1:{id:'h1', name:'The Lamplighter',    cost:2, pow:2, ab:'lantern', l:1, suit:'H'},
     h2:{id:'h2', name:'Shade Eater',        cost:4, pow:5, ab:'dread',  suit:'H'},
     d1:{id:'d1', name:'The Ghost',          cost:5, pow:7, ab:'loner',  suit:'D'}
   };
   const STARTERS = ['s1','s2','s3','s4','s5','s6','s7','s8'];
-  const TH = {P:500, S:10, N:10, F:6, R:15, H:15};
+  const TH = {P:500, S:10, N:10, F:6, H:15};
   const HINTS = {
     P:'Score 500+ in Phantom Paint to lure it out.',
     S:'Stack 10+ in Ghost Stack to lure it out.',
     N:'Score 10+ in Specter Snake to lure it out.',
     F:'Score 6+ in Wisp Flight to lure it out.',
-    R:'Catch 15+ in Firefly Rush to lure it out.',
     H:'Score 15+ in Shade Shooter to lure it out.',
     D:'Beat the Ghost in Spirit Duel to win his card.'
   };
@@ -3065,6 +2837,7 @@ const Gambit = (function(){
     if(owned) return owned;
     owned = (await Shell.store.get('cards')) || null;
     if(!owned){ owned = STARTERS.slice(); Shell.store.set('cards', owned); }
+    owned = owned.filter(id=>CARDS[id]);
     return owned;
   }
   function save(){ Shell.store.set('cards', owned); }
@@ -3574,36 +3347,6 @@ const HowTo = (function(){
       });
     },
 
-    rush(c, t){
-      const tt = t % 290;
-      function fly(x, y, born, tapAt, col, glow, label){
-        if(tt < born) return;
-        if(tt < tapAt){
-          const grow = Math.min(1, ph(tt, born, born+12));
-          orb(c, x, y, 13*grow, col, glow);
-        } else {
-          sparkle(c, x, y, ph(tt, tapAt, tapAt+45), glow);
-          c.globalAlpha = Math.max(0, 1 - ph(tt, tapAt, tapAt+60));
-          txt(c, x, y - 18 - ph(tt, tapAt, tapAt+60)*14, label);
-          c.globalAlpha = 1;
-        }
-        if(tt > tapAt - 34 && tt < tapAt + 6){ fing(c, x, y+2, tt > tapAt - 12); rip(c, x, y, ph(tt, tapAt-10, tapAt+8)); }
-      }
-      fly(80, 60, 15, 75, '#e8a05a', '#e8a05a', '+1');
-      fly(210, 95, 90, 150, '#f2e7cf', '#26e0ff', '+3');
-      if(tt > 175){
-        orb(c, 130, 105, 13, '#141026', '#8b79d9');
-        c.fillStyle = '#8b79d9';
-        c.beginPath(); c.arc(125, 103, 2.2, 0, 6.3); c.arc(135, 103, 2.2, 0, 6.3); c.fill();
-        if(tt > 195 && tt < 265){
-          const fx = ease(190, 152, ph(tt, 195, 225));
-          const back = tt > 235 ? ease(152, 195, ph(tt, 235, 260)) : fx;
-          fing(c, back, 108, false);
-          if(tt > 220){ txt(c, 130, 78, '✕ NEVER', '#ff4d6d', 15); }
-        }
-      }
-    },
-
     shade(c, t){
       const tt = t % 200;
       const sway = Math.sin(tt*0.04)*16;
@@ -3731,8 +3474,7 @@ const HowTo = (function(){
     stack:   {ico:'🌙', title:'Ghost Stack',   cap:'<b>Tap to drop the block.</b> Overhangs get sliced off, so aim for perfect.'},
     snake:   {ico:'🐍', title:'Specter Snake', cap:'<b>Swipe anywhere to steer.</b> The edges wrap around. Eat fireflies, dodge the purple Hollow.'},
     flight:  {ico:'👻', title:'Wisp Flight',   cap:'<b>Tap to fly up.</b> Slip through the gaps. Your first crash is forgiven.'},
-    shade:   {ico:'🏮', title:'Shade Shooter', cap:'<b>Slide to move.</b> The lantern fires by itself. Don’t let the shades reach you.'},
-    rush:    {ico:'✨', title:'Firefly Rush',  cap:'<b>Tap fireflies before they fade.</b> Never tap the purple ones. 3 lives.'}
+    shade:   {ico:'🏮', title:'Shade Shooter', cap:'<b>Slide to move.</b> The lantern fires by itself. Don’t let the shades reach you.'}
   };
   let stopDemo = null;
   function show(key, onPlay){
@@ -3767,8 +3509,8 @@ const HowTo = (function(){
    CHALLENGE SYSTEM: signed score codes you can text to a rival
 ================================================================ */
 const Challenge = (function(){
-  const G2GAME  = {P:'pigment', S:'stack', N:'snake', F:'flight', R:'rush', H:'shade'};
-  const G2TITLE = {P:'Phantom Paint', S:'Ghost Stack', N:'Specter Snake', F:'Wisp Flight', R:'Firefly Rush', H:'Shade Shooter'};
+  const G2GAME  = {P:'pigment', S:'stack', N:'snake', F:'flight', H:'shade'};
+  const G2TITLE = {P:'Phantom Paint', S:'Ghost Stack', N:'Specter Snake', F:'Wisp Flight', H:'Shade Shooter'};
   let active = null, chip = null, chipGame = null;
 
   Shell.store.get('challenge').then(v=>{ if(v && !active) active = v; refreshHubBtn(); });
@@ -3785,7 +3527,7 @@ const Challenge = (function(){
     return core+'-'+chk(core);
   }
   function decode(code){
-    const m = (code||'').trim().toUpperCase().match(/^([PSNFRH])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
+    const m = (code||'').trim().toUpperCase().match(/^([PSNFH])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
     if(!m) return null;
     if(chk(m[1]+'-'+m[2]+'-'+m[3]) !== m[4]) return null;
     return {g:m[1], score:+m[2], name:m[3]};
@@ -3987,7 +3729,6 @@ const Dare = (function(){
     {g:'S', name:'Ghost Stack',   game:'stack',   targets:[8, 12, 16]},
     {g:'N', name:'Specter Snake', game:'snake',   targets:[10, 15, 20]},
     {g:'F', name:'Wisp Flight',   game:'flight',  targets:[6, 10, 14]},
-    {g:'R', name:'Firefly Rush',  game:'rush',    targets:[15, 22, 30]},
     {g:'H', name:'Shade Shooter', game:'shade',   targets:[15, 25, 40]},
     {g:'D', name:'Spirit Duel',   game:'tw',      targets:[1]}
   ];
