@@ -384,7 +384,7 @@
   .ccard .pp{color:var(--gold); font-weight:700;}
 
   /* ============ CHALLENGES ============ */
-  .ch-chip{display:none; align-items:center; gap:5px; font-weight:900; font-size:11.5px; letter-spacing:.5px; padding:4px 10px; border-radius:999px; border:1.5px solid var(--gold); color:var(--gold); white-space:nowrap;}
+  .ch-chip{display:none; align-items:center; gap:5px; font-weight:900; font-size:13px; letter-spacing:.5px; padding:5px 12px; border-radius:999px; border:1.5px solid var(--gold); color:var(--gold); white-space:nowrap; background:rgba(232,160,90,.1);}
   .ch-chip.on{display:inline-flex;}
   .ch-chip.beaten{border-color:var(--lime); color:var(--lime);}
   .chbtn{margin-top:16px; width:min(92vw,430px); font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:16px; letter-spacing:1.5px; color:var(--text); background:rgba(232,160,90,.10); border:2px dashed rgba(232,160,90,.5); border-radius:18px; padding:14px; cursor:pointer;}
@@ -445,6 +445,14 @@
     line-height:1.5; max-width:300px; text-align:center;
   }
   .demo-cap b{color:var(--text);}
+  #howto-ch{
+    align-items:center; justify-content:center;
+    font-weight:900; font-size:14px; letter-spacing:.5px; white-space:nowrap;
+    color:var(--gold); border:1.5px solid var(--gold); background:rgba(232,160,90,.12);
+    border-radius:999px; padding:8px 18px;
+    animation:throb 1.4s ease-in-out infinite;
+  }
+  #howto-ch b{color:var(--text);}
   .rules{text-align:left; display:flex; flex-direction:column; gap:9px; font-size:12.5px; color:var(--dim); font-weight:700; line-height:1.5; width:100%;}
   .rules div{display:flex; gap:9px; align-items:flex-start;}
   .rules b{color:var(--text);}
@@ -3404,6 +3412,7 @@ Shell.register('gambit', (function(){
   <h2 id="howto-title"></h2>
   <canvas id="howto-canvas" width="600" height="300" class="demo-cv"></canvas>
   <p id="howto-cap" class="demo-cap"></p>
+  <div id="howto-ch" style="display:none;"></div>
   <button class="bigbtn" id="howto-play" style="margin-top:2px;">PLAY</button>
 </div></div>
 
@@ -3732,6 +3741,11 @@ const HowTo = (function(){
     document.getElementById('howto-ico').textContent = d.ico;
     document.getElementById('howto-title').textContent = d.title;
     document.getElementById('howto-cap').innerHTML = d.cap;
+    const chEl = document.getElementById('howto-ch');
+    const t = (typeof Challenge !== 'undefined') ? Challenge.targetFor(key) : null;
+    chEl.style.display = t ? 'inline-flex' : 'none';
+    if(t) chEl.innerHTML = '⚔️ CHALLENGE: BEAT <b>&nbsp;'+t.name+'’S '+t.score+'</b>';
+    document.getElementById('howto-play').textContent = t ? 'ACCEPT ⚔️' : 'PLAY';
     document.getElementById('howto').classList.add('show');
     if(stopDemo) stopDemo();
     stopDemo = runLoop(document.getElementById('howto-canvas'), key,
@@ -3794,12 +3808,28 @@ const Challenge = (function(){
       : '⚔️ GOT A CHALLENGE CODE?';
   }
 
+  function targetFor(gameKey){
+    if(!active) return null;
+    return G2GAME[active.g] === gameKey ? {name: active.name, score: active.score} : null;
+  }
+
+  function targetBanner(){
+    if(!active) return;
+    const b = document.createElement('div');
+    b.className = 'dare-banner';
+    b.textContent = '⚔️ BEAT '+active.name+'’S '+active.score;
+    document.body.appendChild(b);
+    setTimeout(()=>b.classList.add('show'), 30);
+    setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(), 500); }, 3200);
+  }
+
   function enterGame(g, chipId){
     chip = document.getElementById(chipId); chipGame = g;
     if(!chip) return;
     if(active && active.g === g){
       chip.className = 'ch-chip on';
-      chip.textContent = '⚔️ '+active.name+' '+active.score;
+      chip.textContent = '⚔️ BEAT '+active.name+'’S '+active.score;
+      targetBanner();
     } else {
       chip.className = 'ch-chip';
     }
@@ -3944,7 +3974,7 @@ const Challenge = (function(){
   consumeHash();
   window.addEventListener('hashchange', consumeHash);
 
-  return { enterGame, leaveGame, onScore, onGameOver };
+  return { enterGame, leaveGame, onScore, onGameOver, targetFor };
 })();
 </script>
 <script>
