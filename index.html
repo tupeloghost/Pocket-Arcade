@@ -588,7 +588,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ RIVALS &amp; CHALLENGES</button>
-  <div class="verstamp">v2026.09.09.20</div>
+  <div class="verstamp">v2026.09.09.22</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -3721,7 +3721,7 @@ const Rivals = (function(){
       ib.forEach((m,i)=>{
         html += '<div class="pt-row" style="color:'+colorOf(m.from)+'">'+
           '<span class="dot" style="background:'+colorOf(m.from)+'"></span>'+
-          '<span class="nm2">'+m.from+' dares you: beat <b>'+m.score+'</b> in '+GAMES[m.game]+'</span>'+
+          '<span class="nm2">'+m.from+' challenges you: beat <b>'+m.score+'</b> in '+GAMES[m.game]+'</span>'+
           '<button class="smallbtn" data-play="'+i+'" style="padding:5px 12px">PLAY</button></div>';
       });
     }
@@ -3733,7 +3733,7 @@ const Rivals = (function(){
         '<span class="dot" style="background:'+colorOf(t)+'"></span>'+
         '<span class="nm2">'+t+'</span>'+
         '<b style="font-family:\'Space Mono\',monospace; font-size:12px">'+r.w+'W · '+r.l+'L</b>'+
-        '<button class="smallbtn" data-dare="'+t+'" style="padding:5px 10px">DARE</button>'+
+        '<button class="smallbtn" data-dare="'+t+'" style="padding:5px 10px">CHALLENGE</button>'+
         '<button class="smallbtn ghost" data-hist="'+t+'" style="padding:5px 8px">…</button></div>';
       if(expanded === t && r.hist.length){
         html += '<div style="font-size:11px; color:var(--dim); text-align:left; width:100%; padding:0 6px 4px; font-weight:700;">'+
@@ -3773,7 +3773,7 @@ const Rivals = (function(){
           body: JSON.stringify({t:'chal', from: await myUser(), game: g, score: best})
         });
         daring = null;
-        banner('⚔️ Dare sent: beat your '+best+' in '+GAMES[g]);
+        banner('⚔️ Challenge sent: beat your '+best+' in '+GAMES[g]);
         open();
       }catch(e){ b.textContent = 'FAILED · RETRY'; }
     });
@@ -3832,7 +3832,7 @@ const Dare = (function(){
     const what = t.g === 'D' ? 'Beat the Ghost in Spirit Duel' : 'Score '+t.target+' in '+t.name;
     el.innerHTML =
       '<span class="d-ico">'+(done ? '🏮' : '🕯️')+'</span>'+
-      '<span class="d-mid"><span class="d-label">Tonight’s dare'+(streak > 1 ? ' · 🔥 '+streak+' nights' : '')+'</span>'+
+      '<span class="d-mid"><span class="d-label">Tonight’s challenge'+(streak > 1 ? ' · 🔥 '+streak+' nights' : '')+'</span>'+
       '<div class="d-task">'+what+'</div></span>'+
       '<span class="d-status">'+(done ? '✓ DONE' : 'TAP TO PLAY')+'</span>';
     el.classList.toggle('lit', done);
@@ -3851,7 +3851,7 @@ const Dare = (function(){
   function banner(){
     const b = document.createElement('div');
     b.className = 'dare-banner';
-    b.textContent = '🏮 DARE COMPLETE!' + (streak > 1 ? ' 🔥 '+streak+' NIGHTS RUNNING' : '');
+    b.textContent = '🏮 CHALLENGE COMPLETE!' + (streak > 1 ? ' 🔥 '+streak+' NIGHTS RUNNING' : '');
     document.body.appendChild(b);
     setTimeout(()=>b.classList.add('show'), 30);
     setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(), 500); }, 3400);
