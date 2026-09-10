@@ -459,7 +459,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.3</div>
+  <div class="verstamp">v2026.09.09.4</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -1453,7 +1453,7 @@ Shell.register('tw', (function(){
 ================================================================ */
 Shell.register('stack', (function(){
   const $ = id => document.getElementById(id);
-  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash, puffs, zoneIdx, bestH, crossedBest, lastLand, salvage, slowT;
+  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash, puffs, zoneIdx, bestH, crossedBest, lastLand, salvage, slowT, lastTick, dog;
   const SAVE_COST = 40, SALVAGE_CAP = 60;
 
   const ZONES = [
@@ -1603,6 +1603,7 @@ Shell.register('stack', (function(){
 
   function draw(){
     if(!running) return;
+    lastTick = Date.now();
     const w = W(), h = H();
     ctx.clearRect(0,0,w,h);
 
@@ -1785,11 +1786,16 @@ Shell.register('stack', (function(){
       window.addEventListener('keydown', onKey);
       window.addEventListener('resize', onResize);
       Challenge.enterGame('S', 'st-chban');
+      lastTick = Date.now();
       raf = requestAnimationFrame(draw);
+      dog = setInterval(()=>{
+        if(running && Date.now() - lastTick > 500){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+      }, 600);
       HowTo.show('stack', reset);
     },
     unmount(){
       running = false;
+      clearInterval(dog);
       cancelAnimationFrame(raf);
       cv.removeEventListener('pointerdown', onTap);
       window.removeEventListener('keydown', onKey);
@@ -2135,7 +2141,7 @@ Shell.register('snake', (function(){
 Shell.register('flight', (function(){
   const $ = id => document.getElementById(id);
   const GRAV = 0.24, FLAP = -5.6, PW = 48, R = 13;
-  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy;
+  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy, lastTick, dog;
 
   function sizeCanvas(){
     const body = cv.parentElement;
@@ -2218,6 +2224,7 @@ Shell.register('flight', (function(){
 
   function draw(){
     if(!running) return;
+    lastTick = Date.now();
     const w = W(), h = H(), x = wx();
     ctx.clearRect(0,0,w,h);
     ctx.save();
@@ -2359,11 +2366,16 @@ Shell.register('flight', (function(){
       window.addEventListener('resize', onResize);
       $('fl-retry').onclick = ()=>reset();
       Challenge.enterGame('F', 'fl-chban');
+      lastTick = Date.now();
       raf = requestAnimationFrame(draw);
+      dog = setInterval(()=>{
+        if(running && Date.now() - lastTick > 500){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+      }, 600);
       HowTo.show('flight', reset);
     },
     unmount(){
       running = false;
+      clearInterval(dog);
       cancelAnimationFrame(raf);
       cv.removeEventListener('pointerdown', onTap);
       window.removeEventListener('keydown', onKey);
@@ -2381,7 +2393,7 @@ Shell.register('flight', (function(){
 ================================================================ */
 Shell.register('shade', (function(){
   const $ = id => document.getElementById(id);
-  let cv, ctx, dpr, raf, running, over, score, lives, wave, px, targetX, shots, foes, pows, fxs, frames, spreadT, fireCd, formY, invulnT, bestS, crossedBS;
+  let cv, ctx, dpr, raf, running, over, score, lives, wave, px, targetX, shots, foes, pows, fxs, frames, spreadT, fireCd, formY, invulnT, bestS, crossedBS, maxSlot, lastTick, dog;
 
   function sizeCanvas(){
     const body = cv.parentElement;
@@ -2410,8 +2422,9 @@ Shell.register('shade', (function(){
     const sp = Math.min(58, (W()-50)/(cols-1));
     const ox = (W() - sp*(cols-1))/2;
     for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
-      foes.push({slotX: ox + c*sp, slotY: 46 + r*46, x:0, y:-40, dive:0, t:0});
+      foes.push({slotX: ox + c*sp, slotY: 46 + r*46, x:0, y:-40, dive:0, t:0, warn:0, drop:0});
     }
+    maxSlot = 46 + (rows-1)*46;
     formY = -rows*46 - 20;
     if(wave > 1){ addFx(W()/2, H()*0.35, 'WAVE '+wave, '#e8a05a'); Snd.swell(); buzz([25,30,25]); }
   }
@@ -2470,6 +2483,7 @@ Shell.register('shade', (function(){
 
   function draw(){
     if(!running) return;
+    lastTick = Date.now();
     const w = W(), h = H(), py = h - 64;
     ctx.clearRect(0,0,w,h);
     frames++;
@@ -2487,33 +2501,42 @@ Shell.register('shade', (function(){
       if(--fireCd <= 0){
         shots.push({x:px, y:py-16, vx:0});
         if(spreadT > 0){ shots.push({x:px-6, y:py-12, vx:-1.8}); shots.push({x:px+6, y:py-12, vx:1.8}); }
-        fireCd = 17;
+        fireCd = 14;
       }
       if(spreadT > 0) spreadT--;
       if(invulnT > 0) invulnT--;
 
-      // formation drifts down and sways
-      formY += 0.06 + wave*0.012;
+      // formation sweeps in fast, then parks in the upper half
+      if(formY < 30) formY += 3;
+      else formY += 0.02 + wave*0.004;
+      const formCap = h*0.55 - maxSlot;
+      if(formY > formCap) formY = formCap;
       const sway = Math.sin(frames*0.018)*22;
 
-      // divers peel off
-      if(frames % Math.max(60, 150 - wave*12) === 0){
-        const idle = foes.filter(f=>!f.dive);
+      // divers telegraph, then peel off
+      if(frames % Math.max(45, 130 - wave*12) === 0){
+        const idle = foes.filter(f=>!f.dive && !f.warn);
         if(idle.length){
-          const f = idle[Math.floor(Math.random()*idle.length)];
-          f.dive = 1; f.t = 0;
-          f.sx = f.slotX + sway; f.sy = f.slotY + formY; f.tx = px;
+          idle[Math.floor(Math.random()*idle.length)].warn = 28;
         }
       }
       for(const f of foes){
+        if(f.warn > 0){
+          f.warn--;
+          if(f.warn === 0){
+            f.dive = 1; f.t = 0;
+            f.sx = f.slotX + sway; f.sy = f.slotY + formY; f.tx = px;
+          }
+        }
         if(f.dive){
           f.t += 0.011 + wave*0.0012;
           f.x = f.sx + (f.tx - f.sx)*f.t + Math.sin(f.t*9)*26;
           f.y = f.sy + (h + 40 - f.sy)*f.t*f.t;
-          if(f.y > h + 30){ f.dive = 0; }
+          if(f.y > h + 30){ f.dive = 0; f.drop = -280; }
         } else {
+          if(f.drop){ f.drop *= 0.88; if(f.drop > -2) f.drop = 0; }
           f.x = f.slotX + sway;
-          f.y = f.slotY + formY;
+          f.y = f.slotY + formY + f.drop;
         }
       }
 
@@ -2543,8 +2566,7 @@ Shell.register('shade', (function(){
 
       // shades reach you
       for(const f of foes){
-        if(Math.abs(f.x-px) < 19 && Math.abs(f.y-py) < 21){ hitPlayer(); if(f.dive){ f.dive = 0; } burst(f.x, f.y, '#8b79d9'); f.dead = 1; break; }
-        if(!f.dive && f.y > h - 110){ hitPlayer(); formY -= 150; break; }
+        if(Math.abs(f.x-px) < 19 && Math.abs(f.y-py) < 22){ hitPlayer(); burst(f.x, f.y, '#8b79d9'); f.dead = 1; break; }
       }
       foes = foes.filter(f=>!f.dead);
       if(!foes.length && !over) nextWave();
@@ -2559,11 +2581,12 @@ Shell.register('shade', (function(){
     // shades
     for(const f of foes){
       if(f.y < -30) continue;
+      const hot = f.dive || (f.warn > 0 && f.warn % 8 < 4);
       ctx.fillStyle = '#141026';
-      ctx.shadowColor = '#8b79d9'; ctx.shadowBlur = f.dive ? 18 : 10;
+      ctx.shadowColor = hot ? '#ff7a2e' : '#8b79d9'; ctx.shadowBlur = f.dive ? 18 : (hot ? 16 : 10);
       ctx.beginPath(); ctx.arc(f.x, f.y, f.dive ? 14 : 12, 0, Math.PI*2); ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.fillStyle = f.dive ? '#ff7a2e' : '#8b79d9';
+      ctx.fillStyle = hot ? '#ff7a2e' : '#8b79d9';
       ctx.beginPath();
       ctx.arc(f.x-4.5, f.y-1.5, 2.1, 0, Math.PI*2);
       ctx.arc(f.x+4.5, f.y-1.5, 2.1, 0, Math.PI*2);
@@ -2652,11 +2675,16 @@ Shell.register('shade', (function(){
       window.addEventListener('resize', onResize);
       $('sh-retry').onclick = ()=>reset();
       Challenge.enterGame('H', 'sh-chban');
+      lastTick = Date.now();
       raf = requestAnimationFrame(draw);
+      dog = setInterval(()=>{
+        if(running && Date.now() - lastTick > 500){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+      }, 600);
       HowTo.show('shade', reset);
     },
     unmount(){
       running = false;
+      clearInterval(dog);
       cancelAnimationFrame(raf);
       cv.removeEventListener('pointerdown', pointTo);
       cv.removeEventListener('pointermove', pointTo);
