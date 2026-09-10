@@ -219,6 +219,10 @@
   .tw-winhalf{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:17px; letter-spacing:2px; padding:9px 20px; border-radius:999px;}
   .flip{transform:rotate(180deg);}
   #scr-tw.solo .tw-side.top, #scr-tw.solo .flip{transform:none;}
+  .tw-arena.reading .opt, .tw-arena.reading .orb, .tw-arena.reading [data-wisp], .tw-arena.reading .targetbox, .tw-arena.reading .oddgrid{
+    opacity:.55; filter:saturate(.5); pointer-events:none; transition:opacity .2s, filter .2s;
+  }
+  .tw-side.goflash{background:rgba(232,160,90,.16) !important;}
 
   /* ============ STACK ============ */
   #st-canvas{display:block; touch-action:manipulation;}
@@ -493,7 +497,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.7</div>
+  <div class="verstamp">v2026.09.09.8</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -759,6 +763,7 @@ Shell.register('tw', (function(){
   const $ = id => document.getElementById(id);
   let arenas, sidesEl, pipsEl, scores, locked, timers, lastGame, active, totalRounds, doubleRound;
   let cpu = false, cpuSkill = 1500, cpuInfo = null;
+  let seenTypes = {}, readDelay = 0;
 
   function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
   function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
@@ -815,7 +820,7 @@ Shell.register('tw', (function(){
       if(locked || !active) return;
       hot = true;
       document.querySelectorAll('#scr-tw .orb').forEach(o=>{ o.classList.add('hot'); o.textContent='TAP!'; });
-    }, 1200 + Math.random()*2600);
+    }, readDelay + 1200 + Math.random()*2600);
   }
 
   function gMatch(){
@@ -913,7 +918,8 @@ Shell.register('tw', (function(){
     };
     const els = document.querySelectorAll('#scr-tw [data-wisp]');
     function drift(){
-      if(locked || !active) return;
+      if(!active) return;
+      if(locked){ later(drift, 60); return; }
       s.x += s.vx; s.y += s.vy;
       if(s.x < .09 || s.x > .91){ s.vx *= -1; s.x = Math.max(.09, Math.min(.91, s.x)); }
       if(s.y < .2 || s.y > .8){ s.vy *= -1; s.y = Math.max(.2, Math.min(.8, s.y)); }
@@ -1000,14 +1006,31 @@ Shell.register('tw', (function(){
       if(!active) return;
       let g;
       do{ g = Math.floor(Math.random()*GAMES.length); } while(g===lastGame);
-      lastGame = g; locked = false;
+      lastGame = g;
+      const seen = seenTypes[g] || 0;
+      seenTypes[g] = seen + 1;
+      readDelay = seen === 0 ? 2400 : (totalRounds > 8 ? 900 : 1400);
+      locked = true;
       GAMES[g]();
       if(doubleRound) document.querySelectorAll('#scr-tw .tw-arena').forEach(a=>{
         const b = document.createElement('div');
         b.className = 'x2badge'; b.textContent = '⚡ ×2';
         a.appendChild(b);
       });
-      cpuPlay();
+      const label = $('tw-midtext').innerHTML;
+      $('tw-midtext').innerHTML = '👀 READ IT…';
+      arenas.forEach(a=>a.classList.add('reading'));
+      later(()=>{
+        if(!active) return;
+        arenas.forEach(a=>a.classList.remove('reading'));
+        $('tw-midtext').innerHTML = label;
+        sidesEl.forEach(sd=>sd.classList.add('goflash'));
+        later(()=>sidesEl.forEach(sd=>sd.classList.remove('goflash')), 320);
+        locked = false;
+        buzz(20);
+        Snd.tap();
+        cpuPlay();
+      }, readDelay);
     }, Math.max(450, 900 - totalRounds*35));
   }
 
