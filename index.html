@@ -178,6 +178,17 @@
     filter:drop-shadow(0 0 12px rgba(242,231,207,.85));
   }
   .orb.mashy{font-size:48px; color:var(--text); font-family:'Space Mono', monospace; font-weight:700;}
+  .tugtrack{
+    position:relative; width:min(72vw,310px); height:52px; border-radius:999px;
+    background:linear-gradient(90deg, rgba(38,224,255,.16), rgba(255,255,255,.05) 32%, rgba(255,255,255,.05) 68%, rgba(255,122,46,.16));
+    border:1.5px solid rgba(140,160,190,.3);
+    box-shadow:inset 0 0 18px rgba(0,0,0,.45);
+  }
+  .tugorb{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:34px; padding:6px; cursor:pointer; transition:left .07s linear;
+    filter:drop-shadow(0 0 11px rgba(242,231,207,.85));
+  }
   .x2badge{
     position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:4;
     color:var(--gold); font-weight:700; font-size:13px; letter-spacing:1.5px;
@@ -501,7 +512,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.10</div>
+  <div class="verstamp">v2026.09.09.11</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -770,7 +781,7 @@ Shell.register('tw', (function(){
   const $ = id => document.getElementById(id);
   let arenas, sidesEl, pipsEl, scores, locked, timers, lastGame, active, totalRounds, doubleRound;
   let cpu = false, cpuSkill = 1500, cpuInfo = null;
-  let seenTypes = {}, readDelay = 0;
+  let seenTypes = {}, readDelay = 0, comebackFor = -1;
 
   function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
   function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
@@ -798,8 +809,8 @@ Shell.register('tw', (function(){
     if(locked || !active) return;
     locked = true; clearTimers();
     const loser = 1-winner;
-    const pts = doubleRound ? 2 : 1;
-    scores[winner] += pts; drawPips(); buzz(doubleRound ? [60,50,60] : 60);
+    const pts = doubleRound ? 2 : (winner === comebackFor ? 2 : 1);
+    scores[winner] += pts; drawPips(); buzz(pts > 1 ? [60,50,60] : 60);
     Snd.pick(doubleRound ? 6 : 4);
     if(cpu){ cpuSkill = Math.max(500, Math.min(2400, cpuSkill + (winner === 1 ? 140 : -110))); }
     sidesEl[winner].classList.add('winflash');
@@ -955,7 +966,27 @@ Shell.register('tw', (function(){
     });
   }
 
-  const GAMES = [gReflex, gMatch, gMath, gOdd, gStroop, gCount, gChase, gMash];
+  function gTug(){
+    $('tw-midtext').innerHTML = 'TUG OF WAR';
+    fillBoth('<div class="tugtrack"><div class="tugorb" data-tug>👻</div></div>'+
+      '<div class="submsg">MASH the wisp! Drag it all the way to your glow!</div>');
+    cpuInfo = {kind:'mash', sel:'[data-tug]'};
+    let pos = 0.5;
+    const upd = ()=>{
+      document.querySelectorAll('#scr-tw .tugorb').forEach(el=>{ el.style.left = (pos*100)+'%'; });
+    };
+    upd();
+    for(let p=0;p<2;p++) bindTaps(p, '[data-tug]', pp=>{
+      if(locked) return;
+      pos += pp === 0 ? 0.048 : -0.048;
+      buzz(6);
+      if(pos >= 0.97){ pos = 0.97; upd(); resolve(0, 'Won the tug'); return; }
+      if(pos <= 0.03){ pos = 0.03; upd(); resolve(1, 'Won the tug'); return; }
+      upd();
+    });
+  }
+
+  const GAMES = [gReflex, gMatch, gMath, gOdd, gStroop, gCount, gChase, gMash, gTug];
 
   /* ---------- the Ghost: a CPU rival that plays player 1's side ---------- */
   function tapEl(el){ if(el) el.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true})); }
@@ -1006,9 +1037,20 @@ Shell.register('tw', (function(){
     clearTimers(); locked = true;
     totalRounds++;
     doubleRound = totalRounds > 1 && Math.random() < 0.18;
+    comebackFor = -1;
+    if(!doubleRound){
+      const diff = scores[0] - scores[1];
+      if(Math.abs(diff) >= 3 && Math.random() < 0.55){
+        comebackFor = diff < 0 ? 0 : 1;
+      }
+    }
     const mp = (scores[0] === WIN-1 || scores[1] === WIN-1) ? ' · <b>MATCH POINT</b>' : '';
-    $('tw-midtext').innerHTML = PNAME[0]+' '+scores[0]+' · '+scores[1]+' '+PNAME[1] + mp + (doubleRound ? ' · <b>⚡ WORTH 2</b>' : '');
-    fillBoth('<div class="msg" style="color:var(--gold)">'+(doubleRound ? '⚡ DOUBLE ROUND ⚡' : (mp ? 'MATCH POINT…' : 'READY…'))+'</div>');
+    const stakes = doubleRound ? ' · <b>⚡ WORTH 2</b>' : (comebackFor >= 0 ? ' · <b>🔥 ×2 for '+PNAME[comebackFor]+'</b>' : '');
+    $('tw-midtext').innerHTML = PNAME[0]+' '+scores[0]+' · '+scores[1]+' '+PNAME[1] + mp + stakes;
+    fillBoth('<div class="msg" style="color:var(--gold)">'+
+      (doubleRound ? '⚡ DOUBLE ROUND ⚡' :
+       (comebackFor >= 0 ? '🔥 REDEMPTION · '+PNAME[comebackFor]+' SCORES DOUBLE' :
+        (mp ? 'MATCH POINT…' : 'READY…')))+'</div>');
     later(()=>{
       if(!active) return;
       let g;
@@ -1016,12 +1058,13 @@ Shell.register('tw', (function(){
       lastGame = g;
       const seen = seenTypes[g] || 0;
       seenTypes[g] = seen + 1;
-      readDelay = seen === 0 ? 2400 : (totalRounds > 8 ? 900 : 1400);
+      readDelay = seen === 0 ? 2400 : (totalRounds > 8 ? 850 : 1150);
       locked = true;
       GAMES[g]();
-      if(doubleRound) document.querySelectorAll('#scr-tw .tw-arena').forEach(a=>{
+      if(doubleRound || comebackFor >= 0) document.querySelectorAll('#scr-tw .tw-arena').forEach(a=>{
         const b = document.createElement('div');
-        b.className = 'x2badge'; b.textContent = '⚡ ×2';
+        b.className = 'x2badge';
+        b.textContent = doubleRound ? '⚡ ×2' : '🔥 ×2 '+PNAME[comebackFor];
         a.appendChild(b);
       });
       const label = $('tw-midtext').innerHTML;
@@ -1056,7 +1099,7 @@ Shell.register('tw', (function(){
   }
 
   function reset(){
-    scores = [0,0]; lastGame = -1; totalRounds = 0; doubleRound = false;
+    scores = [0,0]; lastGame = -1; totalRounds = 0; doubleRound = false; comebackFor = -1;
     $('tw-over').classList.remove('show');
     drawPips(); nextRound();
   }
@@ -1370,7 +1413,7 @@ Shell.register('stack', (function(){
       if(moving.x + moving.w > w+10){ moving.x = w+10-moving.w; dir = -1; }
       const i = blocks.length;
       const y = h - 60 - (i+1)*BH;
-      const prox = Math.abs(moving.x - prev.x);
+      const prox = Math.abs(moving.x - blocks[blocks.length-1].x);
       if(prox < 16){ ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = (16 - prox) * 1.3; }
       ctx.fillStyle = colorFor(i);
       ctx.fillRect(moving.x, y, moving.w, BH);
