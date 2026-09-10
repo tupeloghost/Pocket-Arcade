@@ -263,15 +263,32 @@
   .ch-chip{display:none; align-items:center; gap:5px; font-weight:900; font-size:13px; letter-spacing:.5px; padding:5px 12px; border-radius:999px; border:1.5px solid var(--gold); color:var(--gold); white-space:nowrap; background:rgba(232,160,90,.1);}
   .ch-chip.on{display:inline-flex;}
   .ch-chip.beaten{border-color:var(--lime); color:var(--lime);}
-  .chbtn{margin-top:16px; width:min(92vw,430px); font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:16px; letter-spacing:1.5px; color:var(--text); background:rgba(232,160,90,.10); border:2px dashed rgba(232,160,90,.5); border-radius:18px; padding:14px; cursor:pointer;}
+  .chbtn{
+    margin-top:16px; width:min(92vw,430px);
+    font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase;
+    font-size:16px; letter-spacing:1.5px; color:var(--text);
+    background:linear-gradient(180deg, rgba(30,38,56,.9), rgba(14,19,30,.92));
+    border:1px solid rgba(232,160,90,.4); border-radius:18px; padding:14px; cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 6px 18px rgba(0,0,0,.35);
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .chbtn.friends{
+    margin:0 0 16px; font-size:17px;
+    border-color:rgba(38,224,255,.45);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 6px 20px rgba(38,224,255,.12), 0 6px 18px rgba(0,0,0,.35);
+  }
   .chbtn:active{transform:scale(.97);}
   .verstamp{margin-top:18px; font-size:10px; letter-spacing:1.5px; color:var(--dim); opacity:.55; font-weight:700;}
   .chbtn.dare{
-    margin:0 0 16px; border-color:rgba(139,121,217,.5); background:rgba(139,121,217,.10);
-    font-size:14px; min-height:48px;
+    margin:0 0 12px; border-color:rgba(139,121,217,.45);
+    padding:10px 16px; display:flex; align-items:center; gap:12px; text-align:left;
   }
-  .chbtn.dare.lit{border-color:rgba(232,160,90,.65); background:rgba(232,160,90,.12);}
-  .chbtn.dare .dare-done{color:var(--gold);}
+  .chbtn.dare.lit{border-color:rgba(232,160,90,.6);}
+  .chbtn.dare .d-ico{font-size:24px; flex:none;}
+  .chbtn.dare .d-mid{flex:1; min-width:0;}
+  .chbtn.dare .d-label{font-family:'Space Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--dim); text-transform:uppercase;}
+  .chbtn.dare .d-task{font-size:15px; letter-spacing:1px; line-height:1.25;}
+  .chbtn.dare .d-status{flex:none; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--gold); white-space:nowrap;}
   .dare-banner{
     position:fixed; top:-70px; left:50%; transform:translateX(-50%);
     z-index:95; background:var(--card); border:1.5px solid rgba(232,160,90,.6);
@@ -522,8 +539,9 @@
     <div class="epi">The arcade at the end of the dirt road. It only opens after dark.</div>
   </div>
   <button class="chbtn dare" id="dare-card"></button>
-  <button class="chbtn" id="party-btn" style="margin:0 0 16px;">🎉 PARTY MODE · 2-8 PLAYERS, ONE PHONE</button>
-  <button class="chbtn" id="live-btn" style="margin:0 0 16px; border-color:rgba(38,224,255,.5); background:rgba(38,224,255,.08);">🌐 LIVE PARTY · EVERY PHONE ITS OWN</button>
+  <button class="chbtn friends" id="friends-btn">👥 PLAY WITH FRIENDS</button>
+  <button class="chbtn" id="party-btn" hidden></button>
+  <button class="chbtn" id="live-btn" hidden></button>
   <div class="cards">
     <button class="gcard" data-game="tw" style="--accent:var(--coral)">
       <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M13 2.5 6.5 13.5 H11 L9.5 21.5 17.5 10.5 H13 Z"/></svg></div>
@@ -567,7 +585,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.17</div>
+  <div class="verstamp">v2026.09.09.18</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -3258,7 +3276,7 @@ const Party = (function(){
   function onHub(){ if(!transitioning && on){ on = false; hide(); } }
   function cancel(){ on = false; hide(); }
   document.getElementById('party-btn').addEventListener('click', start);
-  return { intercept, onHub, cancel };
+  return { intercept, onHub, cancel, start };
 })();
 </script>
 <script>
@@ -3526,6 +3544,20 @@ const Live = (function(){
 
   function onHub(){ if(!transitioning && phase === 'playing'){ exit(); } }
   document.getElementById('live-btn').addEventListener('click', entry);
+  document.getElementById('friends-btn').addEventListener('click', ()=>{
+    const cardEl = document.getElementById('lv-card');
+    cardEl.innerHTML =
+      '<h2>👥 PLAY WITH FRIENDS</h2>'+
+      '<button class="bigbtn" id="fr-one" style="width:100%;">🎉 ONE PHONE</button>'+
+      '<p style="margin:-4px 0 8px; font-size:12.5px;">Pass this phone around. Take turns, live scoreboard. 2-8 players.</p>'+
+      '<button class="bigbtn" id="fr-live" style="width:100%; background:linear-gradient(135deg, var(--cyan), var(--B));">🌐 EVERYONE&rsquo;S PHONE</button>'+
+      '<p style="margin:-4px 0 8px; font-size:12.5px;">Each friend joins on their own phone with a room code.</p>'+
+      '<button class="smallbtn ghost" id="fr-x">CANCEL</button>';
+    document.getElementById('lv-modal').classList.add('show');
+    document.getElementById('fr-one').onclick = ()=>{ document.getElementById('lv-modal').classList.remove('show'); Party.start(); };
+    document.getElementById('fr-live').onclick = ()=>entry();
+    document.getElementById('fr-x').onclick = ()=>document.getElementById('lv-modal').classList.remove('show');
+  });
   return { intercept, onHub };
 })();
 </script>
@@ -3559,9 +3591,11 @@ const Dare = (function(){
     if(!el) return;
     const t = todays();
     const what = t.g === 'D' ? 'Beat the Ghost in Spirit Duel' : 'Score '+t.target+' in '+t.name;
-    el.innerHTML = (done ? '🏮 ' : '🕯️ ') + '<b>TONIGHT’S DARE</b> · ' + what +
-      (done ? ' · <span class="dare-done">LIT!</span>' : '') +
-      (streak > 1 ? ' · 🔥 '+streak : '');
+    el.innerHTML =
+      '<span class="d-ico">'+(done ? '🏮' : '🕯️')+'</span>'+
+      '<span class="d-mid"><span class="d-label">Tonight’s dare'+(streak > 1 ? ' · 🔥 '+streak+' nights' : '')+'</span>'+
+      '<div class="d-task">'+what+'</div></span>'+
+      '<span class="d-status">'+(done ? '✓ DONE' : 'TAP TO PLAY')+'</span>';
     el.classList.toggle('lit', done);
     el.onclick = ()=>{ if(document.getElementById('hub').classList.contains('active')) Shell.openGame(t.game); };
   }
