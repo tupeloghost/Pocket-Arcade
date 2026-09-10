@@ -244,7 +244,7 @@
   @keyframes revealPop{from{opacity:0; transform:scale(.72);}to{opacity:1; transform:scale(1);}}
 
   /* ============ STACK ============ */
-  #st-canvas{display:block; touch-action:manipulation;}
+  #st-canvas{display:block; touch-action:none;}
   #st-toast{
     position:absolute; top:18%; left:0; right:0; text-align:center;
     font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:26px; color:var(--gold); letter-spacing:2px;
@@ -513,6 +513,11 @@
     100%{transform:translateY(70px) scale(.85) rotate(14deg); opacity:0}
   }
 
+  html.lowfx body::before{display:none;}
+  html.lowfx .mote{display:none;}
+  html.lowfx .ch-card{backdrop-filter:none; -webkit-backdrop-filter:none;}
+  #fl-canvas{touch-action:none;}
+
   /* ============ 2026 REFRESH ============ */
   :root{ --ui:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
   .ch-card{
@@ -635,7 +640,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ FRIENDS &amp; CHALLENGES</button>
-  <div class="verstamp">v2026.09.09.34</div>
+  <div class="verstamp">v2026.09.09.35</div>
 </div>
 
 <!-- ================= FLOATY ================= -->
@@ -760,6 +765,20 @@
 if('serviceWorker' in navigator && location.hostname.endsWith('github.io')){
   navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
+const LOWFX = (window.matchMedia && matchMedia('(pointer: coarse)').matches) || /lowfx=1/.test(location.search);
+if(LOWFX){
+  document.documentElement.classList.add('lowfx');
+  try{
+    const proto = CanvasRenderingContext2D.prototype;
+    const d = Object.getOwnPropertyDescriptor(proto, 'shadowBlur');
+    Object.defineProperty(proto, 'shadowBlur', {
+      configurable: true,
+      get(){ return d.get.call(this); },
+      set(v){ d.set.call(this, 0); }
+    });
+  }catch(e){}
+}
+
 const Shell = (function(){
   const mem = {};
   const store = {
@@ -1324,7 +1343,7 @@ Shell.register('stack', (function(){
 
   function sizeCanvas(){
     const body = cv.parentElement;
-    dpr = window.devicePixelRatio || 1;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = Math.min(body.clientWidth, 460);
     const h = body.clientHeight - 8;
     cv.width = w*dpr; cv.height = h*dpr;
@@ -1682,7 +1701,7 @@ Shell.register('snake', (function(){
   let cv, ctx, dpr, cell, tick, curMs, snake, dirQ, dir, foods, score, over, running, touchStart, sparks, combo, lastEatTick, tickN, ghostTicks, hollow, hollowStep, deathBy, bestN, crossedBN;
 
   function sizeCanvas(){
-    dpr = window.devicePixelRatio || 1;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     const body = cv.parentElement;
     const s = Math.min(body.clientWidth*0.94, body.clientHeight - 70, 440);
     cell = Math.floor(s/N);
@@ -2054,7 +2073,7 @@ Shell.register('flight', (function(){
 
   function sizeCanvas(){
     const body = cv.parentElement;
-    dpr = window.devicePixelRatio || 1;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = Math.min(body.clientWidth, 460);
     const h = body.clientHeight - 8;
     cv.width = w*dpr; cv.height = h*dpr;
@@ -2321,7 +2340,7 @@ Shell.register('shade', (function(){
 
   function sizeCanvas(){
     const body = cv.parentElement;
-    dpr = window.devicePixelRatio || 1;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = Math.min(body.clientWidth, 460);
     const h = body.clientHeight - 8;
     cv.width = w*dpr; cv.height = h*dpr;
