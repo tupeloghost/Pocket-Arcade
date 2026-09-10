@@ -236,6 +236,8 @@
     opacity:.55; filter:saturate(.5); pointer-events:none; transition:opacity .2s, filter .2s;
   }
   .tw-side.goflash{background:rgba(232,160,90,.16) !important;}
+  .tw-arena.reveal > *{animation:revealPop .32s cubic-bezier(.34,1.56,.64,1) backwards;}
+  @keyframes revealPop{from{opacity:0; transform:scale(.72);}to{opacity:1; transform:scale(1);}}
 
   /* ============ STACK ============ */
   #st-canvas{display:block; touch-action:manipulation;}
@@ -512,7 +514,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.11</div>
+  <div class="verstamp">v2026.09.09.12</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -838,7 +840,7 @@ Shell.register('tw', (function(){
       if(locked || !active) return;
       hot = true;
       document.querySelectorAll('#scr-tw .orb').forEach(o=>{ o.classList.add('hot'); o.textContent='TAP!'; });
-    }, readDelay + 1200 + Math.random()*2600);
+    }, 1200 + Math.random()*2600);
   }
 
   function gMatch(){
@@ -987,6 +989,17 @@ Shell.register('tw', (function(){
   }
 
   const GAMES = [gReflex, gMatch, gMath, gOdd, gStroop, gCount, gChase, gMash, gTug];
+  const INTROS = [
+    ['⚡','DON’T TAP EARLY','An orb appears. Wait for it to light up, then tap. Too early loses.'],
+    ['🔮','FIND THE MATCH','A symbol appears with four choices. Tap its twin first.'],
+    ['🧮','TRUE OR FALSE','A quick equation appears. First right answer wins.'],
+    ['👀','SPOT THE ODD ONE','Six symbols, one is different. Tap the odd one first.'],
+    ['🎨','TAP THE INK COLOR','A color word appears, painted the wrong color. Tap the PAINT color, not the word.'],
+    ['🔢','HOW MANY?','A cluster appears. Count it fast, tap the right number.'],
+    ['👻','CATCH THE WISP','A wisp darts around. First to tap it wins.'],
+    ['💥','GHOST MASH','Mash your orb from 15 down to zero first.'],
+    ['🪢','TUG OF WAR','Mash to drag the shared wisp to your side.']
+  ];
 
   /* ---------- the Ghost: a CPU rival that plays player 1's side ---------- */
   function tapEl(el){ if(el) el.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true})); }
@@ -1058,22 +1071,25 @@ Shell.register('tw', (function(){
       lastGame = g;
       const seen = seenTypes[g] || 0;
       seenTypes[g] = seen + 1;
-      readDelay = seen === 0 ? 2400 : (totalRounds > 8 ? 850 : 1150);
+      readDelay = seen === 0 ? 2600 : (totalRounds > 8 ? 900 : 1300);
       locked = true;
-      GAMES[g]();
-      if(doubleRound || comebackFor >= 0) document.querySelectorAll('#scr-tw .tw-arena').forEach(a=>{
-        const b = document.createElement('div');
-        b.className = 'x2badge';
-        b.textContent = doubleRound ? '⚡ ×2' : '🔥 ×2 '+PNAME[comebackFor];
-        a.appendChild(b);
-      });
-      const label = $('tw-midtext').innerHTML;
-      $('tw-midtext').innerHTML = '👀 READ IT…';
-      arenas.forEach(a=>a.classList.add('reading'));
+      // instructions first: the actual round stays hidden until GO
+      const intro = INTROS[g];
+      fillBoth('<div class="targetbox">'+intro[0]+'</div>'+
+        '<div class="msg" style="color:var(--gold)">'+intro[1]+'</div>'+
+        '<div class="submsg" style="max-width:300px">'+intro[2]+'</div>');
+      $('tw-midtext').innerHTML = '👀 GET READY…';
       later(()=>{
         if(!active) return;
-        arenas.forEach(a=>a.classList.remove('reading'));
-        $('tw-midtext').innerHTML = label;
+        arenas.forEach(a=>a.classList.add('reveal'));
+        GAMES[g]();
+        if(doubleRound || comebackFor >= 0) document.querySelectorAll('#scr-tw .tw-arena').forEach(a=>{
+          const b = document.createElement('div');
+          b.className = 'x2badge';
+          b.textContent = doubleRound ? '⚡ ×2' : '🔥 ×2 '+PNAME[comebackFor];
+          a.appendChild(b);
+        });
+        later(()=>arenas.forEach(a=>a.classList.remove('reveal')), 450);
         sidesEl.forEach(sd=>sd.classList.add('goflash'));
         later(()=>sidesEl.forEach(sd=>sd.classList.remove('goflash')), 320);
         locked = false;
