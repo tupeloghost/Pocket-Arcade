@@ -186,9 +186,10 @@
   }
   .tugorb{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    font-size:34px; padding:6px; cursor:pointer; transition:left .07s linear;
+    font-size:38px; padding:6px; transition:left .07s linear;
     filter:drop-shadow(0 0 11px rgba(242,231,207,.85));
   }
+  .tugzone{position:absolute; inset:0; z-index:6; cursor:pointer;}
   .x2badge{
     position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:4;
     color:var(--gold); font-weight:700; font-size:13px; letter-spacing:1.5px;
@@ -553,7 +554,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.14</div>
+  <div class="verstamp">v2026.09.09.15</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -1009,17 +1010,18 @@ Shell.register('tw', (function(){
 
   function gTug(){
     $('tw-midtext').innerHTML = 'TUG OF WAR';
-    fillBoth('<div class="tugtrack"><div class="tugorb" data-tug>👻</div></div>'+
-      '<div class="submsg">MASH the wisp! Drag it all the way to your glow!</div>');
-    cpuInfo = {kind:'mash', sel:'[data-tug]'};
+    fillBoth('<div class="tugtrack"><div class="tugorb">👻</div></div>'+
+      '<div class="submsg">MASH anywhere on your half! Drag the wisp home!</div>'+
+      '<div class="tugzone" data-tugzone></div>');
+    cpuInfo = {kind:'mash', sel:'[data-tugzone]'};
     let pos = 0.5;
     const upd = ()=>{
       document.querySelectorAll('#scr-tw .tugorb').forEach(el=>{ el.style.left = (pos*100)+'%'; });
     };
     upd();
-    for(let p=0;p<2;p++) bindTaps(p, '[data-tug]', pp=>{
+    for(let p=0;p<2;p++) bindTaps(p, '[data-tugzone]', pp=>{
       if(locked) return;
-      pos += pp === 0 ? 0.048 : -0.048;
+      pos += pp === 0 ? 0.05 : -0.05;
       buzz(6);
       if(pos >= 0.97){ pos = 0.97; upd(); resolve(0, 'Won the tug'); return; }
       if(pos <= 0.03){ pos = 0.03; upd(); resolve(1, 'Won the tug'); return; }
