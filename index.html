@@ -236,6 +236,9 @@
     opacity:.55; filter:saturate(.5); pointer-events:none; transition:opacity .2s, filter .2s;
   }
   .tw-side.goflash{background:rgba(232,160,90,.16) !important;}
+  .readbar{width:min(46vw,210px); height:4px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden; margin-top:4px;}
+  .readbar i{display:block; height:100%; width:100%; border-radius:99px; background:var(--gold); animation:readshrink linear forwards;}
+  @keyframes readshrink{from{width:100%}to{width:0}}
   .tw-arena.reveal > *{animation:revealPop .32s cubic-bezier(.34,1.56,.64,1) backwards;}
   @keyframes revealPop{from{opacity:0; transform:scale(.72);}to{opacity:1; transform:scale(1);}}
 
@@ -514,7 +517,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.12</div>
+  <div class="verstamp">v2026.09.09.13</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -1071,13 +1074,14 @@ Shell.register('tw', (function(){
       lastGame = g;
       const seen = seenTypes[g] || 0;
       seenTypes[g] = seen + 1;
-      readDelay = seen === 0 ? 2600 : (totalRounds > 8 ? 900 : 1300);
+      readDelay = seen === 0 ? 3600 : (totalRounds > 8 ? 1600 : 2300);
       locked = true;
       // instructions first: the actual round stays hidden until GO
       const intro = INTROS[g];
       fillBoth('<div class="targetbox">'+intro[0]+'</div>'+
         '<div class="msg" style="color:var(--gold)">'+intro[1]+'</div>'+
-        '<div class="submsg" style="max-width:300px">'+intro[2]+'</div>');
+        '<div class="submsg" style="max-width:300px">'+intro[2]+'</div>'+
+        '<div class="readbar"><i style="animation-duration:'+readDelay+'ms"></i></div>');
       $('tw-midtext').innerHTML = '👀 GET READY…';
       later(()=>{
         if(!active) return;
