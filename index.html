@@ -642,7 +642,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ FRIENDS &amp; CHALLENGES</button>
-  <div class="verstamp">v2026.09.09.36</div>
+  <div class="verstamp">v2026.09.09.37</div>
 </div>
 
 <!-- ================= FLOATY ================= -->
@@ -2178,7 +2178,7 @@ Shell.register('flight', (function(){
 
     // physics (time-scaled: dropped frames no longer slow the game down)
     const nowFT = performance.now();
-    const k = Math.min(2.5, Math.max(0.5, lastFT ? (nowFT - lastFT)/16.7 : 1));
+    const k = Math.min(2.5, Math.max(0.5, lastFT ? (nowFT - lastFT)/8.35 : 1));
     lastFT = nowFT;
     if(started && !over){
       if(ghostT > 0) ghostT -= k;
