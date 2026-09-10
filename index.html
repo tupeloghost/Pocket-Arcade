@@ -505,6 +505,14 @@
 
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
 
+  .confetti{position:absolute; z-index:40; font-size:19px; pointer-events:none; opacity:0;
+    animation:confpop 2.1s ease-out forwards;}
+  @keyframes confpop{
+    0%{transform:translateY(0) scale(.5) rotate(0deg); opacity:0}
+    15%{opacity:1; transform:translateY(-34px) scale(1.2) rotate(-12deg)}
+    100%{transform:translateY(70px) scale(.85) rotate(14deg); opacity:0}
+  }
+
   /* ============ 2026 REFRESH ============ */
   :root{ --ui:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
   .ch-card{
@@ -627,7 +635,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ FRIENDS &amp; CHALLENGES</button>
-  <div class="verstamp">v2026.09.09.32</div>
+  <div class="verstamp">v2026.09.09.34</div>
 </div>
 
 <!-- ================= FLOATY ================= -->
@@ -897,7 +905,7 @@ Shell.register('tw', (function(){
   const $ = id => document.getElementById(id);
   let arenas, sidesEl, pipsEl, scores, locked, timers, lastGame, active, totalRounds, doubleRound;
   let cpu = false, cpuSkill = 1500, cpuInfo = null;
-  let seenTypes = {}, readDelay = 0, comebackFor = -1, introStops = [];
+  let seenTypes = {}, readDelay = 0, comebackFor = -1, introStops = [], rstreak = [0,0];
 
   function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
   function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
@@ -927,6 +935,7 @@ Shell.register('tw', (function(){
     const loser = 1-winner;
     const pts = doubleRound ? 2 : (winner === comebackFor ? 2 : 1);
     scores[winner] += pts; drawPips(); buzz(pts > 1 ? [60,50,60] : 60);
+    rstreak[winner]++; rstreak[loser] = 0;
     Snd.pick(doubleRound ? 6 : 4);
     if(cpu){ cpuSkill = Math.max(500, Math.min(2400, cpuSkill + (winner === 1 ? 140 : -110))); }
     sidesEl[winner].classList.add('winflash');
@@ -1172,7 +1181,8 @@ Shell.register('tw', (function(){
         comebackFor = diff < 0 ? 0 : 1;
       }
     }
-    const mp = (scores[0] === WIN-1 || scores[1] === WIN-1) ? ' · <b>MATCH POINT</b>' : '';
+    const fire = rstreak[0] >= 3 ? ' · 🔥 '+PNAME[0]+' ×'+rstreak[0] : (rstreak[1] >= 3 ? ' · 🔥 '+PNAME[1]+' ×'+rstreak[1] : '');
+    const mp = ((scores[0] === WIN-1 || scores[1] === WIN-1) ? ' · <b>MATCH POINT</b>' : '') + fire;
     const stakes = doubleRound ? ' · <b>⚡ WORTH 2</b>' : (comebackFor >= 0 ? ' · <b>🔥 ×2 for '+PNAME[comebackFor]+'</b>' : '');
     $('tw-midtext').innerHTML = PNAME[0]+' '+scores[0]+' · '+scores[1]+' '+PNAME[1] + mp + stakes;
     fillBoth('<div class="msg" style="color:var(--gold)">'+
@@ -1229,10 +1239,21 @@ Shell.register('tw', (function(){
     $('tw-over').classList.add('show');
     buzz([80,60,80]);
     Snd.win();
+    const scr = document.getElementById('scr-tw');
+    for(let ci=0;ci<26;ci++){
+      const sp = document.createElement('span');
+      sp.className = 'confetti';
+      sp.textContent = ['🎉','✨','⭐','👻','🔥'][ci%5];
+      sp.style.left = (5+Math.random()*88)+'%';
+      sp.style.top = (winner===0 ? 55+Math.random()*32 : 8+Math.random()*32)+'%';
+      sp.style.animationDelay = (Math.random()*0.6)+'s';
+      scr.appendChild(sp);
+      setTimeout(()=>sp.remove(), 2800);
+    }
   }
 
   function reset(){
-    scores = [0,0]; lastGame = -1; totalRounds = 0; doubleRound = false; comebackFor = -1;
+    scores = [0,0]; lastGame = -1; totalRounds = 0; doubleRound = false; comebackFor = -1; rstreak = [0,0];
     $('tw-over').classList.remove('show');
     drawPips(); nextRound();
   }
@@ -1324,7 +1345,7 @@ Shell.register('stack', (function(){
   }
   function spawn(){
     const prev = blocks[blocks.length-1];
-    moving = { x: -prev.w, w: prev.w, fromLeft: blocks.length%2===0 };
+    moving = { x: -prev.w, w: prev.w, fromLeft: blocks.length%2===0, gold: blocks.length > 0 && blocks.length % 7 === 0 };
     moving.x = moving.fromLeft ? -prev.w : W();
     dir = moving.fromLeft ? 1 : -1;
   }
@@ -1357,6 +1378,7 @@ Shell.register('stack', (function(){
       return;
     }
     const perfect = Math.abs(moving.x - prev.x) < 5;
+    const wasGold = !!moving.gold;
     if(perfect){
       streak++;
       flash = 1;
@@ -1374,14 +1396,21 @@ Shell.register('stack', (function(){
           x2 = Math.max(0, Math.min(prev.x - grow/2, W() - w2));
         }
       }
-      blocks.push({x: x2, w: w2});
-      toast(grow > 0 ? 'PERFECT! RECLAIMED +'+grow : (streak >= 2 ? 'PERFECT x'+streak+'!' : 'PERFECT!'));
-      buzz(streak >= 2 ? [30,40,30] : 30);
-      Snd.perfect(streak);
+      blocks.push({x: x2, w: w2, gold: wasGold});
+      if(wasGold){
+        score += 5;
+        salvage = Math.min(SALVAGE_CAP, salvage + 20);
+        toast('GOLDEN PERFECT! +5');
+      } else {
+        toast(grow > 0 ? 'PERFECT! RECLAIMED +'+grow : (streak >= 2 ? 'PERFECT x'+streak+'!' : 'PERFECT!'));
+      }
+      buzz(streak >= 2 || wasGold ? [30,40,30] : 30);
+      Snd.perfect(streak + (wasGold ? 2 : 0));
     } else {
       streak = 0;
-      blocks.push({x: left, w: overlap});
-      salvage = Math.min(SALVAGE_CAP, salvage + Math.round((moving.w - overlap)*0.5));
+      blocks.push({x: left, w: overlap, gold: wasGold});
+      salvage = Math.min(SALVAGE_CAP, salvage + Math.round((moving.w - overlap)*0.5) + (wasGold ? 10 : 0));
+      if(wasGold) toast('GOLD! +10 SALVAGE');
       const ci = blocks.length - 1;
       if(moving.x < left) debris.push({x:moving.x, w:left-moving.x, y:rowY, vy:0, rot:0, vr:-0.08, ci});
       if(moving.x + moving.w > right) debris.push({x:right, w:(moving.x+moving.w)-right, y:rowY, vy:0, rot:0, vr:0.08, ci});
@@ -1507,9 +1536,11 @@ Shell.register('stack', (function(){
           bh = BH*(1-0.22*e); y += BH - bh;
         }
       }
-      ctx.fillStyle = colorFor(i);
+      if(b.gold){ ctx.shadowColor = '#ffd31d'; ctx.shadowBlur = 12; }
+      ctx.fillStyle = b.gold ? '#f2c14e' : colorFor(i);
       ctx.fillRect(bx, y, bw, bh);
-      ctx.fillStyle = darkFor(i);
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = b.gold ? '#b8860b' : darkFor(i);
       ctx.fillRect(bx, y+bh-6, bw, 6);
       ctx.fillStyle = 'rgba(255,255,255,.25)';
       ctx.fillRect(bx, y, bw, 4);
@@ -1548,8 +1579,9 @@ Shell.register('stack', (function(){
       const i = blocks.length;
       const y = h - 60 - (i+1)*BH;
       const prox = Math.abs(moving.x - blocks[blocks.length-1].x);
-      if(prox < 16){ ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = (16 - prox) * 1.3; }
-      ctx.fillStyle = colorFor(i);
+      if(moving.gold){ ctx.shadowColor = '#ffd31d'; ctx.shadowBlur = 16 + Math.sin(performance.now()/120)*6; }
+      else if(prox < 16){ ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = (16 - prox) * 1.3; }
+      ctx.fillStyle = moving.gold ? '#f2c14e' : colorFor(i);
       ctx.fillRect(moving.x, y, moving.w, BH);
       ctx.shadowBlur = 0;
       ctx.fillStyle = 'rgba(255,255,255,.35)';
@@ -1667,7 +1699,8 @@ Shell.register('snake', (function(){
       if(foods.some(o=>o.x===f.x && o.y===f.y)) continue;
       if(hollow && Math.abs(f.x-hollow.x)+Math.abs(f.y-hollow.y) < 3) continue;
       f.special = Math.random() < 0.18;
-      f.ttl = f.special ? 42 : -1;
+      f.gold = !f.special && score >= 5 && Math.random() < 0.10 && !foods.some(o=>o.gold);
+      f.ttl = f.special ? 42 : (f.gold ? 70 : -1);
       foods.push(f); return;
     }
   }
@@ -1726,7 +1759,7 @@ Shell.register('snake', (function(){
     const fi = foods.findIndex(f=>f.x===head.x && f.y===head.y);
     if(fi >= 0){
       const f = foods[fi];
-      const base = f.special ? 3 : 1;
+      const base = f.special ? 3 : (f.gold ? 7 : 1);
       combo = (tickN - lastEatTick <= 28) ? Math.min(5, combo+1) : 1;
       lastEatTick = tickN;
       const gain = base * combo;
@@ -1737,6 +1770,7 @@ Shell.register('snake', (function(){
       buzz(f.special ? [25,30,25] : 25);
       Snd.pick(combo-1);
       if(f.special){ ghostTicks = 34; Snd.swell(); }
+      if(f.gold){ sparks.push({x:head.x*cell+cell/2, y:head.y*cell+cell/2-18, vx:0, vy:-2.2, life:10, text:'GOLDEN!', color:'#ffd31d'}); Snd.win(); }
       if(!crossedBN && bestN > 0 && score > bestN){
         crossedBN = true;
         sparks.push({x:head.x*cell+cell/2, y:head.y*cell+cell/2-30, vx:0, vy:-1.6, life:12, text:'PAST YOUR BEST!', color:'#e8a05a'});
@@ -1749,9 +1783,23 @@ Shell.register('snake', (function(){
     } else {
       snake.pop();
     }
+    // the golden firefly flees the ribbon
+    for(const f of foods){
+      if(f.gold && tickN % 2 === 0){
+        const dx = Math.sign(f.x - snake[0].x), dy = Math.sign(f.y - snake[0].y);
+        const cand = Math.abs(f.x - snake[0].x) < Math.abs(f.y - snake[0].y)
+          ? {x:(f.x + (dx||((Math.random()<.5)?1:-1)) + N) % N, y:f.y}
+          : {x:f.x, y:(f.y + (dy||((Math.random()<.5)?1:-1)) + N) % N};
+        if(!(cand.x===snake[0].x && cand.y===snake[0].y) &&
+           !snake.some(sg=>sg.x===cand.x && sg.y===cand.y) &&
+           !foods.some(o=>o!==f && o.x===cand.x && o.y===cand.y)){
+          f.x = cand.x; f.y = cand.y;
+        }
+      }
+    }
     // spirit fireflies won't wait around
     for(let i=foods.length-1;i>=0;i--){
-      if(foods[i].special && --foods[i].ttl <= 0){
+      if((foods[i].special || foods[i].gold) && --foods[i].ttl <= 0){
         burst(foods[i].x, foods[i].y, false);
         foods.splice(i, 1);
         placeFood();
@@ -1825,7 +1873,14 @@ Shell.register('snake', (function(){
     }
     // fireflies (spirit fireflies burn pale and won't wait around)
     for(const f of foods){
-      if(f.special){
+      if(f.gold){
+        const pulse = (f.ttl % 4) < 2 ? 0.44 : 0.34;
+        ctx.fillStyle = '#ffd31d';
+        ctx.shadowColor = '#ffd31d'; ctx.shadowBlur = 22;
+        ctx.beginPath();
+        ctx.arc(f.x*cell+cell/2, f.y*cell+cell/2, cell*pulse, 0, Math.PI*2);
+        ctx.fill();
+      } else if(f.special){
         const pulse = (f.ttl % 6) < 3 ? 0.42 : 0.32;
         ctx.fillStyle = '#f2e7cf';
         ctx.shadowColor = '#26e0ff'; ctx.shadowBlur = 20;
@@ -1995,7 +2050,7 @@ Shell.register('snake', (function(){
 Shell.register('flight', (function(){
   const $ = id => document.getElementById(id);
   const GRAV = 0.24, FLAP = -5.6, PW = 48, R = 13;
-  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy, lastTick, dog, mile;
+  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy, lastTick, dog, mile, cleanStreak;
 
   function sizeCanvas(){
     const body = cv.parentElement;
@@ -2012,7 +2067,7 @@ Shell.register('flight', (function(){
 
   function reset(){
     over = false; started = false; score = 0; shakeT = 0; ghostT = 0; spawned = 0; crossedBF = false; mercy = true;
-    mile = 20;
+    mile = 20; cleanStreak = 0;
     wy = H()*0.45; vy = 0;
     pillars = []; trail = []; fx = [];
     $('fl-score').textContent = '0';
@@ -2053,6 +2108,7 @@ Shell.register('flight', (function(){
     }
   }
   function die(){
+    cleanStreak = 0;
     if(mercy){
       mercy = false;
       ghostT = 130;
@@ -2112,8 +2168,14 @@ Shell.register('flight', (function(){
         if(!p.passed && p.x + PW < x - R){
           p.passed = true;
           const c = p.gapY + p.gapH/2;
-          if(Math.abs(wy - c) < p.gapH*0.15){ scoreUp(3); addText(x, wy-16, 'CLEAN +3'); buzz(20); Snd.pick(3); }
-          else { scoreUp(1); buzz(12); Snd.pick(0); }
+          if(Math.abs(wy - c) < p.gapH*0.15){
+            cleanStreak++;
+            const g = 3 + Math.min(4, cleanStreak - 1);
+            scoreUp(g);
+            addText(x, wy-16, cleanStreak > 1 ? 'CLEAN ×'+cleanStreak+' +'+g : 'CLEAN +3');
+            buzz(20); Snd.pick(Math.min(6, 2 + cleanStreak));
+          }
+          else { cleanStreak = 0; scoreUp(1); buzz(12); Snd.pick(0); }
         }
         if(p.fly && !p.fly.got && Math.abs(p.x + PW/2 - x) < R+11 && Math.abs(p.fly.y - wy) < R+11){
           p.fly.got = true;
@@ -2159,8 +2221,8 @@ Shell.register('flight', (function(){
       trail.push({x, y:wy});
       if(trail.length > 10) trail.shift();
       trail.forEach((t,i)=>{
-        ctx.globalAlpha = (i/trail.length)*0.25;
-        ctx.fillStyle = '#f2e7cf';
+        ctx.globalAlpha = (i/trail.length)*(cleanStreak >= 3 ? 0.45 : 0.25);
+        ctx.fillStyle = cleanStreak >= 3 ? '#ffd31d' : '#f2e7cf';
         ctx.beginPath();
         ctx.arc(t.x - (trail.length-i)*2.4, t.y, Math.max(1, R*0.65*(i/trail.length)), 0, Math.PI*2);
         ctx.fill();
@@ -2323,7 +2385,7 @@ Shell.register('shade', (function(){
       addFx(W()/2, H()*0.4, 'PAST YOUR BEST!', '#e8a05a');
       Snd.win(); buzz([40,60,40]);
     }
-    if(Math.random() < 0.09) pows.push({x:f.x, y:f.y, vy:1.7});
+    if(Math.random() < 0.12) pows.push({x:f.x, y:f.y, vy:1.7, fl: Math.random() < 0.45});
   }
 
   function hitPlayer(){
@@ -2428,9 +2490,25 @@ Shell.register('shade', (function(){
       for(const p of pows){
         p.y += p.vy;
         if(Math.abs(p.x-px) < 22 && Math.abs(p.y-py) < 24){
-          p.dead = 1; spreadT = 480;
-          addFx(px, py-30, 'SPREAD SHOT', '#26e0ff');
-          Snd.swell(); buzz([25,30,25]);
+          p.dead = 1;
+          if(p.fl){
+            addFx(px, py-30, 'FLARE!', '#ff7a2e');
+            let nz = 0;
+            for(const f2 of foes){ if(f2.dive && !f2.dead){ f2.dead = 1; nz++; burst(f2.x, f2.y, '#ff7a2e'); } }
+            if(nz){
+              score += nz*3;
+              $('sh-score').textContent = score;
+              bump($('sh-score'));
+              Challenge.onScore('H', score);
+              addFx(px, py-46, '+'+(nz*3), '#e8a05a');
+            }
+            fxs.push({x:px, y:py-10, ring:1, life:18, color:'#ff7a2e'});
+            Snd.win(); buzz([40,50,40]);
+          } else {
+            spreadT = 480;
+            addFx(px, py-30, 'SPREAD SHOT', '#26e0ff');
+            Snd.swell(); buzz([25,30,25]);
+          }
         }
       }
       pows = pows.filter(p=>!p.dead && p.y < h+20);
@@ -2478,8 +2556,8 @@ Shell.register('shade', (function(){
 
     // powerups
     for(const p of pows){
-      ctx.fillStyle = '#f2e7cf';
-      ctx.shadowColor = '#26e0ff'; ctx.shadowBlur = 14;
+      ctx.fillStyle = p.fl ? '#ffb066' : '#f2e7cf';
+      ctx.shadowColor = p.fl ? '#ff7a2e' : '#26e0ff'; ctx.shadowBlur = 14;
       ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI*2); ctx.fill();
       ctx.shadowBlur = 0;
     }
@@ -2523,6 +2601,10 @@ Shell.register('shade', (function(){
         ctx.textAlign = 'center';
         ctx.fillText(s.text, s.x, s.y);
         ctx.textAlign = 'left';
+      } else if(s.ring){
+        ctx.strokeStyle = s.color; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(s.x, s.y, (18-s.life)*8 + 6, 0, Math.PI*2); ctx.stroke();
+        ctx.lineWidth = 1;
       } else ctx.fillRect(s.x-1.5, s.y-1.5, 3, 3);
     }
     ctx.globalAlpha = 1;
@@ -2925,11 +3007,21 @@ const HowTo = (function(){
 const Challenge = (function(){
   const G2GAME  = {S:'stack', N:'snake', F:'flight', H:'shade'};
   const G2TITLE = {S:'Stack', N:'Slither', F:'Floaty', H:'Shoot'};
-  let active = null, chip = null, chipGame = null;
+  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry'};
+  let active = null, chip = null, chipGame = null, setter = null;
 
   Shell.store.get('challenge').then(v=>{ if(v && !active) active = v; refreshHubBtn(); });
+  Shell.store.get('chsetter').then(v=>{ if(v && !setter) setter = v; refreshHubBtn(); });
 
-  function save(){ Shell.store.set('challenge', active); refreshHubBtn(); }
+  function save(){ Shell.store.set('challenge', active); Shell.store.set('chsetter', setter); refreshHubBtn(); }
+  function sum(a){ return (a||[]).reduce((x,y)=>x+y, 0); }
+  function isSeries(){ return !!(active && Array.isArray(active.rounds)); }
+
+  function startSetter(g, tag){
+    setter = {g, tag, rounds: []};
+    save();
+    Shell.openGame(G2GAME[g]);
+  }
   function chk(str){
     let s = 0;
     for(const ch of str) s = (s*31 + ch.charCodeAt(0)) % 1296;
@@ -2960,8 +3052,12 @@ const Challenge = (function(){
     const b = document.getElementById('ch-enter');
     if(!b) return;
     b.textContent = active
-      ? '⚔️ ACTIVE: BEAT '+active.name+'’S '+active.score+' IN '+G2TITLE[active.g].toUpperCase()
-      : '⚔️ FRIENDS & CHALLENGES';
+      ? (isSeries()
+          ? '⚔️ BEAT '+active.name+'’S '+active.score+' · ROUND '+Math.min(3, active.rounds.length+1)+' OF 3'
+          : '⚔️ ACTIVE: BEAT '+active.name+'’S '+active.score+' IN '+G2TITLE[active.g].toUpperCase())
+      : (setter
+          ? '⚔️ SET YOUR CHALLENGE · ROUND '+Math.min(3, setter.rounds.length+1)+' OF 3'
+          : '⚔️ FRIENDS & CHALLENGES');
   }
 
   function targetFor(gameKey){
@@ -2973,7 +3069,9 @@ const Challenge = (function(){
     if(!active) return;
     const b = document.createElement('div');
     b.className = 'dare-banner';
-    b.textContent = '⚔️ BEAT '+active.name+'’S '+active.score;
+    b.textContent = isSeries()
+      ? '⚔️ BEAT '+active.name+'’S '+active.score+' · 3 ROUNDS, HIGHEST TOTAL WINS'
+      : '⚔️ BEAT '+active.name+'’S '+active.score;
     document.body.appendChild(b);
     setTimeout(()=>b.classList.add('show'), 30);
     setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(), 500); }, 3200);
@@ -2984,8 +3082,13 @@ const Challenge = (function(){
     if(!chip) return;
     if(active && active.g === g){
       chip.className = 'ch-chip on';
-      chip.textContent = '⚔️ BEAT '+active.name+'’S '+active.score;
+      chip.textContent = isSeries()
+        ? '⚔️ R'+Math.min(3, active.rounds.length+1)+'/3 · YOU '+sum(active.rounds)+' · BEAT '+active.score
+        : '⚔️ BEAT '+active.name+'’S '+active.score;
       targetBanner();
+    } else if(setter && setter.g === g){
+      chip.className = 'ch-chip on';
+      chip.textContent = '🎯 SET YOUR TOTAL · ROUND '+Math.min(3, setter.rounds.length+1)+' OF 3';
     } else {
       chip.className = 'ch-chip';
     }
@@ -2993,7 +3096,7 @@ const Challenge = (function(){
   function leaveGame(){ chip = null; chipGame = null; }
 
   function onScore(g, s){
-    if(chip && active && active.g === g && g === chipGame && s > active.score){
+    if(chip && active && active.g === g && g === chipGame && (sum(active.rounds) + s) > active.score){
       chip.className = 'ch-chip on beaten';
       chip.textContent = '🏆 '+active.score+' BEATEN!';
     }
@@ -3015,7 +3118,46 @@ const Challenge = (function(){
     }
     if(!slot) return;
     let html = '';
-    if(active && active.g === g){
+    if(setter && setter.g === g){
+      setter.rounds.push(score);
+      const t = sum(setter.rounds);
+      if(setter.rounds.length < 3){
+        save();
+        slot.innerHTML =
+          '<div class="ch-result">🎯 ROUND '+setter.rounds.length+' DONE · YOUR TOTAL: <b>'+t+'</b></div>'+
+          '<button class="smallbtn" data-chnext>PLAY ROUND '+(setter.rounds.length+1)+' OF 3</button>'+
+          '<button class="smallbtn ghost" data-chquit>CANCEL CHALLENGE</button>';
+        slot.querySelector('[data-chnext]').onclick = ()=>{ const b = document.getElementById(RETRY[g]); if(b) b.click(); };
+        slot.querySelector('[data-chquit]').onclick = ()=>{ setter = null; save(); slot.innerHTML = ''; };
+        return;
+      }
+      const tag = setter.tag;
+      setter = null; save();
+      if(typeof Rivals !== 'undefined') Rivals.sendChal(tag, g, t);
+      slot.innerHTML = '<div class="ch-result win">⚔️ CHALLENGE SENT! '+tag+' must beat your total of <b>'+t+'</b>.</div>'+
+        '<button class="smallbtn" data-vsstart>🤝 PASS &amp; PLAY DUEL</button>';
+      slot.querySelector('[data-vsstart]').onclick = ()=>{ if(typeof Vs !== 'undefined') Vs.start(g); };
+      return;
+    }
+    if(active && active.g === g && isSeries()){
+      active.rounds.push(score);
+      const t = sum(active.rounds);
+      if(active.rounds.length < 3){
+        save();
+        if(chip){ chip.className = 'ch-chip on'; chip.textContent = '⚔️ R'+(active.rounds.length+1)+'/3 · YOU '+t+' · BEAT '+active.score; }
+        slot.innerHTML =
+          '<div class="ch-result">⚔️ ROUND '+active.rounds.length+' OF 3 DONE · YOU: <b>'+t+'</b> · '+active.name+': <b>'+active.score+'</b></div>'+
+          '<button class="smallbtn" data-chnext>PLAY ROUND '+(active.rounds.length+1)+' OF 3</button>';
+        slot.querySelector('[data-chnext]').onclick = ()=>{ const b = document.getElementById(RETRY[g]); if(b) b.click(); };
+        return;
+      }
+      if(t > active.score)       html += '<div class="ch-result win">🏆 YOUR '+t+' BEATS '+active.name+'’S '+active.score+'!</div>';
+      else if(t === active.score) html += '<div class="ch-result">😮 TIED WITH '+active.name+' AT '+t+'</div>';
+      else                        html += '<div class="ch-result lose">👻 '+active.name+' WINS · '+active.score+' TO YOUR '+t+'</div>';
+      if(active.tag && typeof Rivals !== 'undefined') Rivals.reportResult(active, t);
+      active = null; save();
+      if(chip) chip.className = 'ch-chip';
+    } else if(active && active.g === g){
       if(score > active.score)      html += '<div class="ch-result win">🏆 YOU BEAT '+active.name+'’S '+active.score+'!</div>';
       else if(score === active.score) html += '<div class="ch-result">😮 TIED WITH '+active.name+' AT '+score+'</div>';
       else                           html += '<div class="ch-result lose">👻 '+active.name+'’S '+active.score+' STILL HAUNTS YOU</div>';
@@ -3128,7 +3270,12 @@ const Challenge = (function(){
     card.querySelector('#ch-code-in').focus();
   }
 
-  document.getElementById('ch-enter').addEventListener('click', ()=>{ if(typeof Rivals !== 'undefined' && !active) Rivals.open(); else if(active) Shell.openGame(G2GAME[active.g]); else openEnter(); });
+  document.getElementById('ch-enter').addEventListener('click', ()=>{
+    if(active) Shell.openGame(G2GAME[active.g]);
+    else if(setter) Shell.openGame(G2GAME[setter.g]);
+    else if(typeof Rivals !== 'undefined') Rivals.open();
+    else openEnter();
+  });
 
   function consumeHash(){
     const h = (location.hash || '').replace(/^#/, '');
@@ -3144,10 +3291,12 @@ const Challenge = (function(){
   window.addEventListener('hashchange', consumeHash);
 
   function acceptDirect(d){
-    active = d; save();
+    active = d;
+    if(d.r === 3) active.rounds = [];
+    save();
     Shell.openGame(G2GAME[d.g]);
   }
-  return { enterGame, leaveGame, onScore, onGameOver, targetFor, acceptDirect, enterCode: openEnter, G2TITLE };
+  return { enterGame, leaveGame, onScore, onGameOver, targetFor, acceptDirect, enterCode: openEnter, startSetter, G2TITLE };
 })();
 </script>
 <script>
@@ -3763,6 +3912,18 @@ const Rivals = (function(){
     r.lastDay = today;
   }
 
+  async function sendChal(tag, g, total){
+    try{
+      await fetch('https://'+HOST+'/box/'+encodeURIComponent(tag), {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({t:'chal', from: await myUser(), game: g, score: total, r: 3, mood: (await store('mood'))||''})
+      });
+      banner('⚔️ Challenge sent! '+tag+' must beat '+total+' in '+GAMES[g]);
+    }catch(e){
+      banner('⚠️ Could not send the challenge. Check your connection.');
+    }
+  }
+
   async function reportResult(active, score){
     try{
       await fetch('https://'+HOST+'/box/'+encodeURIComponent(active.tag), {
@@ -3800,7 +3961,7 @@ const Rivals = (function(){
         html += '<div class="pt-row" style="color:'+colorOf(m.from)+'">'+
           '<span class="dot" style="background:'+colorOf(m.from)+'">'+m.from[0]+'</span>'+
           '<span class="nm2"><span class="fr-name">'+m.from+(m.mood ? ' '+m.mood : '')+'</span>'+
-          '<span class="fr-meta">beat '+m.score+' in '+GAMES[m.game]+'</span></span>'+
+          '<span class="fr-meta">beat '+m.score+' in '+GAMES[m.game]+(m.r===3 ? ' · 3 rounds' : '')+'</span></span>'+
           '<button class="smallbtn" data-play="'+i+'" style="padding:5px 12px">PLAY</button></div>';
       });
     }
@@ -3848,7 +4009,7 @@ const Rivals = (function(){
       const ib2 = ib.filter((_,k)=>k !== +b.dataset.play);
       await store('inbox', ib2);
       hide();
-      Challenge.acceptDirect({g:m.game, score:m.score, name:m.from, tag:m.from});
+      Challenge.acceptDirect({g:m.game, score:m.score, name:m.from, tag:m.from, r:m.r});
     });
     el('rv-card').querySelectorAll('[data-dare]').forEach(b=>b.onclick = ()=>{ daring = daring === b.dataset.dare ? null : b.dataset.dare; expanded = null; open(); });
     el('rv-card').querySelectorAll('[data-hist]').forEach(b=>b.onclick = ()=>{ expanded = expanded === b.dataset.hist ? null : b.dataset.hist; daring = null; open(); });
@@ -3858,19 +4019,12 @@ const Rivals = (function(){
       await store('mood', cur === b.dataset.mood ? '' : b.dataset.mood);
       Snd.tap(); open();
     });
-    el('rv-card').querySelectorAll('[data-send]').forEach(b=>b.onclick = async ()=>{
+    el('rv-card').querySelectorAll('[data-send]').forEach(b=>b.onclick = ()=>{
       const [t, g] = b.dataset.send.split('|');
-      const best = (await Shell.store.get(BESTK[g])) || 0;
-      if(!best){ b.textContent = 'PLAY IT FIRST'; return; }
-      try{
-        await fetch('https://'+HOST+'/box/'+encodeURIComponent(t), {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({t:'chal', from: await myUser(), game: g, score: best, mood: (await store('mood'))||''})
-        });
-        daring = null;
-        banner('⚔️ Challenge sent: beat your '+best+' in '+GAMES[g]);
-        open();
-      }catch(e){ b.textContent = 'FAILED · RETRY'; }
+      daring = null;
+      hide();
+      banner('🎯 Play 3 rounds of '+GAMES[g]+'. Your total becomes the challenge for '+t+'.');
+      Challenge.startSetter(g, t);
     });
     el('rv-addgo').onclick = async ()=>{
       const v = el('rv-add').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -3897,7 +4051,7 @@ const Rivals = (function(){
     drain();
   }, 1600);
 
-  return { open, reportResult };
+  return { open, reportResult, sendChal };
 })();
 </script>
 </body>
