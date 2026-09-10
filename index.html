@@ -13,6 +13,8 @@
 <meta property="og:url" content="https://tupeloghost.github.io/Pocket-Arcade/">
 <meta name="description" content="Five haunted machines, no coins needed. Duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -379,6 +381,8 @@
     border:1px solid rgba(140,160,190,.14);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
   }
+  .gcard .ico{color:var(--accent,var(--gold));}
+  .gcard .ico svg{width:30px; height:30px; filter:drop-shadow(0 0 7px var(--accent,var(--gold)));}
   .tag{background:rgba(255,255,255,.06); border:1px solid rgba(140,160,190,.14);}
   .tag.players{border-color:transparent;}
 
@@ -456,7 +460,7 @@
   <button class="chbtn dare" id="dare-card"></button>
   <div class="cards">
     <button class="gcard" data-game="tw" style="--accent:var(--coral)">
-      <div class="ico">⚡</div>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M13 2.5 6.5 13.5 H11 L9.5 21.5 17.5 10.5 H13 Z"/></svg></div>
       <div class="info">
         <div class="name">SPIRIT DUEL</div>
         <div class="desc">Quick-fire mini-games. Play a friend on one screen, or duel the Ghost solo.</div>
@@ -464,7 +468,7 @@
       </div>
     </button>
     <button class="gcard" data-game="stack" style="--accent:var(--gold)">
-      <div class="ico">🌙</div>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="16.5" width="11" height="4" rx="1.2"/><rect x="7" y="10.5" width="11" height="4" rx="1.2"/><path d="M18.5 3.5 a4.4 4.4 0 1 0 2 5.4 a3.4 3.4 0 0 1 -2 -5.4 Z" fill="currentColor" stroke="none" opacity=".9"/></svg></div>
       <div class="info">
         <div class="name">GHOST STACK</div>
         <div class="desc">Drop blocks to build a tower. Miss the edge and lose a piece, but the ghost saves your scraps.</div>
@@ -472,7 +476,7 @@
       </div>
     </button>
     <button class="gcard" data-game="snake" style="--accent:var(--cyan)">
-      <div class="ico">🐍</div>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3.5 16.5 C7 9.5, 10 21, 14 14.5 S19 7, 20.5 6"/><circle cx="20.5" cy="6" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="7" r="1.2" fill="currentColor" stroke="none" opacity=".7"/></svg></div>
       <div class="info">
         <div class="name">SPECTER SNAKE</div>
         <div class="desc">Classic snake with a hunter: eat fireflies, dodge the Hollow, don’t hit yourself.</div>
@@ -480,7 +484,7 @@
       </div>
     </button>
     <button class="gcard" data-game="flight" style="--accent:var(--grape)">
-      <div class="ico">👻</div>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M5.5 20 v-8.5 a6.5 6.5 0 0 1 13 0 V20 l-2.2-1.8 -2.1 1.8 -2.2-1.8 -2.1 1.8 -2.2-1.8 Z"/><circle cx="9.8" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="11" r="1.1" fill="currentColor" stroke="none"/></svg></div>
       <div class="info">
         <div class="name">WISP FLIGHT</div>
         <div class="desc">Tap to fly the little ghost through the gaps. One touch ends the run.</div>
@@ -488,7 +492,7 @@
       </div>
     </button>
     <button class="gcard" data-game="shade" style="--accent:var(--coral)">
-      <div class="ico">🏮</div>
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 9.5 18 20.5 H6 Z"/><circle cx="12" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><path d="M12 2.5 v3 M7.5 4.5 l1.4 2.2 M16.5 4.5 l-1.4 2.2" opacity=".85"/></svg></div>
       <div class="info">
         <div class="name">SHADE SHOOTER</div>
         <div class="desc">Slide your lantern and blast the diving shades. Waves keep coming, keep getting bigger.</div>
@@ -497,7 +501,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.8</div>
+  <div class="verstamp">v2026.09.09.10</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -619,6 +623,9 @@
 /* ================================================================
    SHELL: navigation + persistent best scores
 ================================================================ */
+if('serviceWorker' in navigator && location.hostname.endsWith('github.io')){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
 const Shell = (function(){
   const mem = {};
   const store = {
@@ -1239,8 +1246,9 @@ Shell.register('stack', (function(){
   async function finish(){
     if(!running) return;
     const isBest = await Shell.reportBest('stack', score);
+    const near = !isBest && bestH > 0 && score >= bestH - Math.max(3, bestH*0.3) ? ' <span style="color:var(--gold)">Only '+(bestH - score + 1)+' from your best!</span>' : '';
     if(score > bestH) bestH = score;
-    $('st-over-msg').innerHTML = 'You stacked <b>'+score+'</b> '+(score===1?'block':'blocks')+' toward the moon.';
+    $('st-over-msg').innerHTML = 'You stacked <b>'+score+'</b> '+(score===1?'block':'blocks')+' toward the moon.'+near;
     $('st-newbest').style.display = isBest ? 'block' : 'none';
     $('st-over').classList.add('show');
     Challenge.onGameOver('S', score, 'st-chslot');
@@ -1362,8 +1370,11 @@ Shell.register('stack', (function(){
       if(moving.x + moving.w > w+10){ moving.x = w+10-moving.w; dir = -1; }
       const i = blocks.length;
       const y = h - 60 - (i+1)*BH;
+      const prox = Math.abs(moving.x - prev.x);
+      if(prox < 16){ ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = (16 - prox) * 1.3; }
       ctx.fillStyle = colorFor(i);
       ctx.fillRect(moving.x, y, moving.w, BH);
+      ctx.shadowBlur = 0;
       ctx.fillStyle = 'rgba(255,255,255,.35)';
       ctx.fillRect(moving.x, y, moving.w, 4);
       // guide line from previous block edges
@@ -1609,11 +1620,12 @@ Shell.register('snake', (function(){
     setTimeout(()=>cv.classList.remove('shake-hard'), 400);
     Snd.bad();
     const isBest = await Shell.reportBest('snake', score);
+    const near = !isBest && bestN > 0 && score >= bestN - Math.max(3, bestN*0.3) ? ' <span style="color:var(--gold)">Only '+(bestN - score + 1)+' from your best!</span>' : '';
     if(score > bestN) bestN = score;
     $('sn-over-title').textContent = deathBy === 'hollow'
       ? 'THE HOLLOW TOOK YOU'
       : (score >= 15 ? 'LEGEND OF THE SWAMP' : 'THE SWAMP GOT YOU');
-    $('sn-over-msg').innerHTML = 'You swallowed <b>'+score+'</b> '+(score===1?'firefly':'fireflies')+'.';
+    $('sn-over-msg').innerHTML = 'You swallowed <b>'+score+'</b> '+(score===1?'firefly':'fireflies')+'.'+near;
     $('sn-newbest').style.display = isBest ? 'block' : 'none';
     $('sn-over').classList.add('show');
     Challenge.onGameOver('N', score, 'sn-chslot');
@@ -1787,7 +1799,7 @@ Shell.register('snake', (function(){
 Shell.register('flight', (function(){
   const $ = id => document.getElementById(id);
   const GRAV = 0.24, FLAP = -5.6, PW = 48, R = 13;
-  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy, lastTick, dog;
+  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy, lastTick, dog, mile;
 
   function sizeCanvas(){
     const body = cv.parentElement;
@@ -1804,6 +1816,7 @@ Shell.register('flight', (function(){
 
   function reset(){
     over = false; started = false; score = 0; shakeT = 0; ghostT = 0; spawned = 0; crossedBF = false; mercy = true;
+    mile = 20;
     wy = H()*0.45; vy = 0;
     pillars = []; trail = []; fx = [];
     $('fl-score').textContent = '0';
@@ -1826,11 +1839,17 @@ Shell.register('flight', (function(){
     pillars.push(p);
   }
   function addText(x, y, text){ fx.push({x, y, vx:0, vy:-1.6, life:22, text}); }
+  const MILES = ['DEEPER INTO THE DARK', 'THE SWAMP HOLDS ITS BREATH', 'THE MOON IS WATCHING', 'FURTHER THAN MOST DARE'];
   function scoreUp(gain){
     score += gain;
     $('fl-score').textContent = score;
     bump($('fl-score'));
     Challenge.onScore('F', score);
+    if(score >= mile){
+      fx.push({x:W()/2, y:H()*0.32, vx:0, vy:-0.5, life:50, text:MILES[Math.min(MILES.length-1, mile/20 - 1)]});
+      mile += 20;
+      Snd.swell(); buzz([25,35,25]);
+    }
     if(!crossedBF && bestF > 0 && score > bestF){
       crossedBF = true;
       addText(wx(), wy - 46, 'PAST YOUR BEST!');
@@ -1861,8 +1880,9 @@ Shell.register('flight', (function(){
   async function finish(){
     if(!running) return;
     const isBest = await Shell.reportBest('flight', score);
+    const near = !isBest && bestF > 0 && score >= bestF - Math.max(3, bestF*0.3) ? ' <span style="color:var(--gold)">Only '+(bestF - score + 1)+' from your best!</span>' : '';
     if(score > bestF) bestF = score;
-    $('fl-over-msg').innerHTML = 'You scored <b>'+score+'</b> drifting the brambles.';
+    $('fl-over-msg').innerHTML = 'You scored <b>'+score+'</b> drifting the brambles.'+near;
     $('fl-newbest').style.display = isBest ? 'block' : 'none';
     $('fl-over').classList.add('show');
     Challenge.onGameOver('F', score, 'fl-chslot');
@@ -2072,7 +2092,15 @@ Shell.register('shade', (function(){
     }
     maxSlot = 46 + (rows-1)*46;
     formY = -rows*46 - 20;
-    if(wave > 1){ addFx(W()/2, H()*0.35, 'WAVE '+wave, '#e8a05a'); Snd.swell(); buzz([25,30,25]); }
+    if(wave > 1){
+      score += 5;
+      $('sh-score').textContent = score;
+      bump($('sh-score'));
+      Challenge.onScore('H', score);
+      addFx(W()/2, H()*0.35, 'WAVE '+wave, '#e8a05a');
+      addFx(W()/2, H()*0.35 + 22, 'CLEAR +5', '#f2e7cf');
+      Snd.swell(); buzz([25,30,25]);
+    }
   }
 
   function reset(){
@@ -2120,8 +2148,9 @@ Shell.register('shade', (function(){
   async function finish(){
     if(!running) return;
     const isBest = await Shell.reportBest('shade', score);
+    const near = !isBest && bestS > 0 && score >= bestS - Math.max(3, bestS*0.3) ? ' <span style="color:var(--gold)">Only '+(bestS - score + 1)+' from your best!</span>' : '';
     if(score > bestS) bestS = score;
-    $('sh-over-msg').innerHTML = 'You banished <b>'+score+'</b> shades and reached wave <b>'+wave+'</b>.';
+    $('sh-over-msg').innerHTML = 'You banished <b>'+score+'</b> shades and reached wave <b>'+wave+'</b>.'+near;
     $('sh-newbest').style.display = isBest ? 'block' : 'none';
     $('sh-over').classList.add('show');
     Challenge.onGameOver('H', score, 'sh-chslot');
