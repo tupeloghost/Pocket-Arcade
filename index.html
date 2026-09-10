@@ -379,6 +379,104 @@
     box-shadow:inset -5px -7px 0 rgba(0,0,0,.18), 0 0 0 3px rgba(232,160,90,.6), 0 0 12px rgba(232,160,90,.4);
   }
 
+  /* ============ MODERN POLISH LAYER ============ */
+  html{color-scheme:dark;}
+  body{-webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; overscroll-behavior:none;}
+
+  /* film grain + vignette */
+  body::before{
+    content:''; position:fixed; inset:0; z-index:99; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity:.045; mix-blend-mode:overlay;
+  }
+  body::after{
+    content:''; position:fixed; inset:0; z-index:98; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 42%, transparent 58%, rgba(0,0,0,.32) 100%);
+  }
+
+  /* screens breathe in */
+  .screen.active{animation:screenIn .3s cubic-bezier(.22,1,.36,1);}
+  @keyframes screenIn{from{opacity:0; transform:scale(.988);}to{opacity:1; transform:scale(1);}}
+
+  /* hub entrance choreography */
+  .hub-head{animation:riseIn .55s cubic-bezier(.22,1,.36,1) backwards;}
+  .cards .gcard{animation:riseIn .5s cubic-bezier(.22,1,.36,1) backwards;}
+  .cards .gcard:nth-child(1){animation-delay:.05s}
+  .cards .gcard:nth-child(2){animation-delay:.1s}
+  .cards .gcard:nth-child(3){animation-delay:.15s}
+  .cards .gcard:nth-child(4){animation-delay:.2s}
+  .cards .gcard:nth-child(5){animation-delay:.25s}
+  .cards .gcard:nth-child(6){animation-delay:.3s}
+  .chbtn{animation:riseIn .5s cubic-bezier(.22,1,.36,1) .34s backwards;}
+  @keyframes riseIn{from{opacity:0; transform:translateY(14px);}to{opacity:1; transform:translateY(0);}}
+
+  /* cards as layered material */
+  .gcard{
+    background:linear-gradient(180deg, rgba(26,33,49,.92), rgba(12,17,27,.94));
+    border:1px solid rgba(140,160,190,.15);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 2px 6px rgba(0,0,0,.35), 0 14px 34px rgba(0,0,0,.3);
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s, border-color .25s;
+  }
+  .gcard:active{transform:scale(.977);}
+  @media (hover:hover){
+    .gcard:hover{
+      transform:translateY(-2px);
+      border-color:rgba(232,160,90,.35);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 4px 10px rgba(0,0,0,.4), 0 20px 46px rgba(0,0,0,.42);
+    }
+  }
+  .gcard::before{width:4px; box-shadow:0 0 14px var(--accent,var(--gold)); opacity:.9;}
+  .gcard .ico{
+    background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
+    border:1px solid rgba(140,160,190,.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+  }
+  .tag{background:rgba(255,255,255,.06); border:1px solid rgba(140,160,190,.14);}
+  .tag.players{border-color:transparent;}
+
+  /* frosted game bars */
+  .gamebar{
+    background:rgba(5,7,13,.5);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(140,160,190,.1);
+  }
+
+  /* buttons: modern shadow stacks */
+  .bigbtn{
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 2px 4px rgba(0,0,0,.4), 0 10px 28px rgba(255,122,46,.32);
+    transition:transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
+  }
+  .bigbtn:active{
+    transform:translateY(1px) scale(.98);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.4), 0 5px 14px rgba(255,122,46,.25);
+  }
+  .backbtn, .smallbtn{
+    border-width:1px; background:rgba(255,255,255,.07);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 2px 6px rgba(0,0,0,.3);
+    transition:transform .12s, background .15s;
+  }
+  .backbtn:active, .smallbtn:active{transform:scale(.95); background:rgba(255,255,255,.11);}
+
+  /* overlay cards: deeper, glassier */
+  .gover{background:rgba(5,7,13,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);}
+  .ch-card, .howto-card{
+    background:linear-gradient(180deg, rgba(24,31,46,.97), rgba(11,16,26,.98));
+    border:1px solid rgba(140,160,190,.2);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 30px 70px rgba(0,0,0,.55);
+  }
+  .dare-banner{
+    background:linear-gradient(180deg, rgba(26,33,49,.97), rgba(12,17,27,.98));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 12px 36px rgba(0,0,0,.55);
+  }
+
+  /* softer marquee */
+  .bulb{width:6px; height:6px; filter:blur(.4px); animation-duration:2.6s;}
+  .bulb{box-shadow:0 0 8px currentColor; color:var(--dim);}
+  .bulb:nth-child(2n){color:var(--coral);}
+  .bulb:nth-child(3n){color:var(--cyan);}
+  .bulb:nth-child(5n){color:var(--gold);}
+
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
 </style>
 </head>
@@ -459,7 +557,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.4</div>
+  <div class="verstamp">v2026.09.09.5</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
