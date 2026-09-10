@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tupelo Ghost">
 <meta property="og:title" content="Tupelo Ghost Arcade">
-<meta property="og:description" content="Five haunted machines, no coins needed. Duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
+<meta property="og:description" content="Five ghostly games, no coins needed. Duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
 <meta property="og:url" content="https://tupeloghost.github.io/Pocket-Arcade/">
-<meta name="description" content="Five haunted machines, no coins needed. Duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
+<meta name="description" content="Five ghostly games, no coins needed. Duel the Ghost, stack to the paper moon, fly the wisp, glide through the swamp dark.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -279,16 +279,6 @@
   }
   .chbtn:active{transform:scale(.97);}
   .verstamp{margin-top:18px; font-size:10px; letter-spacing:1.5px; color:var(--dim); opacity:.55; font-weight:700;}
-  .chbtn.dare{
-    margin:0 0 12px; border-color:rgba(139,121,217,.45);
-    padding:10px 16px; display:flex; align-items:center; gap:12px; text-align:left;
-  }
-  .chbtn.dare.lit{border-color:rgba(232,160,90,.6);}
-  .chbtn.dare .d-ico{font-size:24px; flex:none;}
-  .chbtn.dare .d-mid{flex:1; min-width:0;}
-  .chbtn.dare .d-label{font-family:'Space Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--dim); text-transform:uppercase;}
-  .chbtn.dare .d-task{font-size:15px; letter-spacing:1px; line-height:1.25;}
-  .chbtn.dare .d-status{flex:none; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--gold); white-space:nowrap;}
   .dare-banner{
     position:fixed; top:-70px; left:50%; transform:translateX(-50%);
     z-index:95; background:var(--card); border:1.5px solid rgba(232,160,90,.6);
@@ -538,10 +528,9 @@
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
       <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
     </div>
-    <p>MIDNIGHT ARCADE · FIVE HAUNTS · NO COINS NEEDED</p>
+    <p>MIDNIGHT ARCADE · FIVE GAMES · NO COINS NEEDED</p>
     <div class="epi">The arcade at the end of the dirt road. It only opens after dark.</div>
   </div>
-  <button class="chbtn dare" id="dare-card"></button>
   <button class="chbtn friends" id="friends-btn">👥 PLAY WITH FRIENDS</button>
   <button class="chbtn" id="party-btn" hidden></button>
   <button class="chbtn" id="live-btn" hidden></button>
@@ -587,8 +576,8 @@
       </div>
     </button>
   </div>
-  <button class="chbtn" id="ch-enter">⚔️ RIVALS &amp; CHALLENGES</button>
-  <div class="verstamp">v2026.09.09.22</div>
+  <button class="chbtn" id="ch-enter">⚔️ FRIENDS &amp; CHALLENGES</button>
+  <div class="verstamp">v2026.09.09.25</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -762,7 +751,6 @@ const Shell = (function(){
     current = null;
     show('hub');
     refreshBests();
-    if(typeof Dare !== 'undefined') Dare.refresh();
     if(typeof HowTo !== 'undefined') HowTo.hide();
     if(typeof Vs !== 'undefined') Vs.cancel();
     if(typeof Party !== 'undefined') Party.onHub();
@@ -1005,7 +993,7 @@ Shell.register('tw', (function(){
 
   function gChase(){
     $('tw-midtext').innerHTML = 'CATCH THE WISP';
-    fillBoth('<div class="submsg">Catch it before your rival does!</div><div class="wisp-chase" data-wisp>👻</div>');
+    fillBoth('<div class="submsg">First to catch it wins!</div><div class="wisp-chase" data-wisp>👻</div>');
     cpuInfo = {kind:'chase', sel:'[data-wisp]'};
     const s = {
       x:.5, y:.5,
@@ -1181,7 +1169,6 @@ Shell.register('tw', (function(){
   }
 
   function endGame(winner){
-    if(typeof Dare !== 'undefined') Dare.duelWin(cpu && winner === 0);
     const won = PNAME[winner]+' WINS '+scores[winner]+'–'+scores[1-winner]+'!';
     const lost = 'DEFEAT… REMATCH?';
     const wb = $('tw-winbottom'), wt = $('tw-wintop');
@@ -2924,7 +2911,7 @@ const Challenge = (function(){
     if(!b) return;
     b.textContent = active
       ? '⚔️ ACTIVE: BEAT '+active.name+'’S '+active.score+' IN '+G2TITLE[active.g].toUpperCase()
-      : '⚔️ RIVALS & CHALLENGES';
+      : '⚔️ FRIENDS & CHALLENGES';
   }
 
   function targetFor(gameKey){
@@ -2956,7 +2943,6 @@ const Challenge = (function(){
   function leaveGame(){ chip = null; chipGame = null; }
 
   function onScore(g, s){
-    if(typeof Dare !== 'undefined') Dare.onScore(g, s);
     if(chip && active && active.g === g && g === chipGame && s > active.score){
       chip.className = 'ch-chip on beaten';
       chip.textContent = '🏆 '+active.score+' BEATEN!';
@@ -3016,7 +3002,7 @@ const Challenge = (function(){
   function openCreate(g, score){
     card.innerHTML =
       '<h2>SEND A CHALLENGE</h2>'+
-      '<p>You scored <b style="color:var(--gold)">'+score+'</b> in '+G2TITLE[g]+'. Sign it, then copy the message below and text it to your rival:</p>'+
+      '<p>You scored <b style="color:var(--gold)">'+score+'</b> in '+G2TITLE[g]+'. Sign it, then copy the message below and text it to a friend:</p>'+
       '<input class="ch-input" id="ch-name" maxlength="8" placeholder="YOUR NAME" autocomplete="off">'+
       '<div class="ch-msg" id="ch-msgout"></div>'+
       '<div class="ch-status" id="ch-status"></div>'+
@@ -3069,7 +3055,7 @@ const Challenge = (function(){
   function openEnter(){
     card.innerHTML =
       '<h2>ENTER CHALLENGE</h2>'+
-      '<p>Paste the code your rival sent you.</p>'+
+      '<p>Paste the code your friend sent you.</p>'+
       '<input class="ch-input" id="ch-code-in" placeholder="S-27-SAM-K4" autocomplete="off">'+
       '<div class="ch-err" id="ch-err"></div>'+
       '<div class="ch-row">'+
@@ -3634,7 +3620,7 @@ const Rivals = (function(){
     return {ok:false, taken: r.status === 409};
   }
   function claimCard(msg){
-    card('<h2>⚔️ RIVALS</h2>'+
+    card('<h2>⚔️ FRIENDS</h2>'+
       '<p><b>Claim your ghost name.</b> It’s yours alone — friends will find you by it.</p>'+
       '<input class="ch-input" id="rv-claim" maxlength="12" placeholder="PICK A NAME" value="'+(localStorage.getItem('arcade-name')||'')+'">'+
       '<div class="ch-err">'+(msg||'')+'</div>'+
@@ -3713,7 +3699,7 @@ const Rivals = (function(){
     await drain();
     const rv = await rivals();
     const ib = await inbox();
-    let html = '<h2>⚔️ RIVALS</h2>'+
+    let html = '<h2>⚔️ FRIENDS</h2>'+
       '<p style="margin:0">Your ghost name — friends add you with it:</p>'+
       '<div class="lv-code" style="font-size:28px; letter-spacing:4px;">'+me+'</div>';
     if(ib.length){
@@ -3726,7 +3712,7 @@ const Rivals = (function(){
       });
     }
     const tags = Object.keys(rv);
-    html += '<p style="margin:6px 0 0"><b>Your rivals</b>'+(tags.length ? '' : ' — none yet')+'</p>';
+    html += '<p style="margin:6px 0 0"><b>Your friends</b>'+(tags.length ? '' : ' — none yet')+'</p>';
     tags.forEach(t=>{
       const r = rv[t];
       html += '<div class="pt-row" style="color:'+colorOf(t)+'">'+
@@ -3748,7 +3734,7 @@ const Rivals = (function(){
         }).join('')+'</div>';
       }
     });
-    html += '<input class="ch-input" id="rv-add" maxlength="12" placeholder="ADD A RIVAL BY NAME">'+
+    html += '<input class="ch-input" id="rv-add" maxlength="12" placeholder="ADD A FRIEND BY NAME">'+
       '<div class="ch-row">'+
       '<button class="smallbtn" id="rv-addgo">ADD</button>'+
       '<button class="smallbtn ghost" id="rv-code">PASTE A CODE</button>'+
@@ -3798,88 +3784,6 @@ const Rivals = (function(){
   setTimeout(drain, 2500);
 
   return { open, reportResult };
-})();
-</script>
-<script>
-/* ================================================================
-   TONIGHT'S DARE: one deterministic challenge per night, with streaks
-================================================================ */
-const Dare = (function(){
-  const DEFS = [
-    {g:'S', name:'Ghost Stack',   game:'stack',   targets:[8, 12, 16]},
-    {g:'N', name:'Specter Snake', game:'snake',   targets:[10, 15, 20]},
-    {g:'F', name:'Wisp Flight',   game:'flight',  targets:[6, 10, 14]},
-    {g:'H', name:'Moth Swarm', game:'shade',   targets:[15, 25, 40]},
-    {g:'D', name:'Spirit Duel',   game:'tw',      targets:[1]}
-  ];
-  let done = false, streak = 0;
-
-  function dayKey(){
-    const d = new Date();
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  }
-  function seedFrom(s){ let h = 7; for(const c of s) h = (h*31 + c.charCodeAt(0)) >>> 0; return h; }
-  function todays(){
-    const seed = seedFrom(dayKey());
-    const def = DEFS[seed % DEFS.length];
-    const target = def.targets[Math.floor(seed/7) % def.targets.length];
-    return {g:def.g, name:def.name, game:def.game, target};
-  }
-  function render(){
-    const el = document.getElementById('dare-card');
-    if(!el) return;
-    const t = todays();
-    const what = t.g === 'D' ? 'Beat the Ghost in Spirit Duel' : 'Score '+t.target+' in '+t.name;
-    el.innerHTML =
-      '<span class="d-ico">'+(done ? '🏮' : '🕯️')+'</span>'+
-      '<span class="d-mid"><span class="d-label">Tonight’s challenge'+(streak > 1 ? ' · 🔥 '+streak+' nights' : '')+'</span>'+
-      '<div class="d-task">'+what+'</div></span>'+
-      '<span class="d-status">'+(done ? '✓ DONE' : 'TAP TO PLAY')+'</span>';
-    el.classList.toggle('lit', done);
-    el.onclick = ()=>{ if(document.getElementById('hub').classList.contains('active')) Shell.openGame(t.game); };
-  }
-  async function refresh(){
-    done = !!(await Shell.store.get('dare-'+dayKey()));
-    streak = (await Shell.store.get('dare-streak')) || 0;
-    const last = await Shell.store.get('dare-last');
-    if(last && !done){
-      const diff = (new Date(dayKey()) - new Date(last)) / 86400000;
-      if(diff > 1) streak = 0;
-    }
-    render();
-  }
-  function banner(){
-    const b = document.createElement('div');
-    b.className = 'dare-banner';
-    b.textContent = '🏮 CHALLENGE COMPLETE!' + (streak > 1 ? ' 🔥 '+streak+' NIGHTS RUNNING' : '');
-    document.body.appendChild(b);
-    setTimeout(()=>b.classList.add('show'), 30);
-    setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(), 500); }, 3400);
-  }
-  async function complete(){
-    if(done) return;
-    done = true;
-    const today = dayKey();
-    const last = await Shell.store.get('dare-last');
-    const diff = last ? (new Date(today) - new Date(last)) / 86400000 : 99;
-    streak = (diff === 1) ? ((await Shell.store.get('dare-streak')) || 0) + 1 : 1;
-    Shell.store.set('dare-'+today, true);
-    Shell.store.set('dare-last', today);
-    Shell.store.set('dare-streak', streak);
-    banner();
-    render();
-    buzz([60,50,60,50,90]);
-    Snd.win();
-  }
-  function onScore(g, score){
-    const t = todays();
-    if(!done && t.g === g && t.g !== 'D' && score >= t.target) complete();
-  }
-  function duelWin(beatCpu){
-    if(!done && todays().g === 'D' && beatCpu) complete();
-  }
-  refresh();
-  return { onScore, duelWin, refresh };
 })();
 </script>
 </body>
