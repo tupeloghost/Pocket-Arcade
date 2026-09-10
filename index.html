@@ -291,6 +291,17 @@
   #ch-modal.show{display:flex;}
   #vs-modal{position:fixed; inset:0; z-index:92; background:rgba(5,7,13,.88); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; padding:20px;}
   #vs-modal.show{display:flex;}
+  #pt-modal{position:fixed; inset:0; z-index:93; background:rgba(5,7,13,.9); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:20px;}
+  #pt-modal.show{display:flex;}
+  #lv-modal{position:fixed; inset:0; z-index:94; background:rgba(5,7,13,.9); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:20px;}
+  #lv-modal.show{display:flex;}
+  .lv-code{font-family:'Cormorant Garamond',serif; font-weight:700; font-size:44px; letter-spacing:10px; color:var(--gold); text-shadow:0 0 18px rgba(232,160,90,.5);}
+  .pt-row{display:flex; align-items:center; gap:10px; width:100%; font-weight:700; font-size:14px; padding:7px 10px; border-radius:12px; background:rgba(255,255,255,.05);}
+  .pt-row .dot{width:12px; height:12px; border-radius:50%; box-shadow:0 0 8px currentColor; flex:none;}
+  .pt-row .nm2{flex:1; text-align:left;}
+  .pt-row b{font-size:16px;}
+  .pt-count{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+  .pt-count .smallbtn{min-width:44px; font-size:16px;}
   #vs-card .vs-big{font-size:30px; font-weight:700;}
   .ch-card{background:var(--card); border:2px solid rgba(255,255,255,.14); border-radius:24px; padding:24px 22px; width:min(88vw,360px); display:flex; flex-direction:column; gap:12px; text-align:center;}
   .ch-card h2{font-family:'Cormorant Garamond',serif; font-weight:700; text-transform:uppercase; font-size:27px; margin:0; letter-spacing:1.5px;}
@@ -511,6 +522,8 @@
     <div class="epi">The arcade at the end of the dirt road. It only opens after dark.</div>
   </div>
   <button class="chbtn dare" id="dare-card"></button>
+  <button class="chbtn" id="party-btn" style="margin:0 0 16px;">🎉 PARTY MODE · 2-8 PLAYERS, ONE PHONE</button>
+  <button class="chbtn" id="live-btn" style="margin:0 0 16px; border-color:rgba(38,224,255,.5); background:rgba(38,224,255,.08);">🌐 LIVE PARTY · EVERY PHONE ITS OWN</button>
   <div class="cards">
     <button class="gcard" data-game="tw" style="--accent:var(--coral)">
       <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M13 2.5 6.5 13.5 H11 L9.5 21.5 17.5 10.5 H13 Z"/></svg></div>
@@ -554,7 +567,7 @@
     </button>
   </div>
   <button class="chbtn" id="ch-enter">⚔️ GOT A CHALLENGE CODE?</button>
-  <div class="verstamp">v2026.09.09.15</div>
+  <div class="verstamp">v2026.09.09.17</div>
 </div>
 
 <!-- ================= WISP FLIGHT ================= -->
@@ -731,6 +744,8 @@ const Shell = (function(){
     if(typeof Dare !== 'undefined') Dare.refresh();
     if(typeof HowTo !== 'undefined') HowTo.hide();
     if(typeof Vs !== 'undefined') Vs.cancel();
+    if(typeof Party !== 'undefined') Party.onHub();
+    if(typeof Live !== 'undefined') Live.onHub();
   }
 
   document.querySelectorAll('.gcard').forEach(c=>{
@@ -2293,7 +2308,7 @@ Shell.register('shade', (function(){
       const sway = Math.sin(frames*0.018)*22;
 
       // divers telegraph, then peel off
-      if(frames % Math.max(45, 130 - wave*12) === 0){
+      if(frames % Math.max(38, 130 - wave*12 - Math.floor(frames/700)*12) === 0){
         const idle = foes.filter(f=>!f.dive && !f.warn);
         if(idle.length){
           idle[Math.floor(Math.random()*idle.length)].warn = 28;
@@ -2810,6 +2825,8 @@ const HowTo = (function(){
 
 <div id="ch-modal"><div class="ch-card" id="ch-card"></div></div>
 <div id="vs-modal"><div class="ch-card" id="vs-card"></div></div>
+<div id="pt-modal"><div class="ch-card" id="pt-card"></div></div>
+<div id="lv-modal"><div class="ch-card" id="lv-card"></div></div>
 
 <script>
 /* ================================================================
@@ -2895,6 +2912,14 @@ const Challenge = (function(){
 
   function onGameOver(g, score, slotId){
     const slot = document.getElementById(slotId);
+    if(typeof Live !== 'undefined' && Live.intercept(g, score)){
+      if(slot) slot.innerHTML = '';
+      return;
+    }
+    if(typeof Party !== 'undefined' && Party.intercept(g, score)){
+      if(slot) slot.innerHTML = '';
+      return;
+    }
     if(typeof Vs !== 'undefined' && Vs.intercept(g, score)){
       if(slot) slot.innerHTML = '';
       return;
@@ -3112,6 +3137,396 @@ const Vs = (function(){
 
   function cancel(){ on = false; hide(); }
   return { start, intercept, cancel };
+})();
+</script>
+<script>
+/* ================================================================
+   PARTY MODE: pass-the-phone tournament, live scoreboard, rounds
+================================================================ */
+const Party = (function(){
+  const MACH = {S:['stack','Ghost Stack'], N:['snake','Specter Snake'], F:['flight','Wisp Flight'], H:['shade','Shade Shooter']};
+  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry'};
+  const NAMES = ['EMBER','HAUNT','WISP','MOSS','DUSK','GOLD','ROSE','FROST'];
+  const COLS  = ['#ff7a2e','#26e0ff','#f2e7cf','#3ecf6e','#8b79d9','#e8a05a','#ff4d6d','#9ad7ff'];
+  const ROUNDS = 3;
+  let on = false, transitioning = false, players = [], order = [], round = 0, turn = 0, roundScores = [];
+
+  function el(id){ return document.getElementById(id); }
+  function hide(){ el('pt-modal').classList.remove('show'); }
+  function card(html){ el('pt-card').innerHTML = html; el('pt-modal').classList.add('show'); }
+  function name(i){ return '<span style="color:'+players[i].c+'"><b>'+players[i].n+'</b></span>'; }
+  function board(scoresNote){
+    const rank = players.map((p2,i)=>({i, t:p2.t})).sort((a,b)=>b.t-a.t);
+    return rank.map((r,pos)=>{
+      const p2 = players[r.i];
+      return '<div class="pt-row" style="color:'+p2.c+'">'+
+        '<span class="dot" style="background:'+p2.c+'"></span>'+
+        '<span class="nm2">'+(pos===0?'👑 ':'')+p2.n+(scoresNote && roundScores[r.i]!=null ? ' <span style="opacity:.6; font-weight:400">('+roundScores[r.i]+' this round)</span>' : '')+'</span>'+
+        '<b>'+p2.t+'</b></div>';
+    }).join('');
+  }
+
+  function start(){
+    card('<h2>🎉 PARTY MODE</h2>'+
+      '<p>Pass one phone around. Everyone plays the same game each round. Best rank wins points. <b>'+ROUNDS+' rounds.</b></p>'+
+      '<p>How many players?</p>'+
+      '<div class="pt-count">'+[2,3,4,5,6,7,8].map(n=>'<button class="smallbtn" data-n="'+n+'">'+n+'</button>').join('')+'</div>'+
+      '<button class="smallbtn ghost" id="pt-quit">CANCEL</button>');
+    el('pt-card').querySelectorAll('[data-n]').forEach(b=>b.onclick = ()=>begin(+b.dataset.n));
+    el('pt-quit').onclick = cancel;
+  }
+
+  function begin(n){
+    on = true; round = 0; turn = 0;
+    players = Array.from({length:n}, (_,i)=>({n:NAMES[i], c:COLS[i], t:0}));
+    order = Object.keys(MACH);
+    for(let i=order.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; }
+    order = order.slice(0, ROUNDS);
+    announceRound();
+  }
+
+  function announceRound(){
+    roundScores = players.map(()=>null);
+    turn = 0;
+    const m = MACH[order[round]];
+    card('<h2>ROUND '+(round+1)+' of '+ROUNDS+'</h2>'+
+      '<p>The machine: <b style="color:var(--gold)">'+m[1].toUpperCase()+'</b></p>'+
+      '<p>'+name(0)+' goes first. One run each, highest scores win the round.</p>'+
+      (round > 0 ? board() : '')+
+      '<button class="bigbtn" id="pt-go" style="margin-top:8px;">HAND IT TO '+players[0].n+'</button>'+
+      '<button class="smallbtn ghost" id="pt-quit">END PARTY</button>');
+    el('pt-go').onclick = ()=>{ hide(); launch(true); };
+    el('pt-quit').onclick = ()=>{ cancel(); };
+  }
+
+  function launch(fresh){
+    const key = order[round];
+    if(fresh){
+      transitioning = true;
+      if(document.querySelector('.screen.active').id !== 'hub') Shell.backToHub();
+      Shell.openGame(MACH[key][0]);
+      transitioning = false;
+    } else {
+      const b = el(RETRY[key]);
+      if(b) b.click();
+    }
+  }
+
+  function intercept(letter, score){
+    if(!on || letter !== order[round]) return false;
+    roundScores[turn] = score;
+    players[turn].t += 0; // raw scores recorded; rank points at round end
+    turn++;
+    if(turn < players.length){
+      card('<h2>'+players[turn-1].n+' SCORED '+score+'</h2>'+
+        '<p>Pass the phone to '+name(turn)+'.</p>'+
+        '<button class="bigbtn" id="pt-go">'+players[turn].n+'&rsquo;S RUN</button>'+
+        '<button class="smallbtn ghost" id="pt-quit">END PARTY</button>');
+      el('pt-go').onclick = ()=>{ hide(); launch(false); };
+      el('pt-quit').onclick = ()=>{ cancel(); };
+      Snd.tap();
+    } else {
+      // round over: award rank points (n players: best gets n, ties share the higher points)
+      const idx = players.map((_,i)=>i).sort((a,b)=>roundScores[b]-roundScores[a]);
+      let pts = players.length;
+      for(let k=0;k<idx.length;k++){
+        if(k > 0 && roundScores[idx[k]] < roundScores[idx[k-1]]) pts = players.length - k;
+        players[idx[k]].t += pts;
+      }
+      round++;
+      if(round < ROUNDS){
+        card('<h2>ROUND '+round+' COMPLETE</h2>'+board(true)+
+          '<button class="bigbtn" id="pt-go" style="margin-top:8px;">ROUND '+(round+1)+'</button>'+
+          '<button class="smallbtn ghost" id="pt-quit">END PARTY</button>');
+        el('pt-go').onclick = ()=>announceRound();
+        el('pt-quit').onclick = ()=>{ cancel(); };
+        Snd.win(); buzz([40,50,40]);
+      } else {
+        const champ = players.reduce((a,b)=>b.t>a.t?b:a, players[0]);
+        card('<h2 style="color:'+champ.c+'">'+champ.n+' WINS THE NIGHT! 👑</h2>'+board(true)+
+          '<button class="bigbtn" id="pt-go" style="margin-top:8px;">PLAY AGAIN</button>'+
+          '<button class="smallbtn ghost" id="pt-quit">BACK TO THE ARCADE</button>');
+        el('pt-go').onclick = ()=>{ players.forEach(p2=>p2.t=0); begin(players.length); };
+        el('pt-quit').onclick = ()=>{ cancel(); transitioning = true; Shell.backToHub(); transitioning = false; };
+        on = false;
+        Snd.win(); buzz([60,50,60,50,90]);
+      }
+    }
+    return true;
+  }
+
+  function onHub(){ if(!transitioning && on){ on = false; hide(); } }
+  function cancel(){ on = false; hide(); }
+  document.getElementById('party-btn').addEventListener('click', start);
+  return { intercept, onHub, cancel };
+})();
+</script>
+<script>
+/* ================================================================
+   LIVE PARTY: every phone its own, one room code, shared scoreboard
+================================================================ */
+const Live = (function(){
+  const HOST = 'tupelo-rooms.tupeloghost.workers.dev';
+  const MACH = {S:['stack','Ghost Stack'], N:['snake','Specter Snake'], F:['flight','Wisp Flight'], H:['shade','Shade Shooter']};
+  const COLS = ['#ff7a2e','#26e0ff','#f2e7cf','#3ecf6e','#8b79d9','#e8a05a','#ff4d6d','#9ad7ff'];
+  const ROUNDS = 3;
+  let ws = null, code = '', myName = '', leader = false, leadName = '';
+  let players = {}, order = [], round = 0, phase = 'idle';
+  let transitioning = false, manualExit = false, hb = 0, retries = 0;
+
+  function el(id){ return document.getElementById(id); }
+  function hide(){ el('lv-modal').classList.remove('show'); }
+  function card(html){ el('lv-card').innerHTML = html; el('lv-modal').classList.add('show'); }
+  function names(){ return Object.keys(players).sort(); }
+  function onlineNames(){ return names().filter(n=>players[n].online); }
+  function colorOf(n){ return COLS[names().indexOf(n) % COLS.length]; }
+  function send(o){ try{ ws && ws.readyState === 1 && ws.send(JSON.stringify(o)); }catch(e){} }
+  function ensure(n){ if(!players[n]) players[n] = {total:0, scores:{}, online:true}; players[n].online = true; }
+
+  function board(showRound){
+    return names().sort((a,b)=>players[b].total-players[a].total).map((n,pos)=>{
+      const p2 = players[n];
+      const rs = p2.scores[round];
+      return '<div class="pt-row" style="color:'+colorOf(n)+';opacity:'+(p2.online?1:.45)+'">'+
+        '<span class="dot" style="background:'+colorOf(n)+'"></span>'+
+        '<span class="nm2">'+(pos===0?'👑 ':'')+n+(n===myName?' (you)':'')+(p2.online?'':' · away')+
+        (showRound ? ' <span style="opacity:.6;font-weight:400">'+(rs==null?'· playing…':'('+rs+')')+'</span>' : '')+
+        '</span><b>'+p2.total+'</b></div>';
+    }).join('');
+  }
+
+  function connect(){
+    ws = new WebSocket('wss://'+HOST+'/room/'+code+'?name='+encodeURIComponent(myName));
+    window.__lvws = ws;
+    ws.onmessage = e=>{ let d; try{ d = JSON.parse(e.data); }catch(err){ return; } onMsg(d); };
+    ws.onclose = ()=>{
+      clearInterval(hb);
+      if(manualExit || phase === 'idle') return;
+      if(retries >= 6){
+        phase = 'idle';
+        card('<h2>DISCONNECTED</h2><p>Could not reach the room. Everyone still connected can keep playing.</p><button class="bigbtn" id="lv-x">CLOSE</button>');
+        el('lv-x').onclick = exit;
+        return;
+      }
+      retries++;
+      if(phase !== 'playing') card('<h2>RECONNECTING…</h2><p>The connection flickered. Hold on.</p>');
+      setTimeout(connect, Math.min(8000, 800 * Math.pow(2, retries)));
+    };
+    ws.onerror = ()=>{};
+    ws.onopen = ()=>{
+      retries = 0;
+      clearInterval(hb);
+      hb = setInterval(()=>send({t:'ping'}), 20000);
+    };
+  }
+
+  function open(create, joinCode, name){
+    myName = name;
+    code = create ? Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[Math.floor(Math.random()*23)]).join('') : joinCode.toUpperCase();
+    leader = create;
+    players = {}; order = []; round = 0; phase = 'lobby';
+    manualExit = false; retries = 0;
+    ensure(myName);
+    card('<h2>🌐 LIVE PARTY</h2><p>Connecting to the séance…</p>');
+    connect();
+  }
+
+  function onMsg(d){
+    if(d.t === 'hello'){
+      d.roster.forEach(r=>ensure(r.name));
+      if(leader){ leadName = myName; send({t:'lead', name:myName}); }
+      else send({t:'sync?'});
+      if(phase === 'lobby') lobby();
+    } else if(d.t === 'join'){
+      ensure(d.name);
+      if(leader){ send({t:'lead', name:myName}); send({t:'sync', players: snap(), order, round, phase}); }
+      if(phase === 'lobby') lobby();
+      if(phase === 'waiting'){ waitingCard(); }
+      Snd.tap();
+    } else if(d.t === 'leave'){
+      if(players[d.name]) players[d.name].online = false;
+      if(d.name === leadName && phase === 'lobby'){ card('<h2>THE HOST VANISHED</h2><button class="bigbtn" id="lv-x">CLOSE</button>'); el('lv-x').onclick = exit; return; }
+      if(phase === 'lobby') lobby();
+      if(phase === 'waiting'){ waitingCard(); checkRound(); }
+    } else if(d.t === 'lead'){
+      leadName = d.name;
+    } else if(d.t === 'sync?'){
+      if(leader) send({t:'sync', players: snap(), order, round, phase});
+    } else if(d.t === 'sync'){
+      if(d.from && d.fromName === myName) return;
+      Object.keys(d.players || {}).forEach(n=>{
+        ensure(n);
+        players[n].total = d.players[n].t;
+        players[n].scores = d.players[n].s || {};
+        players[n].online = players[n].online || n === d.fromName;
+      });
+      if(phase === 'lobby' && d.order && d.order.length){
+        order = d.order; round = d.round;
+        if(players[myName].scores[round] != null){ phase = 'waiting'; waitingCard(); checkRound(); }
+        else roundIntro();
+      } else if(phase === 'lobby') lobby();
+    } else if(d.t === 'start'){
+      order = d.order; round = 0;
+      names().forEach(n=>{ players[n].total = 0; players[n].scores = {}; });
+      roundIntro();
+    } else if(d.t === 'score'){
+      ensure(d.fromName);
+      players[d.fromName].scores[d.round] = d.value;
+      if(phase === 'waiting') waitingCard();
+      checkRound();
+    } else if(d.t === 'next'){
+      advance();
+    }
+  }
+
+  function snap(){
+    const o = {};
+    names().forEach(n=>{ o[n] = {t: players[n].total, s: players[n].scores}; });
+    return o;
+  }
+
+  function lobby(){
+    phase = 'lobby';
+    card('<h2>🌐 LIVE PARTY</h2>'+
+      '<p>Room code — friends open the arcade and tap LIVE PARTY → JOIN:</p>'+
+      '<div class="lv-code">'+code+'</div>'+
+      board()+
+      (leader
+        ? '<button class="bigbtn" id="lv-go" style="margin-top:8px;'+(onlineNames().length<2?'opacity:.5;':'')+'">START · '+ROUNDS+' ROUNDS</button>'
+        : '<p style="opacity:.7">Waiting for the host to start…</p>')+
+      '<button class="smallbtn ghost" id="lv-x">LEAVE</button>');
+    if(leader && el('lv-go')) el('lv-go').onclick = ()=>{
+      if(onlineNames().length < 2) return;
+      const keys = Object.keys(MACH);
+      for(let i=keys.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [keys[i],keys[j]]=[keys[j],keys[i]]; }
+      send({t:'start', order: keys.slice(0, ROUNDS)});
+    };
+    el('lv-x').onclick = exit;
+  }
+
+  function roundIntro(){
+    phase = 'intro';
+    const m = MACH[order[round]];
+    card('<h2>ROUND '+(round+1)+' of '+order.length+'</h2>'+
+      '<p>Everyone plays <b style="color:var(--gold)">'+m[1].toUpperCase()+'</b> on their own phone. One run. Highest scores take the points.</p>'+
+      (round > 0 ? board() : '')+
+      '<button class="bigbtn" id="lv-go" style="margin-top:8px;">PLAY MY RUN</button>'+
+      '<button class="smallbtn ghost" id="lv-x">LEAVE PARTY</button>');
+    el('lv-go').onclick = ()=>{ hide(); phase = 'playing'; launch(); };
+    el('lv-x').onclick = exit;
+    Snd.swell();
+  }
+
+  function launch(){
+    const key = order[round];
+    transitioning = true;
+    if(document.querySelector('.screen.active').id !== 'hub') Shell.backToHub();
+    Shell.openGame(MACH[key][0]);
+    transitioning = false;
+  }
+
+  function intercept(letter, score){
+    if(phase !== 'playing' || letter !== order[round]) return false;
+    players[myName].scores[round] = score;
+    send({t:'score', round, value: score});
+    phase = 'waiting';
+    waitingCard();
+    checkRound();
+    return true;
+  }
+
+  function waitingCard(){
+    if(phase !== 'waiting') return;
+    card('<h2>YOU SCORED '+players[myName].scores[round]+'</h2>'+
+      '<p>Live scores, round '+(round+1)+':</p>'+
+      board(true)+
+      '<button class="smallbtn ghost" id="lv-x" style="margin-top:8px;">LEAVE PARTY</button>');
+    el('lv-x').onclick = exit;
+  }
+
+  function checkRound(){
+    if(phase !== 'waiting') return;
+    const need = names().filter(n=>players[n].online || players[n].scores[round] != null);
+    if(!need.every(n=>players[n].scores[round] != null)) return;
+    const scored = need;
+    const sorted = scored.slice().sort((a,b)=>players[b].scores[round]-players[a].scores[round]);
+    let pts = scored.length;
+    sorted.forEach((n,k)=>{
+      if(k > 0 && players[n].scores[round] < players[sorted[k-1]].scores[round]) pts = scored.length - k;
+      players[n].total += pts;
+    });
+    phase = 'board';
+    const last = round >= order.length - 1;
+    card('<h2>ROUND '+(round+1)+' COMPLETE</h2>'+board(true)+
+      (leader
+        ? '<button class="bigbtn" id="lv-go" style="margin-top:8px;">'+(last?'FINISH':'NEXT ROUND')+'</button>'
+        : '<p style="opacity:.7">Waiting for the host…</p>')+
+      '<button class="smallbtn ghost" id="lv-x">LEAVE PARTY</button>');
+    if(leader && el('lv-go')) el('lv-go').onclick = ()=>send({t:'next'});
+    el('lv-x').onclick = exit;
+    Snd.win(); buzz([40,50,40]);
+  }
+
+  function advance(){
+    if(round >= order.length - 1){ podium(); return; }
+    round++;
+    roundIntro();
+  }
+
+  function podium(){
+    phase = 'podium';
+    const champ = names().sort((a,b)=>players[b].total-players[a].total)[0];
+    card('<h2 style="color:'+colorOf(champ)+'">'+champ+' WINS THE NIGHT! 👑</h2>'+
+      board()+
+      (leader ? '<button class="bigbtn" id="lv-go" style="margin-top:8px;">PLAY AGAIN</button>' : '')+
+      '<button class="smallbtn ghost" id="lv-x">LEAVE PARTY</button>');
+    if(leader && el('lv-go')) el('lv-go').onclick = ()=>{
+      const keys = Object.keys(MACH);
+      for(let i=keys.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [keys[i],keys[j]]=[keys[j],keys[i]]; }
+      send({t:'start', order: keys.slice(0, ROUNDS)});
+    };
+    el('lv-x').onclick = exit;
+    Snd.win(); buzz([60,50,60,50,90]);
+  }
+
+  function exit(){
+    manualExit = true;
+    phase = 'idle';
+    clearInterval(hb);
+    try{ ws && ws.close(); }catch(e){}
+    ws = null;
+    hide();
+    transitioning = true;
+    if(document.querySelector('.screen.active').id !== 'hub') Shell.backToHub();
+    transitioning = false;
+  }
+
+  function entry(){
+    const saved = localStorage.getItem('arcade-name') || '';
+    card('<h2>🌐 LIVE PARTY</h2>'+
+      '<p>Everyone plays on their own phone. Same rounds, live scoreboard. 2-8 ghosts, distinct names.</p>'+
+      '<input class="ch-input" id="lv-name" maxlength="10" placeholder="YOUR NAME" value="'+saved+'">'+
+      '<button class="bigbtn" id="lv-create">CREATE A ROOM</button>'+
+      '<p style="margin:4px 0 0">or join a friend:</p>'+
+      '<input class="ch-input" id="lv-code" maxlength="4" placeholder="ROOM CODE">'+
+      '<div class="ch-row"><button class="smallbtn" id="lv-join">JOIN</button>'+
+      '<button class="smallbtn ghost" id="lv-x">CANCEL</button></div>');
+    const getName = ()=>{
+      const v = (el('lv-name').value || 'GHOST').toUpperCase().replace(/[^A-Z0-9 ]/g,'').trim().slice(0,10) || 'GHOST';
+      localStorage.setItem('arcade-name', v);
+      return v;
+    };
+    el('lv-create').onclick = ()=>open(true, '', getName());
+    el('lv-join').onclick = ()=>{
+      const c = el('lv-code').value.trim();
+      if(c.length === 4) open(false, c, getName());
+    };
+    el('lv-x').onclick = ()=>hide();
+  }
+
+  function onHub(){ if(!transitioning && phase === 'playing'){ exit(); } }
+  document.getElementById('live-btn').addEventListener('click', entry);
+  return { intercept, onHub };
 })();
 </script>
 <script>
