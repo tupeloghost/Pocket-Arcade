@@ -681,14 +681,14 @@
   </div>
   <button class="chbtn" id="ch-enter">⚔️ FRIENDS &amp; CHALLENGES</button>
   <div id="lantern-bar"></div>
-  <div class="verstamp">v2026.09.12.5</div>
+  <div class="verstamp">v2026.09.12.6</div>
 </div>
 
 <!-- ================= BLOCK BATTLE ================= -->
 <div id="scr-blocks" class="screen solo">
   <div class="gamebar">
     <button class="backbtn" data-back>← Arcade</button>
-    <div class="gb-title">BLOCK BATTLE</div>
+    <div class="gb-title">BLOCK BATTLE</div><span class="ch-chip" id="bl-chban"></span>
     <div class="gb-right"><span id="bl-score">0 · 0</span></div>
   </div>
   <div class="game-body bl-body">
@@ -715,6 +715,7 @@
   <div class="gover" id="bl-over">
     <h2 id="bl-over-title">GAME OVER</h2>
     <p id="bl-over-msg"></p>
+    <div class="ch-slot" id="bl-chslot"></div>
     <button class="bigbtn" id="bl-retry">REMATCH</button>
     <button class="smallbtn ghost" id="bl-switch">CHANGE MODE</button>
   </div>
@@ -935,6 +936,8 @@ const Shell = (function(){
     const t = LTITLES[Math.min(LTITLES.length-1, lv)];
     el.innerHTML = '🏮 LANTERN LV '+lv+' · <b>'+t+'</b> <span class="lb-track"><i style="width:'+Math.round(100*(xp-30*lv*lv)/(next-30*lv*lv))+'%"></i></span> '+xp+'/'+next;
   }
+  const PERKS = {2:'Stack now starts with 20 scraps', 4:'Floaty now gets 2 free crashes', 6:'Shoot now starts with a shield', 8:'Slither now starts in ghost mode'};
+  async function lanternLevel(){ return lanternLv((await store.get('lantern')) || 0); }
   async function addXp(n){
     if(n <= 0) return;
     const xp = (await store.get('lantern')) || 0;
@@ -944,7 +947,7 @@ const Shell = (function(){
       const lv = lanternLv(xp2);
       const b = document.createElement('div');
       b.className = 'dare-banner';
-      b.textContent = '🏮 LANTERN LEVEL '+lv+' · '+LTITLES[Math.min(LTITLES.length-1, lv)];
+      b.textContent = '🏮 LANTERN LEVEL '+lv+' · '+LTITLES[Math.min(LTITLES.length-1, lv)]+(PERKS[lv] ? ' · '+PERKS[lv] : '');
       document.body.appendChild(b);
       setTimeout(()=>b.classList.add('show'), 30);
       setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(), 500); }, 3200);
@@ -962,7 +965,7 @@ const Shell = (function(){
   }
 
   refreshBests();
-  return { register:(n,g)=>games[n]=g, store, reportBest, backToHub, openGame:open, addXp, updLantern };
+  return { register:(n,g)=>games[n]=g, store, reportBest, backToHub, openGame:open, addXp, updLantern, lanternLevel };
 })();
 
 function buzz(p){ if(navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
@@ -1541,7 +1544,7 @@ Shell.register('tw', (function(){
 ================================================================ */
 Shell.register('stack', (function(){
   const $ = id => document.getElementById(id);
-  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash, puffs, zoneIdx, bestH, crossedBest, lastLand, salvage, slowT, lastTick, dog, moonHit;
+  let cv, ctx, raf, running, blocks, moving, dir, speed, score, over, dpr, streak, stars, debris, flash, puffs, zoneIdx, bestH, crossedBest, lastLand, salvage, slowT, lastTick, dog, moonHit, lampLv = 0;
   const SAVE_COST = 40, SALVAGE_CAP = 60;
 
   const ZONES = [
@@ -1576,6 +1579,7 @@ Shell.register('stack', (function(){
     blocks = [{x: W()/2 - 70, w: 140}];
     score = 0; over = false; speed = 3.0; dir = 1; streak = 0;
     debris = []; flash = 0; puffs = []; zoneIdx = 0; crossedBest = false; lastLand = null; salvage = 0; slowT = 0; moonHit = false;
+    if(lampLv >= 2){ salvage = 20; setTimeout(()=>{ if(running && !over && score === 0) toast('🏮 PERK: +20 SCRAPS'); }, 400); }
     $('st-score').textContent = '0';
     $('st-over').classList.remove('show');
     spawn();
@@ -1891,6 +1895,7 @@ Shell.register('stack', (function(){
       running = true;
       bestH = 0;
       Shell.store.get('best-stack').then(v=>{ bestH = v || 0; });
+      Shell.lanternLevel().then(v=>{ lampLv = v; if(v >= 2 && salvage === 0 && score === 0) salvage = 20; });
       sizeCanvas();
       reset();
       cv.addEventListener('pointerdown', onTap);
@@ -1925,7 +1930,7 @@ Shell.register('stack', (function(){
 Shell.register('snake', (function(){
   const $ = id => document.getElementById(id);
   const N = 17;
-  let cv, ctx, dpr, cell, tick, curMs, snake, dirQ, dir, foods, score, over, running, touchStart, sparks, combo, lastEatTick, tickN, ghostTicks, hollow, hollowStep, deathBy, bestN, crossedBN, nextFeast, heronMad;
+  let cv, ctx, dpr, cell, tick, curMs, snake, dirQ, dir, foods, score, over, running, touchStart, sparks, combo, lastEatTick, tickN, ghostTicks, hollow, hollowStep, deathBy, bestN, crossedBN, nextFeast, heronMad, lampLvN = 0;
 
   function sizeCanvas(){
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1974,7 +1979,9 @@ Shell.register('snake', (function(){
     snake = [{x:8,y:9},{x:7,y:9},{x:6,y:9}];
     dir = {x:1,y:0}; dirQ = [];
     score = 0; over = false; sparks = [];
-    combo = 0; lastEatTick = -999; tickN = 0; ghostTicks = 0;
+    combo = 0; lastEatTick = -999; tickN = 0;
+    ghostTicks = lampLvN >= 8 ? 30 : 0;
+    if(ghostTicks) sparks.push({x:8*cell+cell/2, y:7*cell, vx:0, vy:-1.2, life:16, text:'🏮 PERK: GHOST START', color:'#26e0ff'});
     foods = []; hollow = null; hollowStep = 0; deathBy = null; crossedBN = false; nextFeast = 12; heronMad = false;
     $('sn-score').textContent = '0';
     $('sn-over').classList.remove('show');
@@ -2301,6 +2308,7 @@ Shell.register('snake', (function(){
       running = true;
       bestN = 0;
       Shell.store.get('best-snake').then(v=>{ bestN = v || 0; });
+      Shell.lanternLevel().then(v=>{ lampLvN = v; });
       sizeCanvas();
       HowTo.show('snake', ()=>{ reset(); draw(); });
       const scr = document.getElementById('scr-snake');
@@ -2335,7 +2343,7 @@ Shell.register('snake', (function(){
 Shell.register('flight', (function(){
   const $ = id => document.getElementById(id);
   const GRAV = 0.24, FLAP = -5.6, PW = 48, R = 13;
-  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercy, lastTick, dog, mile, cleanStreak, lastFT, tailT, nextTail;
+  let cv, ctx, dpr, raf, running, over, started, score, wy, vy, pillars, trail, fx, shakeT, ghostT, spawned, bestF, crossedBF, mercyN, lastTick, dog, mile, cleanStreak, lastFT, tailT, nextTail, lampLvF = 0;
 
   function sizeCanvas(){
     const body = cv.parentElement;
@@ -2351,7 +2359,8 @@ Shell.register('flight', (function(){
   function wx(){ return Math.min(120, W()*0.28); }
 
   function reset(){
-    over = false; started = false; score = 0; shakeT = 0; ghostT = 0; spawned = 0; crossedBF = false; mercy = true;
+    over = false; started = false; score = 0; shakeT = 0; ghostT = 0; spawned = 0; crossedBF = false;
+    mercyN = lampLvF >= 4 ? 2 : 1;
     mile = 20; cleanStreak = 0; lastFT = 0; tailT = 0; nextTail = 12;
     wy = H()*0.45; vy = 0;
     pillars = []; trail = []; fx = [];
@@ -2408,8 +2417,8 @@ Shell.register('flight', (function(){
   }
   function die(){
     cleanStreak = 0;
-    if(mercy){
-      mercy = false;
+    if(mercyN > 0){
+      mercyN--;
       ghostT = 130;
       vy = -4;
       if(wy > H() - 70) wy = H() - 80;
@@ -2610,6 +2619,7 @@ Shell.register('flight', (function(){
       running = true;
       bestF = 0;
       Shell.store.get('best-flight').then(v=>{ bestF = v || 0; });
+      Shell.lanternLevel().then(v=>{ lampLvF = v; if(v >= 4) mercyN = 2; });
       sizeCanvas();
       reset();
       cv.addEventListener('pointerdown', onTap);
@@ -2644,7 +2654,7 @@ Shell.register('flight', (function(){
 ================================================================ */
 Shell.register('shade', (function(){
   const $ = id => document.getElementById(id);
-  let cv, ctx, dpr, raf, running, over, score, lives, wave, px, targetX, shots, foes, pows, fxs, frames, spreadT, fireCd, formY, invulnT, bestS, crossedBS, maxSlot, lastTick, dog, shieldOn;
+  let cv, ctx, dpr, raf, running, over, score, lives, wave, px, targetX, shots, foes, pows, fxs, frames, spreadT, fireCd, formY, invulnT, bestS, crossedBS, maxSlot, lastTick, dog, shieldOn, lampLvS = 0;
 
   function sizeCanvas(){
     const body = cv.parentElement;
@@ -2694,7 +2704,9 @@ Shell.register('shade', (function(){
 
   function reset(){
     over = false; score = 0; lives = 3; wave = 0; crossedBS = false;
-    shots = []; pows = []; fxs = []; frames = 0; spreadT = 0; fireCd = 20; invulnT = 0; shieldOn = false;
+    shots = []; pows = []; fxs = []; frames = 0; spreadT = 0; fireCd = 20; invulnT = 0;
+    shieldOn = lampLvS >= 6;
+    if(shieldOn) addFx(W()/2, H()*0.6, '🏮 PERK: SHIELD UP', '#26e0ff');
     px = W()/2; targetX = px;
     $('sh-score').textContent = '0';
     $('sh-over').classList.remove('show');
@@ -3003,6 +3015,7 @@ Shell.register('shade', (function(){
       running = true;
       bestS = 0;
       Shell.store.get('best-shade').then(v=>{ bestS = v || 0; });
+      Shell.lanternLevel().then(v=>{ lampLvS = v; if(v >= 6) shieldOn = true; });
       sizeCanvas();
       over = true; foes = []; shots = []; pows = []; fxs = []; lives = 3; wave = 0; spreadT = 0; invulnT = 0; frames = 0; px = W()/2; targetX = px;
       cv.addEventListener('pointerdown', pointTo);
@@ -3534,6 +3547,7 @@ Shell.register('blocks', (function(){
       sd.flashT = 7;
       $('bl-score').textContent = sides[1].score+' · '+sides[0].score;
       bump($('bl-score'));
+      if(cpu && sd.i === 0) Challenge.onScore('B', sd.score);
       Snd.perfect(lines);
       buzz(lines > 1 ? [30,40,30] : 25);
       const junk = lines + extra;
@@ -3572,6 +3586,9 @@ Shell.register('blocks', (function(){
     Snd[winner === 0 ? 'win' : 'bad']();
     buzz([70,60,70]);
     if(typeof Shell.addXp === 'function') Shell.addXp(sides[0].score*2 + (winner === 0 ? 10 : 0));
+    const slot = document.getElementById('bl-chslot');
+    if(cpu){ Challenge.onGameOver('B', sides[0].score, 'bl-chslot'); }
+    else if(slot) slot.innerHTML = '';
     const scr = document.getElementById('scr-blocks');
     for(let ci=0;ci<20;ci++){
       const sp = document.createElement('span');
@@ -3750,7 +3767,9 @@ Shell.register('blocks', (function(){
       $('bl-switch').onclick = ()=>{ clearInterval(drv); $('bl-over').classList.remove('show'); $('bl-mode').classList.add('show'); };
       $('bl-vs-ghost').onclick = ()=>startMatch(true);
       $('bl-vs-friend').onclick = ()=>startMatch(false);
-      $('bl-mode').classList.add('show');
+      Challenge.enterGame('B', 'bl-chban');
+      if(typeof Challenge.busyWith === 'function' && Challenge.busyWith('blocks')) startMatch(true);
+      else $('bl-mode').classList.add('show');
       lastTick = Date.now();
       raf = requestAnimationFrame(draw);
       dog = setInterval(()=>{
@@ -3765,6 +3784,7 @@ Shell.register('blocks', (function(){
       document.getElementById('scr-blocks').removeEventListener('pointerdown', onBtn);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
+      Challenge.leaveGame();
       $('bl-over').classList.remove('show');
       $('bl-mode').classList.remove('show');
     }
@@ -3776,9 +3796,9 @@ Shell.register('blocks', (function(){
    CHALLENGE SYSTEM: signed score codes you can text to a rival
 ================================================================ */
 const Challenge = (function(){
-  const G2GAME  = {S:'stack', N:'snake', F:'flight', H:'shade'};
-  const G2TITLE = {S:'Stack', N:'Slither', F:'Floaty', H:'Shoot'};
-  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry'};
+  const G2GAME  = {S:'stack', N:'snake', F:'flight', H:'shade', B:'blocks'};
+  const G2TITLE = {S:'Stack', N:'Slither', F:'Floaty', H:'Shoot', B:'Block Battle'};
+  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry', B:'bl-retry'};
   let active = null, chip = null, chipGame = null, setter = null;
 
   Shell.store.get('challenge').then(v=>{ if(v && !active) active = v; refreshHubBtn(); });
@@ -3804,7 +3824,7 @@ const Challenge = (function(){
     return core+'-'+chk(core);
   }
   function decode(code){
-    const m = (code||'').trim().toUpperCase().match(/^([SNFH])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
+    const m = (code||'').trim().toUpperCase().match(/^([SNFHB])[\s-]+(\d{1,6})[\s-]+([A-Z0-9]{1,8})[\s-]+([A-Z0-9]{2})$/);
     if(!m) return null;
     if(chk(m[1]+'-'+m[2]+'-'+m[3]) !== m[4]) return null;
     return {g:m[1], score:+m[2], name:m[3]};
@@ -3937,10 +3957,11 @@ const Challenge = (function(){
       if(chip) chip.className = 'ch-chip';
     }
     html += '<button class="smallbtn" data-chsend>⚔️ CHALLENGE A FRIEND</button>';
-    html += '<button class="smallbtn" data-vsstart>🤝 PASS &amp; PLAY DUEL</button>';
+    if(g !== 'B') html += '<button class="smallbtn" data-vsstart>🤝 PASS &amp; PLAY DUEL</button>';
     slot.innerHTML = html;
     slot.querySelector('[data-chsend]').onclick = ()=>openCreate(g, score);
-    slot.querySelector('[data-vsstart]').onclick = ()=>{ if(typeof Vs !== 'undefined') Vs.start(g); };
+    const vb = slot.querySelector('[data-vsstart]');
+    if(vb) vb.onclick = ()=>{ if(typeof Vs !== 'undefined') Vs.start(g); };
   }
 
   /* ---------- modal ---------- */
@@ -4067,7 +4088,10 @@ const Challenge = (function(){
     save();
     Shell.openGame(G2GAME[d.g]);
   }
-  return { enterGame, leaveGame, onScore, onGameOver, targetFor, acceptDirect, enterCode: openEnter, startSetter, G2TITLE };
+  function busyWith(gameKey){
+    return (active && G2GAME[active.g] === gameKey) || (setter && G2GAME[setter.g] === gameKey);
+  }
+  return { enterGame, leaveGame, onScore, onGameOver, targetFor, acceptDirect, enterCode: openEnter, startSetter, busyWith, G2TITLE };
 })();
 </script>
 <script>
@@ -4075,7 +4099,7 @@ const Challenge = (function(){
    PASS & PLAY DUEL: best-of-3 hot-seat series on any machine
 ================================================================ */
 const Vs = (function(){
-  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry'};
+  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry', B:'bl-retry'};
   const NAMES = ['EMBER','HAUNT'];
   const COLS = ['var(--coral)','var(--cyan)'];
   let on = false, g = null, turn = 0, scores = [0,0], wins = [0,0], round = 1;
@@ -4159,7 +4183,7 @@ const Vs = (function(){
 ================================================================ */
 const Party = (function(){
   const MACH = {S:['stack','Stack'], N:['snake','Slither'], F:['flight','Floaty'], H:['shade','Shoot']};
-  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry'};
+  const RETRY = {S:'st-retry', N:'sn-retry', F:'fl-retry', H:'sh-retry', B:'bl-retry'};
   const NAMES = ['EMBER','HAUNT','WISP','MOSS','DUSK','GOLD','ROSE','FROST'];
   const COLS  = ['#ff7a2e','#26e0ff','#f2e7cf','#3ecf6e','#8b79d9','#e8a05a','#ff4d6d','#9ad7ff'];
   const ROUNDS = 3;
@@ -4551,8 +4575,8 @@ const Live = (function(){
 const Rivals = (function(){
   const HOST = 'tupelo-rooms.tupeloghost.workers.dev';
   const COLS = ['#ff7a2e','#26e0ff','#f2e7cf','#3ecf6e','#8b79d9','#e8a05a','#ff4d6d','#9ad7ff'];
-  const GAMES = {S:'Stack', N:'Slither', F:'Floaty', H:'Shoot'};
-  const BESTK = {S:'best-stack', N:'best-snake', F:'best-flight', H:'best-shade'};
+  const GAMES = {S:'Stack', N:'Slither', F:'Floaty', H:'Shoot', B:'Block Battle'};
+  const BESTK = {S:'best-stack', N:'best-snake', F:'best-flight', H:'best-shade', B:'best-blocks'};
   let expanded = null, daring = null;
 
   function el(id){ return document.getElementById(id); }
