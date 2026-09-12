@@ -524,6 +524,10 @@
   html.lowfx .ch-card{backdrop-filter:none; -webkit-backdrop-filter:none;}
   #fl-canvas{touch-action:none;}
 
+  .fly{position:absolute; transform:translate(-50%,-50%); font-size:26px; z-index:6; cursor:pointer;
+    -webkit-user-select:none; user-select:none; filter:drop-shadow(0 0 6px rgba(232,160,90,.6));}
+  .fly.got{visibility:hidden;}
+
   /* ============ BLOCK BATTLE ============ */
   .bl-body{display:flex; flex-direction:column; height:100%; padding:2px 0;}
   .bl-side{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:0; position:relative;}
@@ -677,7 +681,7 @@
   </div>
   <button class="chbtn" id="ch-enter">⚔️ FRIENDS &amp; CHALLENGES</button>
   <div id="lantern-bar"></div>
-  <div class="verstamp">v2026.09.12.4</div>
+  <div class="verstamp">v2026.09.12.5</div>
 </div>
 
 <!-- ================= BLOCK BATTLE ================= -->
@@ -1240,7 +1244,82 @@ Shell.register('tw', (function(){
     });
   }
 
-  const GAMES = [gReflex, gMatch, gMath, gOdd, gStroop, gCount, gChase, gMash, gTug];
+  function gBig(){
+    $('tw-midtext').innerHTML = 'BIGGEST NUMBER';
+    const vals = [];
+    while(vals.length < 4){
+      const v = 6 + Math.floor(Math.random()*94);
+      if(!vals.includes(v)) vals.push(v);
+    }
+    const max = Math.max(...vals);
+    const sizes = shuffle([15, 21, 28, 38]);
+    fillBoth('<div class="submsg">Sizes lie. Tap the biggest NUMBER!</div>'+
+      '<div class="optrow">'+vals.map((v,i)=>'<div class="opt" data-v="'+v+'"><span style="font-size:'+sizes[i]+'px; font-weight:900">'+v+'</span></div>').join('')+'</div>');
+    cpuInfo = {kind:'pick', sel:'.opt[data-v="'+max+'"]', slow:1.3};
+    for(let p=0;p<2;p++) bindTaps(p, '.opt', (pp,el)=>{
+      if(locked) return;
+      +el.dataset.v===max ? resolve(pp,'Saw through the sizes') : resolve(1-pp, PNAME[pp]+' fell for the big print');
+    });
+  }
+
+  function gSweep(){
+    $('tw-midtext').innerHTML = 'FIREFLY SWEEP';
+    const spots = [];
+    while(spots.length < 6){
+      const sp = {x: 10 + Math.random()*80, y: 18 + Math.random()*62};
+      if(spots.every(o=>Math.abs(o.x-sp.x) + Math.abs(o.y-sp.y) > 22)) spots.push(sp);
+    }
+    const html = spots.map((sp,i)=> i < 5
+      ? '<div class="fly" data-fly style="left:'+sp.x+'%; top:'+sp.y+'%">✨</div>'
+      : '<div class="fly" data-skull style="left:'+sp.x+'%; top:'+sp.y+'%">💀</div>').join('');
+    fillBoth('<div class="submsg" style="position:absolute; top:6px; left:0; right:0;">Tap all 5 sparks. DON’T touch the skull!</div>'+html);
+    cpuInfo = {kind:'sweep', sel:'[data-fly]:not(.got)'};
+    for(let p=0;p<2;p++){
+      bindTaps(p, '[data-fly]', (pp,el)=>{
+        if(locked || el.classList.contains('got')) return;
+        el.classList.add('got');
+        buzz(8); Snd.tap();
+        if(arenas[pp].querySelectorAll('[data-fly]:not(.got)').length === 0) resolve(pp, 'Swept every spark');
+      });
+      bindTaps(p, '[data-skull]', pp=>{
+        if(locked) return;
+        resolve(1-pp, PNAME[pp]+' touched the skull');
+      });
+    }
+  }
+
+  function gHold(){
+    $('tw-midtext').innerHTML = 'HOLD… THEN LET GO';
+    fillBoth('<div class="orb" data-hold>HOLD</div><div class="submsg">Press and HOLD your orb. When it glows, let go first!</div>');
+    cpuInfo = {kind:'hold', sel:'[data-hold]'};
+    const holding = [false, false];
+    let hot = false;
+    for(let p=0;p<2;p++){
+      const orbEl = arenas[p].querySelector('[data-hold]');
+      orbEl.addEventListener('pointerdown', e=>{
+        e.preventDefault();
+        if(locked) return;
+        holding[p] = true;
+        orbEl.style.transform = 'scale(.92)';
+      });
+      const release = e=>{
+        if(locked || !holding[p]) return;
+        holding[p] = false;
+        orbEl.style.transform = '';
+        hot ? resolve(p, 'Quickest release') : resolve(1-p, PNAME[p]+' let go too soon');
+      };
+      orbEl.addEventListener('pointerup', release);
+      orbEl.addEventListener('pointerleave', release);
+    }
+    later(()=>{
+      if(locked || !active) return;
+      hot = true;
+      document.querySelectorAll('#scr-tw [data-hold]').forEach(o=>{ o.classList.add('hot'); o.textContent = 'LET GO!'; });
+      buzz(15);
+    }, 1300 + Math.random()*2400);
+  }
+
+  const GAMES = [gReflex, gMatch, gMath, gOdd, gStroop, gCount, gChase, gMash, gTug, gBig, gSweep, gHold];
   const INTROS = [
     ['⚡','DON’T TAP EARLY','An orb appears. Wait for it to light up, then tap. Too early loses.'],
     ['🔮','FIND THE MATCH','A symbol appears with four choices. Tap its twin first.'],
@@ -1250,7 +1329,10 @@ Shell.register('tw', (function(){
     ['🔢','HOW MANY?','A cluster appears. Count it fast, tap the right number.'],
     ['👻','CATCH THE WISP','A wisp darts around. First to tap it wins.'],
     ['💥','GHOST MASH','Mash your orb from 15 down to zero first.'],
-    ['🪢','TUG OF WAR','Mash to drag the shared wisp to your side.']
+    ['🪢','TUG OF WAR','Mash to drag the shared wisp to your side.'],
+    ['🔍','BIGGEST NUMBER','Four numbers in tricky print sizes. Tap the biggest NUMBER, not the biggest print.'],
+    ['✨','FIREFLY SWEEP','Five sparks and one skull. Tap all your sparks first. Don’t touch the skull.'],
+    ['🤚','HOLD… THEN LET GO','Press and hold your orb. When it glows, let go first. Too soon loses.']
   ];
 
   /* ---------- the Ghost: a CPU rival that plays player 1's side ---------- */
@@ -1271,6 +1353,33 @@ Shell.register('tw', (function(){
       })();
     } else if(info.kind === 'chase'){
       later(()=>{ if(!locked && active) tapEl(arenas[1].querySelector(info.sel)); }, cpuDelay() + 600);
+    } else if(info.kind === 'sweep'){
+      (function sweepTick(){
+        if(locked || !active) return;
+        if(Math.random() < 0.05){
+          tapEl(arenas[1].querySelector('[data-skull]'));
+          return;
+        }
+        const rem = arenas[1].querySelectorAll('[data-fly]:not(.got)');
+        if(rem.length) tapEl(rem[Math.floor(Math.random()*rem.length)]);
+        later(sweepTick, cpuSkill*0.35 + Math.random()*220);
+      })();
+    } else if(info.kind === 'hold'){
+      later(()=>{
+        if(locked || !active) return;
+        const o = arenas[1].querySelector('[data-hold]');
+        if(!o) return;
+        o.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true}));
+        if(Math.random() < 0.07){
+          later(()=>{ if(!locked && active) o.dispatchEvent(new PointerEvent('pointerup', {bubbles:true})); }, 700 + Math.random()*500);
+          return;
+        }
+        (function watchHot(){
+          if(locked || !active) return;
+          if(o.classList.contains('hot')) later(()=>{ if(!locked && active) o.dispatchEvent(new PointerEvent('pointerup', {bubbles:true})); }, 190 + cpuSkill*0.3*Math.random());
+          else later(watchHot, 60);
+        })();
+      }, 350 + Math.random()*400);
     } else if(info.kind === 'reflex'){
       if(Math.random() < 0.08){
         later(()=>{
@@ -1324,7 +1433,7 @@ Shell.register('tw', (function(){
       lastGame = g;
       const seen = seenTypes[g] || 0;
       seenTypes[g] = seen + 1;
-      readDelay = seen === 0 ? 3600 : (totalRounds > 8 ? 1600 : 2300);
+      readDelay = seen === 0 ? 3600 : (seen >= 3 || totalRounds > 8 ? 1300 : 2100);
       locked = true;
       // instructions first: the actual round stays hidden until GO
       const intro = INTROS[g];
@@ -3237,6 +3346,32 @@ const HowTo = (function(){
       const px2=130+Math.sin(tt*0.15)*46;
       txt(c,px2,58,'👻',null,17);
       fing(c,80,78,tt%14<7); fing(c,180,78,tt%14>=7);
+    },
+    (c,t)=>{ const tt=t%170;
+      txt(c,70,54,'9','#f2e7cf',34);
+      txt(c,125,50,'72','#f2e7cf',15);
+      txt(c,175,52,'31','#f2e7cf',22);
+      txt(c,222,52,'14','#f2e7cf',18);
+      if(tt>52&&tt<94){ fing(c,125,60,tt>72); rip(c,125,50,ph(tt,74,94)); }
+      if(tt>=94){ sparkle(c,125,48,ph(tt,94,140)); txt(c,125,26,'+1'); }
+    },
+    (c,t)=>{ const tt=t%200;
+      const spots=[[70,36],[180,30],[120,64],[220,66],[85,86]];
+      const done=Math.min(5,Math.floor(tt/34));
+      spots.forEach((sp,i)=>{ if(i>=done) txt(c,sp[0],sp[1]+6,'✨',null,16); });
+      txt(c,155,92,'💀',null,15);
+      if(done<5){ const sp2=spots[done]; fing(c,sp2[0],sp2[1]+10,tt%34>20); }
+      if(done>=5){ sparkle(c,130,52,ph(tt,172,198)); txt(c,130,20,'+1'); }
+    },
+    (c,t)=>{ const tt=t%190;
+      const hot=tt>100;
+      c.beginPath(); c.arc(130,48,25,0,7);
+      c.fillStyle = hot?'#e8a05a':'#141a28'; c.fill();
+      c.strokeStyle='rgba(140,160,190,.4)'; c.lineWidth=2; c.stroke();
+      txt(c,130,53,hot?'LET GO!':'HOLD',hot?'#3a1c04':'#9a937e',10);
+      if(tt<=118) fing(c,130,56,true);
+      else fing(c,130,74,false);
+      if(tt>118&&tt<160) sparkle(c,130,48,ph(tt,118,158));
     }
   ];
   function attachRound(cv, i){
