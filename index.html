@@ -38,7 +38,7 @@
   .screen.active{display:flex;}
 
   /* ============ HUB ============ */
-  #hub{align-items:center; overflow-y:auto; padding:34px 16px 30px; position:relative;}
+  #hub{align-items:center; overflow-y:auto; padding:34px 16px 30px;}
   .hub-head{text-align:center; margin-bottom:20px; position:relative; z-index:1;}
   #hub-art{
     position:absolute; top:0; left:50%; transform:translateX(-50%);
@@ -832,7 +832,7 @@
   </div>
   <button class="chbtn" id="ch-enter">FRIENDS &amp; CHALLENGES</button>
   <div id="lantern-bar"></div>
-  <div class="verstamp">v2026.09.14.12</div>
+  <div class="verstamp">v2026.09.14.17</div>
 </div>
 
 <!-- ================= PARTY BOARD ================= -->
@@ -853,8 +853,23 @@
   </div>
   <div class="gover" id="bd-mode">
     <h2>PARTY BOARD</h2>
-    <p style="max-width:310px">10 rounds. Roll, land on spaces, collect sparks and items. When you reach the moon, <b>buy it for 10 sparks</b> — then it moves somewhere new. <b>Most moons wins.</b> Sparks break ties.</p>
+    <p style="max-width:310px">Roll, land on spaces, collect sparks, shop for items, and win duels — some are quick, some are 20 seconds of a real game. Reach the moon and <b>buy it for 10 sparks</b>; it moves after. Bonus moons at the end for the best earner and duelist. <b>Most moons wins.</b></p>
     <button class="bigbtn" id="bd-vs-ghost">PLAY THE GHOST</button>
+    <div class="ch-row" id="bd-diffrow" style="margin:0">
+      <button class="smallbtn ghost" data-diff="easy">EASY</button>
+      <button class="smallbtn ghost" data-diff="normal">NORMAL</button>
+      <button class="smallbtn ghost" data-diff="mean">HARD</button>
+    </div>
+    <p class="sec-label" id="bd-tally" style="margin:0 !important"></p>
+    <div class="ch-row" id="bd-lenrow" style="margin:0">
+      <button class="smallbtn ghost" data-len="6">SHORT · 6</button>
+      <button class="smallbtn ghost" data-len="10">CLASSIC · 10</button>
+      <button class="smallbtn ghost" data-len="15">LONG · 15</button>
+    </div>
+    <div class="ch-row" id="bd-themerow" style="margin:0">
+      <button class="smallbtn ghost" data-theme="swamp">THE SWAMP</button>
+      <button class="smallbtn ghost" data-theme="graveyard">THE GRAVEYARD</button>
+    </div>
     <button class="bigbtn" id="bd-vs-friend" style="background:var(--cyan); color:#05202a">FRIEND · ONE PHONE</button>
   </div>
 </div>
@@ -3780,7 +3795,7 @@ const HowTo = (function(){
   };
   let stopDemo = null;
   function show(key, onPlay){
-    if(typeof Run !== 'undefined' && Run.active()){ onPlay(); return; }
+    if((typeof Run !== 'undefined' && Run.active()) || (typeof BoardDuel !== 'undefined' && BoardDuel.active())){ onPlay(); return; }
     const d = DATA[key];
     if(!d){ onPlay(); return; }
     document.getElementById('howto-ico').textContent = d.ico;
@@ -4195,9 +4210,25 @@ Shell.register('blocks', (function(){
 ================================================================ */
 Shell.register('board', (function(){
   const $ = id => document.getElementById(id);
-  const NSP = 24, ROUNDS = 10, MOON_COST = 10, SPARK_MINI = 4;
-  const TCOL = {start:'#9a937e', plain:'#3a4358', candle:'#e2a562', skull:'#d47585', ghost:'#9d92d4', duel:'#74c4d6', again:'#84bc94', warp:'#dcc46f', chest:'#e9dfc8'};
-  const TFILL = {start:'#1a1e2c', plain:'#141a2a', candle:'#3b2a14', skull:'#3c1622', ghost:'#2a2048', duel:'#0f3540', again:'#14351f', warp:'#3b3010', chest:'#33281a'};
+  const NSP = 24, MOON_COST = 10, SPARK_MINI = 4;
+  let ROUNDS = 10, theme = 'swamp';
+  const THEMES = {
+    swamp: {name:'The Swamp', rows:6, cols:4,
+      sky0:'rgba(44,36,84,.5)', sky1:'rgba(14,18,34,.24)', sky2:'rgba(8,28,30,.4)',
+      tree0:'rgba(16,17,36,.85)', tree1:'rgba(6,8,17,.95)',
+      water0:'rgba(12,44,48,.55)', water1:'rgba(4,14,16,.7)', waterLine:'rgba(38,224,255,.12)',
+      tuft:'rgba(90,110,90,.35)', reed:'rgba(10,20,16,.9)', trail:'rgba(232,160,90,.35)', fly:'#e8a05a',
+      bag:['candle','candle','candle','candle','skull','skull','skull','duel','duel','duel','duel','ghost','ghost','ghost','chest','chest','chest','again','again','warp','warp','shop','shop']},
+    graveyard: {name:'The Graveyard', rows:8, cols:3,
+      sky0:'rgba(58,50,86,.55)', sky1:'rgba(26,26,44,.3)', sky2:'rgba(18,22,30,.5)',
+      tree0:'rgba(22,20,34,.85)', tree1:'rgba(9,8,16,.95)',
+      water0:'rgba(40,44,52,.5)', water1:'rgba(10,12,16,.7)', waterLine:'rgba(200,210,230,.1)',
+      tuft:'rgba(120,120,110,.3)', reed:'rgba(18,18,24,.9)', trail:'rgba(180,200,230,.3)', fly:'#9fd8ff',
+      bag:['candle','candle','candle','skull','skull','skull','skull','skull','duel','duel','duel','duel','ghost','ghost','ghost','chest','chest','chest','again','again','warp','shop','shop']}
+  };
+  let stat = null;
+  const TCOL = {start:'#9a937e', plain:'#3a4358', candle:'#e2a562', skull:'#d47585', ghost:'#9d92d4', duel:'#74c4d6', again:'#84bc94', warp:'#dcc46f', chest:'#e9dfc8', shop:'#c9a7e0'};
+  const TFILL = {start:'#1a1e2c', plain:'#141a2a', candle:'#3b2a14', skull:'#3c1622', ghost:'#2a2048', duel:'#0f3540', again:'#14351f', warp:'#3b3010', chest:'#33281a', shop:'#2c2140'};
   function drawIcon(t, x, y){
     ctx.save();
     ctx.translate(x, y);
@@ -4253,6 +4284,14 @@ Shell.register('board', (function(){
       ctx.beginPath(); ctx.arc(0, 0, 5.4, 0, Math.PI*1.25); ctx.stroke();
       ctx.beginPath(); ctx.arc(0.6, 0.4, 3.1, Math.PI*0.9, Math.PI*2.2); ctx.stroke();
       ctx.beginPath(); ctx.arc(0, 0, 1.1, 0, 7); ctx.stroke();
+    } else if(t === 'shop'){
+      ctx.fillStyle = '#e9d8ff';
+      ctx.beginPath(); ctx.ellipse(0, 2.5, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, -0.5, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, -3.5, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#2c2140'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.ellipse(0, -0.5, 5.5, 2.4, 0, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, 2.5, 5.5, 2.4, 0, 0, Math.PI*2); ctx.stroke();
     } else if(t === 'start'){
       ctx.strokeStyle = '#c9c0a6';
       ctx.strokeRect(-3, -5, 6, 9);
@@ -4265,12 +4304,26 @@ Shell.register('board', (function(){
     die:    {ico:'🎯', name:'CHARM DIE',  tip:'roll 4, 5 or 6'},
     boots:  {ico:'👟', name:'SWAP BOOTS', tip:'trade places'},
     magnet: {ico:'🧲', name:'MAGNET',     tip:'steal 5 sparks'},
-    ward:   {ico:'🛡', name:'WARD',       tip:'blocks the next bad thing'}
+    ward:   {ico:'🛡', name:'WARD',       tip:'blocks the next bad thing'},
+    trap:   {ico:'🕸', name:'GHOST TRAP', tip:'set it here · whoever lands loses 5'}
   };
   const GHOSTLINES = ['THE GHOST hums an old tune…', 'THE GHOST grins in the dark…', 'THE GHOST rattles the die…'];
   let cv, ctx, dpr, raf, dog, lastTick, running;
   let pts, types, pos, sparks, moons, inv, turn, cpu, phase, dieVal, dieAnimT, over, banner2, bannerT, minState, matchId = 0, tok, stars2, landPulse;
   let round, moonAt, loadedDie, usedItem;
+  const cam = {x:0, y:0, z:1};
+  let hopAnim = null, puffs = [], tileFlash = null, dieBigT = 0, dispSparks = [5,5], bannerSub = '', bannerCol = '#e8a05a';
+  let earned = [0,0], duelsWon = [0,0];
+  let roundEvent = null, traps = [], diff = 'normal', ghostTally = {you:0, ghost:0};
+  const DIFF = {easy:{t:0.7, react:1.6, err:0.25}, normal:{t:1, react:1, err:0.12}, mean:{t:1.35, react:0.65, err:0.05}};
+  const EVENTS = {
+    festival:  {name:'Firefly festival', sub:'candles pay double this round', tag:'festival'},
+    skullhour: {name:'Skull hour', sub:'skulls take double this round', tag:'skull hour'},
+    moonsale:  {name:'Moon sale', sub:'the moon costs 6 this round', tag:'moon sale'},
+    ghostwind: {name:'Ghost wind', sub:'everyone rolls 4, 5 or 6 this round', tag:'ghost wind'}
+  };
+  function moonCost(){ return roundEvent === 'moonsale' ? 6 : MOON_COST; }
+  const TAUNTS = ['THE GHOST: “Sweet sparks.”', 'THE GHOST: “Too slow, sugar.”', 'THE GHOST: “The night is long.”', 'THE GHOST: “Mine now.”'];
   const PNAME2 = ['EMBER', 'HAUNT'];
   const PCOL2 = ['#e8895a', '#7cc7db'];
 
@@ -4293,7 +4346,7 @@ Shell.register('board', (function(){
   let ffs, fogs, tufts, reeds;
   function buildPath(){
     const w = W(), h = H();
-    const rows = 6, cols2 = 4;
+    const rows = THEMES[theme].rows, cols2 = THEMES[theme].cols;
     const bw = Math.min(w, 470);
     const x0 = (w - bw)/2;
     const mx = x0 + 48, myTop = 92, myBot = 40;
@@ -4327,17 +4380,15 @@ Shell.register('board', (function(){
 
   function buildTypes(){
     types = Array(NSP).fill('plain');
-    const bag = shuffle(['candle','candle','candle','candle','candle',
-      'skull','skull','skull','duel','duel','duel','duel',
-      'ghost','ghost','ghost','chest','chest','chest','again','again','warp','warp']);
+    const bag = shuffle(THEMES[theme].bag.slice());
     const slots = shuffle(Array.from({length: NSP-1}, (_,i)=>i+1)).slice(0, bag.length);
     slots.forEach((sl,i)=>types[sl] = bag[i]);
     types[0] = 'start';
   }
 
   function say(t){ $('bd-status').innerHTML = t; }
-  function flash2(t){ banner2 = t; bannerT = 100; }
-  function hud(){ $('bd-score').textContent = 'ROUND '+Math.min(round, ROUNDS)+'/'+ROUNDS; }
+  function flash2(t, sub, col){ banner2 = t; bannerSub = sub || ''; bannerCol = col || '#e8a05a'; bannerT = 115; }
+  function hud(){ $('bd-score').textContent = 'ROUND '+Math.min(round, ROUNDS)+'/'+ROUNDS+(roundEvent ? ' · '+EVENTS[roundEvent].tag : ''); }
 
   function itemsUI(){
     const box = $('bd-items');
@@ -4349,7 +4400,7 @@ Shell.register('board', (function(){
       return;
     }
     const myTurn = !over && turn === 0 && phase === 'await' && !usedItem;
-    box.innerHTML = mine.map((k,i)=>'<button class="bd-itbtn" data-it="'+i+'" '+(myTurn && k !== 'ward' ? '' : 'disabled')+'>'+ITEMS[k].name+'</button>').join('');
+    box.innerHTML = mine.map((k,i)=>'<button class="bd-itbtn" data-it="'+i+'" '+(myTurn && k !== 'ward' && !(k === 'trap' && traps.some(tr=>tr.i === pos[0])) ? '' : 'disabled')+'>'+ITEMS[k].name+'</button>').join('');
     box.querySelectorAll('[data-it]').forEach(b=>{
       b.onclick = ()=>useItem(0, +b.dataset.it);
     });
@@ -4374,6 +4425,15 @@ Shell.register('board', (function(){
     } else if(k === 'magnet'){
       if(!hurtSparks(o, 5, '· '+PNAME2[p]+'’s magnet')){ give(p, Math.min(5, 5), 'stolen by the magnet'); }
       Snd.win(); buzz([25,35,25]);
+    } else if(k === 'trap'){
+      if(traps.some(tr=>tr.i === pos[p])){
+        inv[p].push(k); usedItem = false;
+        flash2('There is already a trap here', 'set it somewhere else', '#9a937e');
+      } else {
+        traps.push({i: pos[p], owner: p});
+        flash2(PNAME2[p]+' sets a ghost trap', 'whoever lands here loses 5 sparks', '#d47585');
+        Snd.swell(); buzz(15);
+      }
     }
     itemsUI();
   }
@@ -4384,14 +4444,17 @@ Shell.register('board', (function(){
     const distMe = (moonAt - pos[1] + NSP) % NSP;
     const distOp = (moonAt - pos[0] + NSP) % NSP;
     let idx = -1;
-    if(mine.includes('die') && distMe >= 4 && distMe <= 6 && sparks[1] >= MOON_COST) idx = mine.indexOf('die');
+    if(mine.includes('die') && distMe >= 4 && distMe <= 6 && sparks[1] >= moonCost()) idx = mine.indexOf('die');
     else if(mine.includes('boots') && distOp < distMe - 4) idx = mine.indexOf('boots');
     else if(mine.includes('magnet') && sparks[0] >= 8) idx = mine.indexOf('magnet');
+    else if(mine.includes('trap') && pos[1] !== 0 && !traps.some(tr=>tr.i === pos[1])) idx = mine.indexOf('trap');
+    if(diff === 'easy' && idx >= 0 && mine[idx] === 'die') idx = -1;
     if(idx >= 0){
       const k = mine[idx];
       mine.splice(idx, 1);
       usedItem = true;
       if(k === 'die'){ loadedDie = true; flash2('The Ghost charms the die'); Snd.swell(); }
+      else if(k === 'trap'){ traps.push({i: pos[1], owner: 1}); flash2('The Ghost sets a trap here', 'whoever lands loses 5 sparks', '#d47585'); Snd.bad(); }
       else if(k === 'boots'){ const t2 = pos[1]; pos[1] = pos[0]; pos[0] = t2; landPulse = 1; flash2('The Ghost trades places with you'); Snd.bad(); buzz([25,30,25]); }
       else if(k === 'magnet'){ if(!hurtSparks(0, 5, '· the Ghost’s magnet')){ give(1, 5, 'stolen by the Ghost'); } }
     }
@@ -4399,8 +4462,9 @@ Shell.register('board', (function(){
 
   function give(p, n, why){
     sparks[p] = Math.max(0, sparks[p] + n);
-    flash2((n >= 0 ? '+' : '')+n+' sparks '+why);
-    if(n >= 0){ Snd.pick(2); buzz(15); } else { Snd.bad(); buzz([25,25]); }
+    if(n > 0){ earned[p] += n; if(stat && n > stat.big[p]) stat.big[p] = n; }
+    flash2((n >= 0 ? '+' : '')+n+' sparks', (why || '').replace(/^[·\s]+/, ''), n >= 0 ? '#e8a05a' : '#d47585');
+    if(n >= 0){ Snd.perfect(2); buzz(15); } else { Snd.bad(); buzz([25,25]); }
   }
 
   // returns true if a ward blocked it
@@ -4427,7 +4491,8 @@ Shell.register('board', (function(){
     moonAt = 10 + Math.floor(Math.random()*10);
     hud();
     tok = [ {x: pts[0].x, y: pts[0].y}, {x: pts[0].x, y: pts[0].y} ];
-    landPulse = 0;
+    landPulse = 0; hopAnim = null; puffs = []; tileFlash = null; dieBigT = 0; dispSparks = [5,5]; earned = [0,0]; duelsWon = [0,0]; duel = null; resume = false; roundEvent = null; traps = []; stat = {big:[0,0], moved:[0,0], rolls:[0,0], pips:[0,0], trapped:[0,0]};
+    cam.x = W()/2; cam.y = H()/2; cam.z = 1;
     $('bd-modal').classList.remove('show');
     itemsUI();
     startTurn();
@@ -4443,6 +4508,7 @@ Shell.register('board', (function(){
       say(Math.random() < 0.3 ? '<b style="color:'+PCOL2[1]+'">'+GHOSTLINES[Math.floor(Math.random()*GHOSTLINES.length)]+'</b>'
         : '<b style="color:'+PCOL2[1]+'">THE GHOST</b> is rolling…');
       $('bd-roll').disabled = true;
+      flash2('The Ghost’s turn', round === ROUNDS ? 'final round' : 'round '+round+' of '+ROUNDS, PCOL2[1]);
       const mid = matchId;
       setTimeout(()=>{
         if(mid !== matchId || !running || over || phase !== 'await' || turn !== 1) return;
@@ -4451,6 +4517,7 @@ Shell.register('board', (function(){
       }, 1000);
     } else {
       say('<b style="color:'+PCOL2[me]+'">'+PNAME2[me]+'</b> — tap ROLL'+(round === ROUNDS ? ' · <b>final round</b>' : ''));
+      flash2(PNAME2[me]+'’s turn', round === ROUNDS ? 'final round' : 'round '+round+' of '+ROUNDS, PCOL2[me]);
       $('bd-roll').disabled = false;
     }
   }
@@ -4463,42 +4530,51 @@ Shell.register('board', (function(){
     dieAnimT = 30;
     Snd.tap(); buzz(10);
     const mid = matchId;
-    const wasLoaded = loadedDie;
+    const wasLoaded = loadedDie || roundEvent === 'ghostwind';
     loadedDie = false;
     const spin = setInterval(()=>{
       if(mid !== matchId || !running){ clearInterval(spin); return; }
       dieVal = wasLoaded ? 4 + Math.floor(Math.random()*3) : 1 + Math.floor(Math.random()*6);
+      if(dieAnimT % 3 === 0) Snd.tap();
       if(--dieAnimT <= 0){
         clearInterval(spin);
-        Snd.pick(2); buzz(20);
+        if(stat){ stat.rolls[turn]++; stat.pips[turn] += dieVal; }
+        dieBigT = Date.now();
+        Snd.perfect(3); buzz(20);
         say('<b style="color:'+PCOL2[turn]+'">'+PNAME2[turn]+'</b> rolled a <b>'+dieVal+'</b>!');
-        setTimeout(()=>{ if(mid === matchId) hop(dieVal); }, 400);
+        setTimeout(()=>{ if(mid === matchId) hop(dieVal, 0); }, 650);
       }
     }, 55);
   }
 
-  function hop(n){
+  function hop(n, k){
     if(!running || over) return;
     phase = 'hop';
-    if(n <= 0){ landOn(); return; }
+    k = k || 0;
+    if(n <= 0){ Snd.drop(); buzz(12); landOn(); return; }
     pos[turn] = (pos[turn] + 1) % NSP;
+    if(stat) stat.moved[turn]++;
     landPulse = 1;
-    Snd.tap(); buzz(6);
+    hopAnim = {p: turn, t0: Date.now()};
+    const lp = pts[pos[turn]];
+    for(let q=0;q<4;q++) puffs.push({x: lp.x + (Math.random()-.5)*12, y: lp.y + 6, vx:(Math.random()-.5)*1.2, vy:-(0.3+Math.random()*0.6), t:1});
+    Snd.pick(Math.min(6, k)); buzz(6);
     const mid = matchId;
-    let delay = 200;
+    let delay = 215;
     if(pos[turn] === moonAt){
-      delay = 900;
-      tryBuyMoon(turn);
+      delay = 1000;
+      setTimeout(()=>{ if(mid === matchId && running && !over) tryBuyMoon(turn); }, 180);
     }
-    setTimeout(()=>{ if(mid === matchId && running && !over) hop(n-1); }, delay);
+    setTimeout(()=>{ if(mid === matchId && running && !over) hop(n-1, k+1); }, delay);
   }
 
   function tryBuyMoon(p){
-    if(sparks[p] >= MOON_COST){
-      sparks[p] -= MOON_COST;
+    if(sparks[p] >= moonCost()){
+      sparks[p] -= moonCost();
       moons[p]++;
-      flash2(PNAME2[p]+' buys the moon · '+moons[p]);
-      Snd.win(); buzz([40,60,40]);
+      flash2(PNAME2[p]+' buys the moon', moons[p]+' moon'+(moons[p] === 1 ? '' : 's')+' · the moon moves on', '#f2e7cf');
+      if(cpu && p === 1) say('<b style="color:'+PCOL2[1]+'">'+TAUNTS[3]+'</b>');
+      Snd.win(); setTimeout(()=>Snd.perfect(5), 180); buzz([40,60,40]);
       const old = moonAt;
       do{ moonAt = (old + 7 + Math.floor(Math.random()*11)) % NSP; } while(moonAt === old || moonAt === 0);
       const scr = document.getElementById('scr-board');
@@ -4513,7 +4589,7 @@ Shell.register('board', (function(){
         setTimeout(()=>sp.remove(), 2600);
       }
     } else {
-      flash2('The moon wants '+MOON_COST+' sparks · '+PNAME2[p]+' has '+sparks[p]);
+      flash2('The moon wants '+moonCost()+' sparks', PNAME2[p]+' has '+sparks[p], '#9a937e');
       Snd.bad(); buzz(15);
     }
   }
@@ -4522,8 +4598,19 @@ Shell.register('board', (function(){
     if(!running || over) return;
     phase = 'event';
     const p = turn, t = types[pos[p]];
-    if(t === 'candle'){ give(p, 3 + Math.floor(Math.random()*4), 'for '+PNAME2[p]); endTurn(); }
-    else if(t === 'skull'){ hurtSparks(p, 3 + Math.floor(Math.random()*3), '· the skull taxes '+PNAME2[p]); endTurn(); }
+    tileFlash = {i: pos[p], t: 1};
+    const tr = traps.find(x=>x.i === pos[p]);
+    if(tr && tr.owner !== p){
+      traps = traps.filter(x=>x !== tr);
+      const blocked = hurtSparks(p, 5, '· '+PNAME2[tr.owner]+'’s trap');
+      if(!blocked){ sparks[tr.owner] += 5; earned[tr.owner] += 5; if(stat) stat.trapped[tr.owner]++; }
+      flash2(PNAME2[p]+' stepped in a ghost trap', blocked ? 'the ward held' : '5 sparks go to '+PNAME2[tr.owner], '#d47585');
+      Snd.bad(); buzz([30,30,30]);
+      endTurn();
+      return;
+    }
+    if(t === 'candle'){ give(p, (3 + Math.floor(Math.random()*4)) * (roundEvent === 'festival' ? 2 : 1), (roundEvent === 'festival' ? 'festival candle · ' : '')+'for '+PNAME2[p]); endTurn(); }
+    else if(t === 'skull'){ hurtSparks(p, (3 + Math.floor(Math.random()*3)) * (roundEvent === 'skullhour' ? 2 : 1), '· the skull taxes '+PNAME2[p]+(roundEvent === 'skullhour' ? ' · skull hour' : '')); endTurn(); }
     else if(t === 'plain' || t === 'start'){ give(p, 1, 'for '+PNAME2[p]); endTurn(); }
     else if(t === 'chest'){
       if(inv[p].length >= 2){ give(p, 4, '· chest, but '+PNAME2[p]+'’s hands are full'); }
@@ -4531,7 +4618,7 @@ Shell.register('board', (function(){
         const keys = Object.keys(ITEMS);
         const k = keys[Math.floor(Math.random()*keys.length)];
         inv[p].push(k);
-        flash2(PNAME2[p]+' finds: '+ITEMS[k].name);
+        flash2(PNAME2[p]+' finds a '+ITEMS[k].name.toLowerCase(), ITEMS[k].tip, '#e9dfc8');
         Snd.swell(); buzz([20,30,20]);
         itemsUI();
       }
@@ -4552,7 +4639,8 @@ Shell.register('board', (function(){
       endTurn();
     }
     else if(t === 'ghost'){ ghostEvent(p); }
-    else if(t === 'duel'){ const mid = matchId; setTimeout(()=>{ if(mid === matchId && running && !over) openMini(); }, 500); }
+    else if(t === 'shop'){ const mid = matchId; setTimeout(()=>{ if(mid === matchId && running && !over) openShop(p); }, 500); }
+    else if(t === 'duel'){ const mid = matchId; setTimeout(()=>{ if(mid === matchId && running && !over){ if(Math.random() < 0.45) openArcadeDuel(); else openMini(); } }, 500); }
   }
 
   function ghostEvent(p){
@@ -4581,12 +4669,137 @@ Shell.register('board', (function(){
     endTurn();
   }
 
+  /* ---------- the shop: spend sparks on items ---------- */
+  const PRICES = {die:6, boots:5, magnet:5, ward:4, trap:5};
+  function openShop(p){
+    phase = 'mini';
+    if(cpu && p === 1){
+      const keys = shuffle(Object.keys(ITEMS));
+      keys.sort((a,b)=>(a==='ward'?-1:0) - (b==='ward'?-1:0));
+      const pick = inv[1].length < 2 ? keys.find(k=>sparks[1] - PRICES[k] >= 6) : null;
+      if(pick){
+        sparks[1] -= PRICES[pick]; inv[1].push(pick);
+        flash2('The Ghost buys a '+ITEMS[pick].name.toLowerCase(), 'for '+PRICES[pick]+' sparks', '#c9a7e0');
+        Snd.swell(); buzz(15);
+      } else {
+        flash2('The Ghost browses the shop', 'and buys nothing', '#9a937e');
+      }
+      endTurn();
+      return;
+    }
+    const stock = shuffle(Object.keys(ITEMS)).slice(0, 3);
+    const card = $('bd-card');
+    card.innerHTML = '<h2>THE SHOP</h2>'+
+      '<p>'+PNAME2[p]+' has <b style="color:var(--gold)">'+sparks[p]+' sparks</b>'+(inv[p].length >= 2 ? ' · hands full' : '')+'. Buy one thing, or leave.</p>'+
+      stock.map(k=>'<button class="smallbtn" data-buy="'+k+'" style="width:100%; max-width:280px" '+
+        ((sparks[p] < PRICES[k] || inv[p].length >= 2) ? 'disabled' : '')+'>'+ITEMS[k].name+' · '+PRICES[k]+' sparks<br><span style="font-weight:600; opacity:.7; font-size:11px">'+ITEMS[k].tip+'</span></button>').join('')+
+      '<button class="smallbtn ghost" id="bd-shopleave">LEAVE</button>';
+    card.querySelectorAll('[data-buy]').forEach(b=>{
+      b.onclick = ()=>{
+        const k = b.dataset.buy;
+        if(sparks[p] < PRICES[k] || inv[p].length >= 2) return;
+        sparks[p] -= PRICES[k]; inv[p].push(k);
+        $('bd-modal').classList.remove('show');
+        flash2(PNAME2[p]+' buys a '+ITEMS[k].name.toLowerCase(), ITEMS[k].tip, '#c9a7e0');
+        Snd.swell(); buzz(15);
+        itemsUI();
+        endTurn();
+      };
+    });
+    $('bd-shopleave').onclick = ()=>{ $('bd-modal').classList.remove('show'); endTurn(); };
+    $('bd-modal').classList.add('show');
+  }
+
+  /* ---------- arcade duels: a real 20-second round of one of the games ---------- */
+  const AD_GAMES = {S:'stack', N:'snake', F:'flight', H:'shade'};
+  const AD_TITLES = {S:'Stack', N:'Slither', F:'Floaty', H:'Shoot'};
+  const AD_TIPS = {S:'Tap to drop blocks on the tower', N:'Swipe to steer and eat fireflies', F:'Tap to fly through the gaps', H:'Slide to move and blast the moths'};
+  const AD_MS = 20000;
+  let duel = null, resume = false, adIv = null;
+  function ghostTarget(g){
+    const base = {S:4, N:3, F:3, H:8}[g] + Math.floor(Math.random()*4);
+    return Math.max(1, Math.round(base * (1 + round*0.04) * DIFF[diff].t));
+  }
+  function openArcadeDuel(){
+    phase = 'mini';
+    const g = ['S','N','F','H'][Math.floor(Math.random()*4)];
+    const hi = round >= Math.ceil(ROUNDS*0.7);
+    duel = {g, stake: hi ? SPARK_MINI*2 : SPARK_MINI, scores:[0,0], stage:0, target: cpu ? ghostTarget(g) : null, cur:0};
+    const card = $('bd-card');
+    card.innerHTML = '<h2>ARCADE DUEL</h2>'+
+      '<p class="sec-label" style="margin:0 !important">Winner +'+duel.stake+' · loser -'+duel.stake+'</p>'+
+      '<div class="mathq" style="color:var(--gold)">'+AD_TITLES[g].toUpperCase()+'</div>'+
+      '<p>'+AD_TIPS[g]+'. <b>20 seconds.</b> '+(cpu ? 'Beat the Ghost’s <b>'+duel.target+'</b>.' : PNAME2[0]+' plays first, then '+PNAME2[1]+'. Higher score wins.')+'</p>'+
+      '<button class="bigbtn" id="bd-adgo">PLAY</button>';
+    $('bd-adgo').onclick = ()=>{ $('bd-modal').classList.remove('show'); launchStage(); };
+    $('bd-modal').classList.add('show');
+  }
+  function launchStage(){
+    resume = true;
+    duel.cur = 0;
+    const who = duel.stage === 0 ? PNAME2[0] : PNAME2[1];
+    const g = duel.g, target = duel.target;
+    Shell.openGame(AD_GAMES[g]);
+    const hud = document.getElementById('run-hud');
+    const deadline = Date.now() + AD_MS;
+    clearInterval(adIv);
+    adIv = setInterval(()=>{
+      if(!duel || !resume){ clearInterval(adIv); return; }
+      const scr = document.querySelector('.screen.active');
+      if(scr && scr.id !== 'scr-'+AD_GAMES[g]){ clearInterval(adIv); abortDuel(); return; }
+      const left = Math.max(0, Math.ceil((deadline - Date.now())/1000));
+      if(hud){ hud.style.display = 'block'; hud.innerHTML = who+' · <b>0:'+String(left).padStart(2,'0')+'</b> · score '+duel.cur+(cpu ? ' · beat '+target : ''); }
+      if(Date.now() >= deadline){ clearInterval(adIv); stageDone(); }
+    }, 250);
+  }
+  function adScore(g, s2){ if(duel && resume && g === duel.g) duel.cur = s2; }
+  function adIntercept(g, score){
+    if(!duel || !resume || g !== duel.g) return false;
+    duel.cur = score;
+    clearInterval(adIv);
+    setTimeout(stageDone, 650);
+    return true;
+  }
+  function stageDone(){
+    if(!duel || !resume) return;
+    const hud = document.getElementById('run-hud'); if(hud) hud.style.display = 'none';
+    duel.scores[duel.stage] = duel.cur;
+    Shell.openGame('board');
+  }
+  function abortDuel(){
+    duel = null; resume = false;
+    const hud = document.getElementById('run-hud'); if(hud) hud.style.display = 'none';
+  }
+  function afterResume(){
+    if(!duel){ startTurn(); return; }
+    if(!cpu && duel.stage === 0){
+      duel.stage = 1;
+      const card = $('bd-card');
+      card.innerHTML = '<h2>PASS THE PHONE</h2>'+
+        '<p><b style="color:'+PCOL2[0]+'">'+PNAME2[0]+'</b> scored <b>'+duel.scores[0]+'</b>.</p>'+
+        '<p>Now <b style="color:'+PCOL2[1]+'">'+PNAME2[1]+'</b> plays '+AD_TITLES[duel.g]+' for 20 seconds.</p>'+
+        '<button class="bigbtn" id="bd-adgo">'+PNAME2[1]+' IS READY</button>';
+      $('bd-adgo').onclick = ()=>{ $('bd-modal').classList.remove('show'); launchStage(); };
+      $('bd-modal').classList.add('show');
+      return;
+    }
+    const mine = duel.scores[0];
+    const theirs = cpu ? duel.target : duel.scores[1];
+    const st = duel.stake, g = duel.g;
+    duel = null; resume = false;
+    minState = {stake: st};
+    if(mine > theirs) miniWin(0, AD_TITLES[g]+' · '+mine+' to '+theirs);
+    else if(theirs > mine) miniWin(1, AD_TITLES[g]+' · '+theirs+' to '+mine);
+    else { minState = null; flash2('Arcade duel tied at '+mine, 'no sparks change hands', '#9a937e'); endTurn(); }
+  }
+  window.BoardDuel = { active: ()=>!!(duel && resume), onScore: adScore, intercept: adIntercept };
+
   /* ---------- mini duels: winner takes sparks FROM the loser ---------- */
   function openMini(){
     phase = 'mini';
     const k = Math.floor(Math.random()*4);
     const card = $('bd-card');
-    const hi = round >= 7;
+    const hi = round >= Math.ceil(ROUNDS*0.7);
     minState = {done:false, k, stake: hi ? SPARK_MINI*2 : SPARK_MINI};
     const stakeLine = '<p class="sec-label" style="margin:0 !important">Winner +'+minState.stake+' · loser -'+minState.stake+(hi ? ' · high stakes' : '')+'</p>';
     if(k === 0){
@@ -4604,9 +4817,9 @@ Shell.register('board', (function(){
         if(cue){ cue.textContent = 'GO!'; cue.style.color = 'var(--gold)'; }
         document.querySelectorAll('#bd-card .bd-vsbtn').forEach(b=>b.classList.add('hotbtn'));
         buzz(15);
-        if(cpu) setTimeout(()=>miniTap(1), 260 + Math.random()*420);
+        if(cpu) setTimeout(()=>miniTap(1), (260 + Math.random()*420)*DIFF[diff].react);
       }, 1200 + Math.random()*2200);
-      if(cpu && Math.random() < 0.08) setTimeout(()=>miniTap(1), 600 + Math.random()*400);
+      if(cpu && Math.random() < DIFF[diff].err*0.7) setTimeout(()=>miniTap(1), 600 + Math.random()*400);
     } else if(k === 1){
       const a = 2+Math.floor(Math.random()*12), b = 2+Math.floor(Math.random()*12);
       const truth = Math.random() < 0.5;
@@ -4621,9 +4834,9 @@ Shell.register('board', (function(){
         '<button class="bd-vsbtn" data-mp="1" data-a="F" style="color:'+PCOL2[1]+'">'+PNAME2[1]+'<br>FALSE</button></div>';
       if(cpu) setTimeout(()=>{
         if(!minState || minState.done || minState.k !== 1) return;
-        const right = Math.random() > 0.12;
+        const right = Math.random() > DIFF[diff].err;
         miniAnswer(1, right ? minState.answer : (minState.answer === 'T' ? 'F' : 'T'));
-      }, 1400 + Math.random()*1600);
+      }, (1400 + Math.random()*1600)*DIFF[diff].react);
     } else if(k === 2){
       const pool = ['🕯️','🦋','🌙','🍄','🪶','⭐'];
       const main = pool[Math.floor(Math.random()*pool.length)];
@@ -4638,9 +4851,9 @@ Shell.register('board', (function(){
         '<div class="bd-vsrow">'+cells.map(cch=>'<button class="bd-vsbtn" data-mp="1" data-a="'+cch+'" style="font-size:24px">'+cch+'</button>').join('')+'</div>';
       if(cpu) setTimeout(()=>{
         if(!minState || minState.done || minState.k !== 2) return;
-        const right = Math.random() > 0.1;
+        const right = Math.random() > DIFF[diff].err;
         miniAnswer(1, right ? minState.odd : main);
-      }, 1500 + Math.random()*1700);
+      }, (1500 + Math.random()*1700)*DIFF[diff].react);
     } else {
       minState.counts = [0,0];
       card.innerHTML = '<h2>SPARK MASH</h2>'+stakeLine+
@@ -4655,7 +4868,7 @@ Shell.register('board', (function(){
           minState.counts[1]++;
           const el2 = document.getElementById('bd-mc1');
           if(el2) el2.textContent = minState.counts[1];
-          setTimeout(cpuMash, 150 + Math.random()*120);
+          setTimeout(cpuMash, (150 + Math.random()*120)*DIFF[diff].react);
         })();
       }
       setTimeout(()=>{
@@ -4702,7 +4915,10 @@ Shell.register('board', (function(){
     minState = null;
     const blocked = hurtSparks(1-mp, st, '· lost the duel');
     sparks[mp] = sparks[mp] + st;
+    earned[mp] += st;
+    duelsWon[mp]++;
     flash2(PNAME2[mp]+' wins the duel · +'+st+' ('+why+')');
+    if(cpu && mp === 1) say('<b style="color:'+PCOL2[1]+'">'+TAUNTS[Math.floor(Math.random()*3)]+'</b>');
     Snd.win(); buzz([25,35,25]);
     endTurn();
   }
@@ -4718,11 +4934,19 @@ Shell.register('board', (function(){
         hud();
         if(round > ROUNDS){ endGame(); return; }
         if(round === ROUNDS){ flash2('Final round'); Snd.swell(); buzz([30,40,30]); }
-        if(round === 5 || round === 9){
+        if(round === Math.round(ROUNDS/2) || round === ROUNDS - 1){
           const trail = moons[0] === moons[1] ? (sparks[0] <= sparks[1] ? 0 : 1) : (moons[0] < moons[1] ? 0 : 1);
           sparks[trail] += 3;
           flash2('The ghosts pity '+PNAME2[trail]+' · +3 sparks');
         }
+        roundEvent = null;
+        if(round % 3 === 0 && round < ROUNDS){
+          const keys = Object.keys(EVENTS);
+          roundEvent = keys[Math.floor(Math.random()*keys.length)];
+          flash2(EVENTS[roundEvent].name, EVENTS[roundEvent].sub, '#dcc46f');
+          Snd.swell(); buzz([20,30,20]);
+        }
+        hud();
       }
       startTurn();
     }, 1200);
@@ -4733,13 +4957,26 @@ Shell.register('board', (function(){
     over = true;
     phase = 'over';
     itemsUI();
+    const bonus = [];
+    if(earned[0] !== earned[1]){ const b = earned[0] > earned[1] ? 0 : 1; moons[b]++; bonus.push('Bonus moon · most sparks earned · '+PNAME2[b]); }
+    if(duelsWon[0] !== duelsWon[1]){ const b = duelsWon[0] > duelsWon[1] ? 0 : 1; moons[b]++; bonus.push('Bonus moon · most duels won · '+PNAME2[b]); }
     const winr = moons[0] !== moons[1] ? (moons[0] > moons[1] ? 0 : 1)
       : (sparks[0] !== sparks[1] ? (sparks[0] > sparks[1] ? 0 : 1) : (Math.random() < 0.5 ? 0 : 1));
+    const report = [];
+    if(stat){
+      const avg = [0,1].map(i=>stat.rolls[i] ? stat.pips[i]/stat.rolls[i] : 0);
+      if(avg[0] !== avg[1]){ const b = avg[0] > avg[1] ? 0 : 1; report.push('Luckiest roller · '+PNAME2[b]+' (average '+avg[b].toFixed(1)+')'); }
+      if(stat.big[0] !== stat.big[1]){ const b = stat.big[0] > stat.big[1] ? 0 : 1; report.push('Biggest windfall · '+PNAME2[b]+' (+'+stat.big[b]+' at once)'); }
+      if(stat.moved[0] !== stat.moved[1]){ const b = stat.moved[0] > stat.moved[1] ? 0 : 1; report.push('Longest walk · '+PNAME2[b]+' ('+stat.moved[b]+' spaces)'); }
+      if(stat.trapped[0] + stat.trapped[1] > 0 && stat.trapped[0] !== stat.trapped[1]){ const b = stat.trapped[0] > stat.trapped[1] ? 0 : 1; report.push('Trapper · '+PNAME2[b]+' ('+stat.trapped[b]+' caught)'); }
+    }
     const card = $('bd-card');
     card.innerHTML = '<h2 style="color:'+PCOL2[winr]+'">'+PNAME2[winr]+' wins the night</h2>'+
+      (bonus.length ? '<p style="margin:0; color:var(--gold); font-weight:700">'+bonus.join('<br>')+'</p>' : '')+
       '<p><b style="color:'+PCOL2[0]+'">'+PNAME2[0]+'</b> · '+moons[0]+' moons · '+sparks[0]+' sparks<br>'+
       '<b style="color:'+PCOL2[1]+'">'+PNAME2[1]+'</b> · '+moons[1]+' moons · '+sparks[1]+' sparks</p>'+
       '<p class="sec-label" style="margin:0 !important">MOONS WIN · SPARKS BREAK TIES</p>'+
+      (report.length ? '<p style="margin:0; font-size:12px; color:var(--dim); line-height:1.6">'+report.slice(0,3).join('<br>')+'</p>' : '')+
       '<button class="bigbtn" id="bd-again">PLAY AGAIN</button>'+
       '<button class="smallbtn ghost" id="bd-swmode">CHANGE MODE</button>';
     $('bd-modal').classList.add('show');
@@ -4747,6 +4984,7 @@ Shell.register('board', (function(){
     $('bd-swmode').onclick = ()=>{ $('bd-modal').classList.remove('show'); $('bd-mode').classList.add('show'); };
     Snd[winr === 0 ? 'win' : 'bad']();
     buzz([70,60,70]);
+    if(cpu){ ghostTally[winr === 0 ? 'you' : 'ghost']++; Shell.store.set('bd-wins', ghostTally); refreshDiffUI(); }
     if(typeof Shell.addXp === 'function') Shell.addXp(Math.round(sparks[0]/2) + moons[0]*8 + (winr === 0 ? 10 : 0));
     const scr = document.getElementById('scr-board');
     for(let ci=0;ci<22;ci++){
@@ -4834,11 +5072,12 @@ Shell.register('board', (function(){
     const w = W(), h = H();
     ctx.clearRect(0, 0, w, h);
     const nowD = Date.now();
+    const TH = THEMES[theme];
     // night sky
     const bg = ctx.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, 'rgba(44,36,84,.5)');
-    bg.addColorStop(0.45, 'rgba(14,18,34,.24)');
-    bg.addColorStop(1, 'rgba(8,28,30,.4)');
+    bg.addColorStop(0, TH.sky0);
+    bg.addColorStop(0.45, TH.sky1);
+    bg.addColorStop(1, TH.sky2);
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     for(const st2 of stars2){
@@ -4849,15 +5088,15 @@ Shell.register('board', (function(){
     }
     ctx.globalAlpha = 1;
     // treeline silhouettes on the horizon
-    treeband(w, 58, 15, 0.55, 'rgba(16,17,36,.85)');
-    treeband(w, 70, 24, 0.31, 'rgba(6,8,17,.95)');
+    treeband(w, 58, 15, 0.55, TH.tree0);
+    treeband(w, 70, 24, 0.31, TH.tree1);
     // black water at the bottom
     const wg = ctx.createLinearGradient(0, h-26, 0, h);
-    wg.addColorStop(0, 'rgba(12,44,48,.55)');
-    wg.addColorStop(1, 'rgba(4,14,16,.7)');
+    wg.addColorStop(0, TH.water0);
+    wg.addColorStop(1, TH.water1);
     ctx.fillStyle = wg;
     ctx.fillRect(0, h-26, w, 26);
-    ctx.fillStyle = 'rgba(38,224,255,.12)';
+    ctx.fillStyle = TH.waterLine;
     ctx.fillRect(0, h-26, w, 2);
     ctx.globalAlpha = 0.25 + 0.15*Math.sin(nowD/900);
     ctx.fillStyle = '#f2e7cf';
@@ -4872,6 +5111,17 @@ Shell.register('board', (function(){
       ctx.beginPath(); ctx.ellipse(fx2, fg.y, fg.w/2, 26, 0, 0, Math.PI*2); ctx.fill();
     }
     ctx.globalAlpha = 1;
+    // camera: ride along with whoever is moving, pull back when the night ends
+    {
+      const zt = over ? 1 : 1.5;
+      cam.z += (zt - cam.z)*0.06;
+      const hw = w/(2*cam.z), hh = h/(2*cam.z);
+      const tg = over ? {x: w/2, y: h/2} : {x: tok[turn].x, y: tok[turn].y - 12};
+      const cx = Math.max(hw, Math.min(w - hw, tg.x)), cy = Math.max(hh, Math.min(h - hh, tg.y));
+      cam.x += (cx - cam.x)*0.08; cam.y += (cy - cam.y)*0.08;
+    }
+    ctx.save();
+    ctx.translate(w/2, h/2); ctx.scale(cam.z, cam.z); ctx.translate(-cam.x, -cam.y);
     // winding trail: dark bed, then flowing lantern dots
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     ctx.strokeStyle = 'rgba(0,0,0,.42)';
@@ -4880,7 +5130,7 @@ Shell.register('board', (function(){
     ctx.strokeStyle = 'rgba(20,26,44,.8)';
     ctx.lineWidth = 12;
     trailPath(); ctx.stroke();
-    ctx.strokeStyle = 'rgba(232,160,90,.35)';
+    ctx.strokeStyle = TH.trail;
     ctx.lineWidth = 2;
     ctx.setLineDash([2, 9]);
     ctx.lineDashOffset = -(nowD/90) % 11;
@@ -4888,7 +5138,7 @@ Shell.register('board', (function(){
     ctx.setLineDash([]);
     ctx.lineWidth = 1;
     // grass tufts scattered through the marsh
-    ctx.strokeStyle = 'rgba(90,110,90,.35)';
+    ctx.strokeStyle = TH.tuft;
     ctx.lineWidth = 1.4;
     for(const tf of tufts){
       for(let b2=0; b2<tf.n; b2++){
@@ -4928,27 +5178,59 @@ Shell.register('board', (function(){
         ctx.beginPath(); ctx.arc(pt.x, pt.y, 2.2, 0, Math.PI*2); ctx.fill();
       } else drawIcon(t, pt.x, pt.y);
     }
-    // reeds standing in the water
-    ctx.strokeStyle = 'rgba(10,20,16,.9)';
-    ctx.lineWidth = 2;
-    for(const rd of reeds){
-      ctx.beginPath();
-      ctx.moveTo(rd.x, h - 4);
-      ctx.quadraticCurveTo(rd.x + rd.lean*10, h - 12 - rd.hgt/2, rd.x + rd.lean*16, h - 8 - rd.hgt);
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(10,20,16,.9)';
-      ctx.beginPath();
-      ctx.ellipse(rd.x + rd.lean*16, h - 10 - rd.hgt, 2, 5, rd.lean, 0, Math.PI*2);
-      ctx.fill();
+    // on your turn: the six spaces a roll could reach
+    if(!over && phase === 'await' && !(cpu && turn === 1)){
+      for(let k=1;k<=6;k++){
+        const pt = pts[(pos[turn]+k) % NSP];
+        ctx.fillStyle = 'rgba(10,14,24,.9)';
+        rr2(pt.x - 7, pt.y - 34, 14, 14, 5); ctx.fill();
+        ctx.strokeStyle = PCOL2[turn]; ctx.lineWidth = 1;
+        rr2(pt.x - 7, pt.y - 34, 14, 14, 5); ctx.stroke();
+        ctx.fillStyle = '#f2e7cf';
+        ctx.font = '800 9px "Nunito", sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(k, pt.x, pt.y - 27);
+        ctx.textBaseline = 'alphabetic';
+      }
+      ctx.textAlign = 'left';
     }
-    ctx.lineWidth = 1;
+    // ghost traps lying in wait
+    for(const tr of traps){
+      const pt = pts[tr.i];
+      ctx.save();
+      ctx.translate(pt.x, pt.y);
+      ctx.rotate(nowD/900);
+      ctx.strokeStyle = 'rgba(212,117,133,.85)';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(212,117,133,.9)'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(pt.x - 11, pt.y - 11); ctx.lineTo(pt.x - 6, pt.y - 6); ctx.moveTo(pt.x + 11, pt.y - 11); ctx.lineTo(pt.x + 6, pt.y - 6);
+      ctx.moveTo(pt.x - 11, pt.y + 11); ctx.lineTo(pt.x - 6, pt.y + 6); ctx.moveTo(pt.x + 11, pt.y + 11); ctx.lineTo(pt.x + 6, pt.y + 6); ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+    // the tile you just landed on lights up
+    if(tileFlash && tileFlash.t > 0){
+      const pt = pts[tileFlash.i];
+      tileFlash.t -= 0.035;
+      const tf = tileFlash.t;
+      ctx.globalAlpha = tf*0.55;
+      ctx.fillStyle = TCOL[types[tileFlash.i]] || '#f2e7cf';
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, 16, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = tf*0.8;
+      ctx.strokeStyle = '#f2e7cf'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, 18 + (1-tf)*26, 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.lineWidth = 1;
+    }
     // fireflies drifting over the board
     for(const ff of ffs){
       const fx2 = ff.x + Math.sin(nowD/1300 + ff.ph)*16;
       const fy2 = ff.y + Math.cos(nowD/1700 + ff.ph)*10;
       ctx.globalAlpha = 0.35 + 0.4*Math.abs(Math.sin(nowD/650 + ff.ph));
-      ctx.fillStyle = '#e8a05a';
-      ctx.shadowColor = '#e8a05a'; ctx.shadowBlur = 7;
+      ctx.fillStyle = TH.fly;
+      ctx.shadowColor = TH.fly; ctx.shadowBlur = 7;
       ctx.beginPath(); ctx.arc(fx2, fy2, 1.6, 0, Math.PI*2); ctx.fill();
       ctx.shadowBlur = 0;
     }
@@ -4976,7 +5258,7 @@ Shell.register('board', (function(){
       ctx.beginPath(); ctx.arc(pt.x - 5, pt.y - 37, 2.6, 0, Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc(pt.x + 4, pt.y - 30, 1.9, 0, Math.PI*2); ctx.fill();
       ctx.font = '800 9.5px \"Nunito\", sans-serif';
-      const ptxt = '✦ ' + MOON_COST;
+      const ptxt = '✦ ' + moonCost();
       const pw2 = ctx.measureText(ptxt).width + 12;
       ctx.fillStyle = 'rgba(10,14,24,.85)';
       rr2(pt.x - pw2/2, pt.y - 62, pw2, 15, 8); ctx.fill();
@@ -5003,7 +5285,14 @@ Shell.register('board', (function(){
       tok[p2].x += (pt.x + off - tok[p2].x)*0.22;
       tok[p2].y += (pt.y - tok[p2].y)*0.22;
       const bob = !over && turn === p2 ? Math.sin(nowD/180)*3 : 0;
-      const tx = tok[p2].x, ty = tok[p2].y - 21 + bob;
+      let arc = 0, sq = 1;
+      if(hopAnim && hopAnim.p === p2){
+        const hp2 = Math.min(1, (nowD - hopAnim.t0)/200);
+        arc = -Math.sin(hp2*Math.PI)*18;
+        sq = 1 + 0.16*Math.sin(hp2*Math.PI);
+        if(hp2 >= 1) hopAnim = null;
+      }
+      const tx = tok[p2].x, ty = tok[p2].y - 21 + bob + arc;
       ctx.fillStyle = 'rgba(0,0,0,.35)';
       ctx.beginPath(); ctx.ellipse(tx, tok[p2].y - 2, 8, 3, 0, 0, Math.PI*2); ctx.fill();
       const tg = ctx.createRadialGradient(tx-3, ty-4, 2, tx, ty, 13);
@@ -5012,35 +5301,101 @@ Shell.register('board', (function(){
       tg.addColorStop(1, PCOL2[p2]);
       ctx.fillStyle = tg;
       ctx.shadowColor = PCOL2[p2]; ctx.shadowBlur = 12;
-      ctx.beginPath(); ctx.arc(tx, ty, 12, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(tx, ty, 12*(2-sq), 12*sq, 0, 0, Math.PI*2); ctx.fill();
       ctx.shadowBlur = 0;
       ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(p2 === 0 ? '🔥' : '👻', tx, ty+1);
     }
     ctx.textBaseline = 'alphabetic';
+    // landing dust
+    for(const pf of puffs){
+      pf.x += pf.vx; pf.y += pf.vy; pf.t -= 0.06;
+      ctx.globalAlpha = Math.max(0, pf.t)*0.5;
+      ctx.fillStyle = '#c9bfa6';
+      ctx.beginPath(); ctx.arc(pf.x, pf.y, 2.2 + (1-pf.t)*2, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    puffs = puffs.filter(pf=>pf.t > 0);
+    // the die rattles above whoever is rolling
+    if(phase === 'roll'){
+      const tk = tok[turn];
+      drawDie(tk.x, tk.y - 58 + Math.abs(Math.sin(nowD/70))*-10, dieVal || 1, true);
+    }
+    ctx.restore();
+    // reeds standing in the water
+    ctx.strokeStyle = TH.reed;
+    ctx.lineWidth = 2;
+    for(const rd of reeds){
+      ctx.beginPath();
+      ctx.moveTo(rd.x, h - 4);
+      ctx.quadraticCurveTo(rd.x + rd.lean*10, h - 12 - rd.hgt/2, rd.x + rd.lean*16, h - 8 - rd.hgt);
+      ctx.stroke();
+      ctx.fillStyle = TH.reed;
+      ctx.beginPath();
+      ctx.ellipse(rd.x + rd.lean*16, h - 10 - rd.hgt, 2, 5, rd.lean, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.lineWidth = 1;
     const vg = ctx.createRadialGradient(w/2, h*0.46, Math.min(w,h)*0.42, w/2, h*0.46, Math.max(w,h)*0.78);
     vg.addColorStop(0, 'rgba(0,0,0,0)');
     vg.addColorStop(1, 'rgba(0,0,0,.4)');
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, w, h);
-    chip(8, 8, 100, PNAME2[0]+'  ◐ '+moons[0]+'  ✦ '+sparks[0], PCOL2[0], !over && turn === 0, false);
-    chip(w-8, 8, 100, PNAME2[1]+'  ◐ '+moons[1]+'  ✦ '+sparks[1], PCOL2[1], !over && turn === 1, true);
-    if(phase === 'roll' || (dieVal && (phase === 'hop' || phase === 'event' || phase === 'mini'))){
-      drawDie(w/2, 30, dieVal || 1, phase === 'roll');
+    for(let q=0;q<2;q++){ dispSparks[q] += (sparks[q] - dispSparks[q])*0.12; if(Math.abs(sparks[q]-dispSparks[q]) < 0.5) dispSparks[q] = sparks[q]; }
+    chip(8, 8, 100, PNAME2[0]+'  ◐ '+moons[0]+'  ✦ '+Math.round(dispSparks[0]), PCOL2[0], !over && turn === 0, false);
+    chip(w-8, 8, 100, PNAME2[1]+'  ◐ '+moons[1]+'  ✦ '+Math.round(dispSparks[1]), PCOL2[1], !over && turn === 1, true);
+    if(!over){
+      ctx.font = '700 10px "Nunito", sans-serif';
+      ctx.fillStyle = 'rgba(242,231,207,.55)';
+      ctx.textAlign = 'left';
+      ctx.fillText(((moonAt - pos[0] + NSP) % NSP)+' to the moon', 20, 52);
+      ctx.textAlign = 'right';
+      ctx.fillText(((moonAt - pos[1] + NSP) % NSP)+' to the moon', w - 20, 52);
+      ctx.textAlign = 'left';
+    }
+    if(dieBigT && nowD - dieBigT < 750 && dieVal){
+      const dp = Math.min(1, (nowD - dieBigT)/160);
+      const sc = 2.4 - 0.5*dp;
+      ctx.save();
+      ctx.globalAlpha = nowD - dieBigT > 560 ? Math.max(0, 1 - (nowD - dieBigT - 560)/190) : 1;
+      ctx.translate(w/2, h*0.42); ctx.scale(sc, sc);
+      drawDie(0, 0, dieVal, false);
+      ctx.restore();
+      ctx.globalAlpha = 1;
     }
     if(bannerT > 0){
       bannerT--;
-      ctx.font = '800 13.5px \"Nunito\", sans-serif';
+      const age = 115 - bannerT;
+      const ease = Math.min(1, age/9);
+      const alpha = bannerT < 16 ? bannerT/16 : 1;
+      ctx.font = '800 15px "Nunito", sans-serif';
       const tw2 = ctx.measureText(banner2).width;
-      const bw2 = Math.min(w - 16, tw2 + 34);
-      ctx.globalAlpha = Math.min(1, bannerT/18);
-      ctx.fillStyle = 'rgba(10,14,24,.9)';
-      rr2(w/2 - bw2/2, 56, bw2, 30, 15); ctx.fill();
-      ctx.strokeStyle = 'rgba(232,160,90,.5)';
-      rr2(w/2 - bw2/2, 56, bw2, 30, 15); ctx.stroke();
+      ctx.font = '700 11.5px "Nunito", sans-serif';
+      const sw2 = bannerSub ? ctx.measureText(bannerSub).width : 0;
+      const bw2 = Math.min(w - 20, Math.max(tw2, sw2) + 46);
+      const bh2 = bannerSub ? 56 : 40;
+      const by = 52 + (1-ease)*-10;
+      ctx.save();
+      ctx.globalAlpha = alpha*ease;
+      ctx.translate(w/2, by + bh2/2); ctx.scale(0.94 + 0.06*ease, 0.94 + 0.06*ease); ctx.translate(-w/2, -(by + bh2/2));
+      ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 16;
+      ctx.fillStyle = 'rgba(12,16,28,.94)';
+      rr2(w/2 - bw2/2, by, bw2, bh2, 14); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(242,231,207,.14)';
+      rr2(w/2 - bw2/2, by, bw2, bh2, 14); ctx.stroke();
+      ctx.fillStyle = bannerCol;
+      rr2(w/2 - bw2/2 + 10, by + 10, 4, bh2 - 20, 2); ctx.fill();
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillStyle = '#f2e7cf';
-      ctx.fillText(banner2, w/2, 71);
+      ctx.font = '800 15px "Nunito", sans-serif';
+      ctx.fillText(banner2, w/2 + 6, by + (bannerSub ? 20 : bh2/2));
+      if(bannerSub){
+        ctx.fillStyle = 'rgba(242,231,207,.6)';
+        ctx.font = '700 11.5px "Nunito", sans-serif';
+        ctx.fillText(bannerSub, w/2 + 6, by + 39);
+      }
+      ctx.restore();
       ctx.textBaseline = 'alphabetic';
       ctx.globalAlpha = 1;
       ctx.textAlign = 'left';
@@ -5048,36 +5403,73 @@ Shell.register('board', (function(){
     raf = requestAnimationFrame(draw);
   }
 
+  function refreshDiffUI(){
+    const paint = (sel, isOn)=>document.querySelectorAll(sel).forEach(b=>{
+      const on = isOn(b);
+      b.style.borderColor = on ? 'var(--gold)' : '';
+      b.style.color = on ? 'var(--gold)' : '';
+      b.style.opacity = on ? '1' : '.6';
+    });
+    paint('#bd-diffrow [data-diff]', b=>b.dataset.diff === diff);
+    paint('#bd-lenrow [data-len]', b=>+b.dataset.len === ROUNDS);
+    paint('#bd-themerow [data-theme]', b=>b.dataset.theme === theme);
+    const t = $('bd-tally');
+    if(t) t.textContent = (ghostTally.you + ghostTally.ghost) ? 'vs the Ghost · you '+ghostTally.you+' · Ghost '+ghostTally.ghost : 'Ghost difficulty';
+  }
   function startMatch(vsCpu){
     cpu = vsCpu;
     PNAME2[1] = cpu ? 'THE GHOST' : 'HAUNT';
     $('bd-mode').classList.remove('show');
     reset();
+    flash2('Round 1 of '+ROUNDS, 'buy the moon for 10 sparks · most moons wins', '#f2e7cf');
   }
   function onResize(){ if(running) sizeCanvas(); }
 
   return {
     mount(){
       cv = $('bd-canvas'); ctx = cv.getContext('2d');
-      running = true; over = true; cpu = true;
-      pos = [0,0]; sparks = [0,0]; moons = [0,0]; inv = [[],[]]; turn = 0; phase = 'over';
-      dieVal = 0; banner2 = ''; bannerT = 0; landPulse = 0; round = 1; moonAt = 12;
-      buildTypes();
+      const resuming = !!(resume && duel);
+      running = true;
+      if(!resuming){
+        over = true; cpu = true;
+        pos = [0,0]; sparks = [0,0]; moons = [0,0]; inv = [[],[]]; turn = 0; phase = 'over';
+        dieVal = 0; banner2 = ''; bannerT = 0; landPulse = 0; round = 1; moonAt = 12;
+        roundEvent = null; traps = [];
+        buildTypes();
+      }
       sizeCanvas();
-      tok = [ {x: pts[0].x, y: pts[0].y}, {x: pts[0].x, y: pts[0].y} ];
+      tok = [ {x: pts[pos[0]].x, y: pts[pos[0]].y}, {x: pts[pos[1]].x, y: pts[pos[1]].y} ];
+      cam.x = W()/2; cam.y = H()/2; cam.z = 1;
       $('bd-roll').onclick = roll;
       $('bd-roll').disabled = true;
       $('bd-vs-ghost').onclick = ()=>startMatch(true);
       $('bd-vs-friend').onclick = ()=>startMatch(false);
+      document.querySelectorAll('#bd-diffrow [data-diff]').forEach(b=>{
+        b.onclick = ()=>{ diff = b.dataset.diff; Shell.store.set('bd-diff', diff); refreshDiffUI(); Snd.tap(); };
+      });
+      document.querySelectorAll('#bd-lenrow [data-len]').forEach(b=>{
+        b.onclick = ()=>{ ROUNDS = +b.dataset.len; Shell.store.set('bd-len', ROUNDS); refreshDiffUI(); Snd.tap(); };
+      });
+      document.querySelectorAll('#bd-themerow [data-theme]').forEach(b=>{
+        b.onclick = ()=>{ theme = b.dataset.theme; Shell.store.set('bd-theme', theme); sizeCanvas(); if(!resuming) buildTypes(); tok.forEach((t2,i)=>{ t2.x = pts[pos[i]].x; t2.y = pts[pos[i]].y; }); refreshDiffUI(); Snd.tap(); };
+      });
+      Shell.store.get('bd-len').then(v=>{ if(v && [6,10,15].includes(+v)) ROUNDS = +v; refreshDiffUI(); });
+      Shell.store.get('bd-theme').then(v=>{ if(v && THEMES[v] && v !== theme){ theme = v; sizeCanvas(); if(!resuming) buildTypes(); tok.forEach((t2,i)=>{ t2.x = pts[pos[i]].x; t2.y = pts[pos[i]].y; }); } refreshDiffUI(); });
+      Shell.store.get('bd-diff').then(v=>{ if(v && DIFF[v]) diff = v; refreshDiffUI(); });
+      Shell.store.get('bd-wins').then(v=>{ if(v) ghostTally = v; refreshDiffUI(); });
       window.addEventListener('resize', onResize);
-      $('bd-mode').classList.add('show');
+      if(!resuming) $('bd-mode').classList.add('show');
       itemsUI();
       lastTick = Date.now();
       raf = requestAnimationFrame(draw);
       dog = setInterval(()=>{
         if(running && Date.now() - lastTick > 500){ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
       }, 600);
-      HowTo.show('board', ()=>{});
+      if(resuming){
+        over = false; phase = 'event'; hud();
+        const mid = matchId;
+        setTimeout(()=>{ if(mid === matchId && running) afterResume(); }, 450);
+      } else HowTo.show('board', ()=>{});
     },
     unmount(){
       running = false;
@@ -5315,6 +5707,7 @@ const Challenge = (function(){
 
   function onScore(g, s){
     if(typeof Run !== 'undefined') Run.onScore(g, s);
+    if(typeof BoardDuel !== 'undefined') BoardDuel.onScore(g, s);
     if(chip && active && active.g === g && g === chipGame && (sum(active.rounds) + s) > active.score){
       chip.className = 'ch-chip on beaten';
       chip.textContent = '🏆 '+active.score+' BEATEN!';
@@ -5323,6 +5716,10 @@ const Challenge = (function(){
 
   function onGameOver(g, score, slotId){
     const slot = document.getElementById(slotId);
+    if(typeof BoardDuel !== 'undefined' && BoardDuel.intercept(g, score)){
+      if(slot) slot.innerHTML = '';
+      return;
+    }
     if(typeof Run !== 'undefined' && Run.intercept(g, score)){
       if(slot) slot.innerHTML = '';
       return;
