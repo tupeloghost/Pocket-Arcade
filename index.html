@@ -832,7 +832,7 @@
   </div>
   <button class="chbtn" id="ch-enter">FRIENDS &amp; CHALLENGES</button>
   <div id="lantern-bar"></div>
-  <div class="verstamp">v2026.09.14.17</div>
+  <div class="verstamp">v2026.09.14.18</div>
 </div>
 
 <!-- ================= PARTY BOARD ================= -->
@@ -870,7 +870,12 @@
       <button class="smallbtn ghost" data-theme="swamp">THE SWAMP</button>
       <button class="smallbtn ghost" data-theme="graveyard">THE GRAVEYARD</button>
     </div>
-    <button class="bigbtn" id="bd-vs-friend" style="background:var(--cyan); color:#05202a">FRIEND · ONE PHONE</button>
+    <p class="sec-label" style="margin:4px 0 0 !important">Friends · one phone</p>
+    <div class="ch-row" style="margin:0">
+      <button class="smallbtn" data-np="2">2 PLAYERS</button>
+      <button class="smallbtn" data-np="3">3 PLAYERS</button>
+      <button class="smallbtn" data-np="4">4 PLAYERS</button>
+    </div>
   </div>
 </div>
 
@@ -4324,8 +4329,34 @@ Shell.register('board', (function(){
   };
   function moonCost(){ return roundEvent === 'moonsale' ? 6 : MOON_COST; }
   const TAUNTS = ['THE GHOST: “Sweet sparks.”', 'THE GHOST: “Too slow, sugar.”', 'THE GHOST: “The night is long.”', 'THE GHOST: “Mine now.”'];
-  const PNAME2 = ['EMBER', 'HAUNT'];
-  const PCOL2 = ['#e8895a', '#7cc7db'];
+  const PNAME2 = ['EMBER', 'HAUNT', 'WISP', 'MOTH'];
+  const PCOL2 = ['#e8895a', '#7cc7db', '#b39ddb', '#8fcf9f'];
+  const TOKG = ['🔥', '👻', '✦', '☾'];
+  let NP = 2, seats = [0,1];
+  function arr(v){ return Array.from({length: NP}, ()=>v); }
+  function rival(p){
+    let best = -1;
+    for(let i=0;i<NP;i++){
+      if(i === p) continue;
+      if(best < 0 || moons[i] > moons[best] || (moons[i] === moons[best] && sparks[i] > sparks[best])) best = i;
+    }
+    return best;
+  }
+  function leader(){
+    let b = 0;
+    for(let i=1;i<NP;i++) if(moons[i] > moons[b] || (moons[i] === moons[b] && sparks[i] > sparks[b])) b = i;
+    return b;
+  }
+  function trailing(){
+    let b = 0;
+    for(let i=1;i<NP;i++) if(moons[i] < moons[b] || (moons[i] === moons[b] && sparks[i] < sparks[b])) b = i;
+    return b;
+  }
+  function uniqueMax(a){
+    let b = 0;
+    for(let i=1;i<a.length;i++) if(a[i] > a[b]) b = i;
+    return a.filter(v=>v === a[b]).length === 1 ? b : -1;
+  }
 
   function W(){ return cv.width/dpr; }
   function H(){ return cv.height/dpr; }
@@ -4393,16 +4424,18 @@ Shell.register('board', (function(){
   function itemsUI(){
     const box = $('bd-items');
     if(!box) return;
-    const mine = inv[0];
+    const who = cpu ? 0 : turn;
+    const mine = inv[who] || [];
     if(over || !mine.length){
-      box.innerHTML = mine.length ? '' : '<span class="bd-ithint">Land on chests to find items</span>';
+      box.innerHTML = mine.length ? '' : '<span class="bd-ithint">'+(NP > 2 ? PNAME2[who]+' · ' : '')+'Land on chests to find items</span>';
       if(over) box.innerHTML = '';
       return;
     }
-    const myTurn = !over && turn === 0 && phase === 'await' && !usedItem;
-    box.innerHTML = mine.map((k,i)=>'<button class="bd-itbtn" data-it="'+i+'" '+(myTurn && k !== 'ward' && !(k === 'trap' && traps.some(tr=>tr.i === pos[0])) ? '' : 'disabled')+'>'+ITEMS[k].name+'</button>').join('');
+    const myTurn = !over && turn === who && phase === 'await' && !usedItem;
+    box.innerHTML = (NP > 2 ? '<span class="bd-ithint" style="color:'+PCOL2[who]+'">'+PNAME2[who]+'</span>' : '')+
+      mine.map((k,i)=>'<button class="bd-itbtn" data-it="'+i+'" '+(myTurn && k !== 'ward' && !(k === 'trap' && traps.some(tr=>tr.i === pos[who])) ? '' : 'disabled')+'>'+ITEMS[k].name+'</button>').join('');
     box.querySelectorAll('[data-it]').forEach(b=>{
-      b.onclick = ()=>useItem(0, +b.dataset.it);
+      b.onclick = ()=>useItem(who, +b.dataset.it);
     });
   }
 
@@ -4412,7 +4445,7 @@ Shell.register('board', (function(){
     if(!k || k === 'ward') return;
     inv[p].splice(idx, 1);
     usedItem = true;
-    const o = 1-p;
+    const o = rival(p);
     if(k === 'die'){
       loadedDie = true;
       flash2(PNAME2[p]+' charms the die · 4, 5 or 6');
@@ -4484,14 +4517,14 @@ Shell.register('board', (function(){
   function reset(){
     matchId++;
     buildTypes();
-    pos = [0,0]; sparks = [5,5]; moons = [0,0]; inv = [[],[]];
+    pos = arr(0); sparks = arr(5); moons = arr(0); inv = Array.from({length: NP}, ()=>[]);
     turn = 0; over = false; round = 1;
     phase = 'await'; dieVal = 0; dieAnimT = 0; banner2 = ''; bannerT = 0; minState = null;
     loadedDie = false; usedItem = false;
     moonAt = 10 + Math.floor(Math.random()*10);
     hud();
-    tok = [ {x: pts[0].x, y: pts[0].y}, {x: pts[0].x, y: pts[0].y} ];
-    landPulse = 0; hopAnim = null; puffs = []; tileFlash = null; dieBigT = 0; dispSparks = [5,5]; earned = [0,0]; duelsWon = [0,0]; duel = null; resume = false; roundEvent = null; traps = []; stat = {big:[0,0], moved:[0,0], rolls:[0,0], pips:[0,0], trapped:[0,0]};
+    tok = Array.from({length: NP}, ()=>({x: pts[0].x, y: pts[0].y}));
+    landPulse = 0; hopAnim = null; puffs = []; tileFlash = null; dieBigT = 0; dispSparks = arr(5); earned = arr(0); duelsWon = arr(0); duel = null; resume = false; roundEvent = null; traps = []; stat = {big:arr(0), moved:arr(0), rolls:arr(0), pips:arr(0), trapped:arr(0)};
     cam.x = W()/2; cam.y = H()/2; cam.z = 1;
     $('bd-modal').classList.remove('show');
     itemsUI();
@@ -4644,7 +4677,7 @@ Shell.register('board', (function(){
   }
 
   function ghostEvent(p){
-    const o = 1-p;
+    const o = rival(p);
     const ev = Math.floor(Math.random()*5);
     if(ev === 0){
       const tmp = pos[p]; pos[p] = pos[o]; pos[o] = tmp;
@@ -4722,6 +4755,7 @@ Shell.register('board', (function(){
   }
   function openArcadeDuel(){
     phase = 'mini';
+    seats = cpu ? [0,1] : [turn, rival(turn)];
     const g = ['S','N','F','H'][Math.floor(Math.random()*4)];
     const hi = round >= Math.ceil(ROUNDS*0.7);
     duel = {g, stake: hi ? SPARK_MINI*2 : SPARK_MINI, scores:[0,0], stage:0, target: cpu ? ghostTarget(g) : null, cur:0};
@@ -4729,7 +4763,7 @@ Shell.register('board', (function(){
     card.innerHTML = '<h2>ARCADE DUEL</h2>'+
       '<p class="sec-label" style="margin:0 !important">Winner +'+duel.stake+' · loser -'+duel.stake+'</p>'+
       '<div class="mathq" style="color:var(--gold)">'+AD_TITLES[g].toUpperCase()+'</div>'+
-      '<p>'+AD_TIPS[g]+'. <b>20 seconds.</b> '+(cpu ? 'Beat the Ghost’s <b>'+duel.target+'</b>.' : PNAME2[0]+' plays first, then '+PNAME2[1]+'. Higher score wins.')+'</p>'+
+      '<p>'+AD_TIPS[g]+'. <b>20 seconds.</b> '+(cpu ? 'Beat the Ghost’s <b>'+duel.target+'</b>.' : PNAME2[seats[0]]+' plays first, then '+PNAME2[seats[1]]+'. Higher score wins.')+'</p>'+
       '<button class="bigbtn" id="bd-adgo">PLAY</button>';
     $('bd-adgo').onclick = ()=>{ $('bd-modal').classList.remove('show'); launchStage(); };
     $('bd-modal').classList.add('show');
@@ -4737,7 +4771,7 @@ Shell.register('board', (function(){
   function launchStage(){
     resume = true;
     duel.cur = 0;
-    const who = duel.stage === 0 ? PNAME2[0] : PNAME2[1];
+    const who = PNAME2[seats[duel.stage]];
     const g = duel.g, target = duel.target;
     Shell.openGame(AD_GAMES[g]);
     const hud = document.getElementById('run-hud');
@@ -4776,9 +4810,9 @@ Shell.register('board', (function(){
       duel.stage = 1;
       const card = $('bd-card');
       card.innerHTML = '<h2>PASS THE PHONE</h2>'+
-        '<p><b style="color:'+PCOL2[0]+'">'+PNAME2[0]+'</b> scored <b>'+duel.scores[0]+'</b>.</p>'+
-        '<p>Now <b style="color:'+PCOL2[1]+'">'+PNAME2[1]+'</b> plays '+AD_TITLES[duel.g]+' for 20 seconds.</p>'+
-        '<button class="bigbtn" id="bd-adgo">'+PNAME2[1]+' IS READY</button>';
+        '<p><b style="color:'+PCOL2[seats[0]]+'">'+PNAME2[seats[0]]+'</b> scored <b>'+duel.scores[0]+'</b>.</p>'+
+        '<p>Now <b style="color:'+PCOL2[seats[1]]+'">'+PNAME2[seats[1]]+'</b> plays '+AD_TITLES[duel.g]+' for 20 seconds.</p>'+
+        '<button class="bigbtn" id="bd-adgo">'+PNAME2[seats[1]]+' IS READY</button>';
       $('bd-adgo').onclick = ()=>{ $('bd-modal').classList.remove('show'); launchStage(); };
       $('bd-modal').classList.add('show');
       return;
@@ -4797,6 +4831,7 @@ Shell.register('board', (function(){
   /* ---------- mini duels: winner takes sparks FROM the loser ---------- */
   function openMini(){
     phase = 'mini';
+    seats = cpu ? [0,1] : [turn, rival(turn)];
     const k = Math.floor(Math.random()*4);
     const card = $('bd-card');
     const hi = round >= Math.ceil(ROUNDS*0.7);
@@ -4807,8 +4842,8 @@ Shell.register('board', (function(){
         '<p>Wait for GO, then tap your button first. Tapping early loses!</p>'+
         '<div class="mathq" id="bd-cue" style="color:var(--dim)">WAIT…</div>'+
         '<div class="bd-vsrow">'+
-        '<button class="bd-vsbtn" data-mp="0" style="color:'+PCOL2[0]+'">'+PNAME2[0]+'</button>'+
-        '<button class="bd-vsbtn" data-mp="1" style="color:'+PCOL2[1]+'">'+PNAME2[1]+'</button></div>';
+        '<button class="bd-vsbtn" data-mp="0" style="color:'+PCOL2[seats[0]]+'">'+PNAME2[seats[0]]+'</button>'+
+        '<button class="bd-vsbtn" data-mp="1" style="color:'+PCOL2[seats[1]]+'">'+PNAME2[seats[1]]+'</button></div>';
       minState.hot = false;
       setTimeout(()=>{
         if(!running || !minState || minState.done || minState.k !== 0) return;
@@ -4828,10 +4863,10 @@ Shell.register('board', (function(){
       card.innerHTML = '<h2>TRUE OR FALSE</h2>'+stakeLine+
         '<p>First right answer wins. Wrong answer loses!</p>'+
         '<div class="mathq">'+a+' + '+b+' = '+shown+'</div>'+
-        '<div class="bd-vsrow"><button class="bd-vsbtn" data-mp="0" data-a="T" style="color:'+PCOL2[0]+'">'+PNAME2[0]+'<br>TRUE</button>'+
-        '<button class="bd-vsbtn" data-mp="0" data-a="F" style="color:'+PCOL2[0]+'">'+PNAME2[0]+'<br>FALSE</button></div>'+
-        '<div class="bd-vsrow"><button class="bd-vsbtn" data-mp="1" data-a="T" style="color:'+PCOL2[1]+'">'+PNAME2[1]+'<br>TRUE</button>'+
-        '<button class="bd-vsbtn" data-mp="1" data-a="F" style="color:'+PCOL2[1]+'">'+PNAME2[1]+'<br>FALSE</button></div>';
+        '<div class="bd-vsrow"><button class="bd-vsbtn" data-mp="0" data-a="T" style="color:'+PCOL2[seats[0]]+'">'+PNAME2[seats[0]]+'<br>TRUE</button>'+
+        '<button class="bd-vsbtn" data-mp="0" data-a="F" style="color:'+PCOL2[seats[0]]+'">'+PNAME2[seats[0]]+'<br>FALSE</button></div>'+
+        '<div class="bd-vsrow"><button class="bd-vsbtn" data-mp="1" data-a="T" style="color:'+PCOL2[seats[1]]+'">'+PNAME2[seats[1]]+'<br>TRUE</button>'+
+        '<button class="bd-vsbtn" data-mp="1" data-a="F" style="color:'+PCOL2[seats[1]]+'">'+PNAME2[seats[1]]+'<br>FALSE</button></div>';
       if(cpu) setTimeout(()=>{
         if(!minState || minState.done || minState.k !== 1) return;
         const right = Math.random() > DIFF[diff].err;
@@ -4845,9 +4880,9 @@ Shell.register('board', (function(){
       minState.odd = odd;
       card.innerHTML = '<h2>ODD ONE OUT</h2>'+stakeLine+
         '<p>One charm is different. First to tap it wins. Wrong charm loses!</p>'+
-        '<p class="sec-label">'+PNAME2[0]+'</p>'+
+        '<p class="sec-label">'+PNAME2[seats[0]]+'</p>'+
         '<div class="bd-vsrow">'+cells.map(cch=>'<button class="bd-vsbtn" data-mp="0" data-a="'+cch+'" style="font-size:24px">'+cch+'</button>').join('')+'</div>'+
-        '<p class="sec-label">'+PNAME2[1]+'</p>'+
+        '<p class="sec-label">'+PNAME2[seats[1]]+'</p>'+
         '<div class="bd-vsrow">'+cells.map(cch=>'<button class="bd-vsbtn" data-mp="1" data-a="'+cch+'" style="font-size:24px">'+cch+'</button>').join('')+'</div>';
       if(cpu) setTimeout(()=>{
         if(!minState || minState.done || minState.k !== 2) return;
@@ -4859,8 +4894,8 @@ Shell.register('board', (function(){
       card.innerHTML = '<h2>SPARK MASH</h2>'+stakeLine+
         '<p>Mash your button as fast as you can. 3 seconds. Most taps wins!</p>'+
         '<div class="bd-vsrow">'+
-        '<button class="bd-vsbtn hotbtn" data-mp="0" style="font-size:17px">'+PNAME2[0]+'<br><span id="bd-mc0">0</span></button>'+
-        '<button class="bd-vsbtn hotbtn" data-mp="1" style="font-size:17px">'+PNAME2[1]+'<br><span id="bd-mc1">0</span></button></div>';
+        '<button class="bd-vsbtn hotbtn" data-mp="0" style="font-size:17px">'+PNAME2[seats[0]]+'<br><span id="bd-mc0">0</span></button>'+
+        '<button class="bd-vsbtn hotbtn" data-mp="1" style="font-size:17px">'+PNAME2[seats[1]]+'<br><span id="bd-mc1">0</span></button></div>';
       const mid = matchId;
       if(cpu){
         (function cpuMash(){
@@ -4913,12 +4948,13 @@ Shell.register('board', (function(){
     $('bd-modal').classList.remove('show');
     const st = minState ? minState.stake : SPARK_MINI;
     minState = null;
-    const blocked = hurtSparks(1-mp, st, '· lost the duel');
-    sparks[mp] = sparks[mp] + st;
-    earned[mp] += st;
-    duelsWon[mp]++;
-    flash2(PNAME2[mp]+' wins the duel · +'+st+' ('+why+')');
-    if(cpu && mp === 1) say('<b style="color:'+PCOL2[1]+'">'+TAUNTS[Math.floor(Math.random()*3)]+'</b>');
+    const wp = seats[mp], lp = seats[1-mp];
+    const blocked = hurtSparks(lp, st, '· lost the duel');
+    sparks[wp] = sparks[wp] + st;
+    earned[wp] += st;
+    duelsWon[wp]++;
+    flash2(PNAME2[wp]+' wins the duel · +'+st+' ('+why+')');
+    if(cpu && wp === 1) say('<b style="color:'+PCOL2[1]+'">'+TAUNTS[Math.floor(Math.random()*3)]+'</b>');
     Snd.win(); buzz([25,35,25]);
     endTurn();
   }
@@ -4928,14 +4964,14 @@ Shell.register('board', (function(){
     const mid = matchId;
     setTimeout(()=>{
       if(mid !== matchId || over || !running) return;
-      turn = 1 - turn;
+      turn = (turn + 1) % NP;
       if(turn === 0){
         round++;
         hud();
         if(round > ROUNDS){ endGame(); return; }
         if(round === ROUNDS){ flash2('Final round'); Snd.swell(); buzz([30,40,30]); }
         if(round === Math.round(ROUNDS/2) || round === ROUNDS - 1){
-          const trail = moons[0] === moons[1] ? (sparks[0] <= sparks[1] ? 0 : 1) : (moons[0] < moons[1] ? 0 : 1);
+          const trail = trailing();
           sparks[trail] += 3;
           flash2('The ghosts pity '+PNAME2[trail]+' · +3 sparks');
         }
@@ -4958,23 +4994,21 @@ Shell.register('board', (function(){
     phase = 'over';
     itemsUI();
     const bonus = [];
-    if(earned[0] !== earned[1]){ const b = earned[0] > earned[1] ? 0 : 1; moons[b]++; bonus.push('Bonus moon · most sparks earned · '+PNAME2[b]); }
-    if(duelsWon[0] !== duelsWon[1]){ const b = duelsWon[0] > duelsWon[1] ? 0 : 1; moons[b]++; bonus.push('Bonus moon · most duels won · '+PNAME2[b]); }
-    const winr = moons[0] !== moons[1] ? (moons[0] > moons[1] ? 0 : 1)
-      : (sparks[0] !== sparks[1] ? (sparks[0] > sparks[1] ? 0 : 1) : (Math.random() < 0.5 ? 0 : 1));
+    { const b = uniqueMax(earned); if(b >= 0){ moons[b]++; bonus.push('Bonus moon · most sparks earned · '+PNAME2[b]); } }
+    { const b = uniqueMax(duelsWon); if(b >= 0){ moons[b]++; bonus.push('Bonus moon · most duels won · '+PNAME2[b]); } }
+    const winr = leader();
     const report = [];
     if(stat){
-      const avg = [0,1].map(i=>stat.rolls[i] ? stat.pips[i]/stat.rolls[i] : 0);
-      if(avg[0] !== avg[1]){ const b = avg[0] > avg[1] ? 0 : 1; report.push('Luckiest roller · '+PNAME2[b]+' (average '+avg[b].toFixed(1)+')'); }
-      if(stat.big[0] !== stat.big[1]){ const b = stat.big[0] > stat.big[1] ? 0 : 1; report.push('Biggest windfall · '+PNAME2[b]+' (+'+stat.big[b]+' at once)'); }
-      if(stat.moved[0] !== stat.moved[1]){ const b = stat.moved[0] > stat.moved[1] ? 0 : 1; report.push('Longest walk · '+PNAME2[b]+' ('+stat.moved[b]+' spaces)'); }
-      if(stat.trapped[0] + stat.trapped[1] > 0 && stat.trapped[0] !== stat.trapped[1]){ const b = stat.trapped[0] > stat.trapped[1] ? 0 : 1; report.push('Trapper · '+PNAME2[b]+' ('+stat.trapped[b]+' caught)'); }
+      const avg = stat.rolls.map((r2,i)=>r2 ? stat.pips[i]/r2 : 0);
+      let b = uniqueMax(avg); if(b >= 0) report.push('Luckiest roller · '+PNAME2[b]+' (average '+avg[b].toFixed(1)+')');
+      b = uniqueMax(stat.big); if(b >= 0 && stat.big[b] > 0) report.push('Biggest windfall · '+PNAME2[b]+' (+'+stat.big[b]+' at once)');
+      b = uniqueMax(stat.moved); if(b >= 0) report.push('Longest walk · '+PNAME2[b]+' ('+stat.moved[b]+' spaces)');
+      b = uniqueMax(stat.trapped); if(b >= 0 && stat.trapped[b] > 0) report.push('Trapper · '+PNAME2[b]+' ('+stat.trapped[b]+' caught)');
     }
     const card = $('bd-card');
     card.innerHTML = '<h2 style="color:'+PCOL2[winr]+'">'+PNAME2[winr]+' wins the night</h2>'+
       (bonus.length ? '<p style="margin:0; color:var(--gold); font-weight:700">'+bonus.join('<br>')+'</p>' : '')+
-      '<p><b style="color:'+PCOL2[0]+'">'+PNAME2[0]+'</b> · '+moons[0]+' moons · '+sparks[0]+' sparks<br>'+
-      '<b style="color:'+PCOL2[1]+'">'+PNAME2[1]+'</b> · '+moons[1]+' moons · '+sparks[1]+' sparks</p>'+
+      '<p>'+Array.from({length: NP}, (_,i)=>'<b style="color:'+PCOL2[i]+'">'+PNAME2[i]+'</b> · '+moons[i]+' moons · '+sparks[i]+' sparks').join('<br>')+'</p>'+
       '<p class="sec-label" style="margin:0 !important">MOONS WIN · SPARKS BREAK TIES</p>'+
       (report.length ? '<p style="margin:0; font-size:12px; color:var(--dim); line-height:1.6">'+report.slice(0,3).join('<br>')+'</p>' : '')+
       '<button class="bigbtn" id="bd-again">PLAY AGAIN</button>'+
@@ -5028,9 +5062,9 @@ Shell.register('board', (function(){
     });
     ctx.restore();
   }
-  function chip(x, y, wCh, txt2, col, activeCh, alignRight){
-    ctx.font = '800 12.5px \"Nunito\", sans-serif';
-    wCh = Math.max(wCh, ctx.measureText(txt2).width + 26);
+  function chip(x, y, wCh, txt2, col, activeCh, alignRight, small){
+    ctx.font = (small ? '800 10.5px' : '800 12.5px')+' "Nunito", sans-serif';
+    wCh = Math.max(wCh, ctx.measureText(txt2).width + (small ? 16 : 26));
     const bx = alignRight ? x - wCh : x;
     ctx.fillStyle = 'rgba(10,14,24,.82)';
     rr2(bx, y, wCh, 30, 15); ctx.fill();
@@ -5041,7 +5075,7 @@ Shell.register('board', (function(){
     ctx.shadowBlur = 0; ctx.lineWidth = 1;
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillStyle = col;
-    ctx.fillText(txt2, bx + 12, y + 16);
+    ctx.fillText(txt2, bx + (small ? 8 : 12), y + 16);
     ctx.textBaseline = 'alphabetic';
   }
   function trailPath(){
@@ -5279,9 +5313,9 @@ Shell.register('board', (function(){
       ctx.beginPath(); ctx.arc(pt.x, pt.y, 14 + (1-landPulse)*16, 0, Math.PI*2); ctx.stroke();
       ctx.globalAlpha = 1; ctx.lineWidth = 1;
     }
-    for(let p2=0;p2<2;p2++){
+    for(let p2=0;p2<NP;p2++){
       const pt = pts[pos[p2]];
-      const off = p2 === 0 ? -11 : 11;
+      const off = (p2 - (NP-1)/2) * 12;
       tok[p2].x += (pt.x + off - tok[p2].x)*0.22;
       tok[p2].y += (pt.y - tok[p2].y)*0.22;
       const bob = !over && turn === p2 ? Math.sin(nowD/180)*3 : 0;
@@ -5304,7 +5338,7 @@ Shell.register('board', (function(){
       ctx.beginPath(); ctx.ellipse(tx, ty, 12*(2-sq), 12*sq, 0, 0, Math.PI*2); ctx.fill();
       ctx.shadowBlur = 0;
       ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(p2 === 0 ? '🔥' : '👻', tx, ty+1);
+      ctx.fillText(TOKG[p2], tx, ty+1);
     }
     ctx.textBaseline = 'alphabetic';
     // landing dust
@@ -5341,16 +5375,31 @@ Shell.register('board', (function(){
     vg.addColorStop(1, 'rgba(0,0,0,.4)');
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, w, h);
-    for(let q=0;q<2;q++){ dispSparks[q] += (sparks[q] - dispSparks[q])*0.12; if(Math.abs(sparks[q]-dispSparks[q]) < 0.5) dispSparks[q] = sparks[q]; }
-    chip(8, 8, 100, PNAME2[0]+'  ◐ '+moons[0]+'  ✦ '+Math.round(dispSparks[0]), PCOL2[0], !over && turn === 0, false);
-    chip(w-8, 8, 100, PNAME2[1]+'  ◐ '+moons[1]+'  ✦ '+Math.round(dispSparks[1]), PCOL2[1], !over && turn === 1, true);
-    if(!over){
-      ctx.font = '700 10px "Nunito", sans-serif';
-      ctx.fillStyle = 'rgba(242,231,207,.55)';
-      ctx.textAlign = 'left';
-      ctx.fillText(((moonAt - pos[0] + NSP) % NSP)+' to the moon', 20, 52);
-      ctx.textAlign = 'right';
-      ctx.fillText(((moonAt - pos[1] + NSP) % NSP)+' to the moon', w - 20, 52);
+    for(let q=0;q<NP;q++){ dispSparks[q] += (sparks[q] - dispSparks[q])*0.12; if(Math.abs(sparks[q]-dispSparks[q]) < 0.5) dispSparks[q] = sparks[q]; }
+    if(NP === 2){
+      chip(8, 8, 100, PNAME2[0]+'  ◐ '+moons[0]+'  ✦ '+Math.round(dispSparks[0]), PCOL2[0], !over && turn === 0, false);
+      chip(w-8, 8, 100, PNAME2[1]+'  ◐ '+moons[1]+'  ✦ '+Math.round(dispSparks[1]), PCOL2[1], !over && turn === 1, true);
+      if(!over){
+        ctx.font = '700 10px "Nunito", sans-serif';
+        ctx.fillStyle = 'rgba(242,231,207,.55)';
+        ctx.textAlign = 'left';
+        ctx.fillText(((moonAt - pos[0] + NSP) % NSP)+' to the moon', 20, 52);
+        ctx.textAlign = 'right';
+        ctx.fillText(((moonAt - pos[1] + NSP) % NSP)+' to the moon', w - 20, 52);
+        ctx.textAlign = 'left';
+      }
+    } else {
+      const cw = (w - 16 - (NP-1)*5) / NP;
+      for(let i=0;i<NP;i++){
+        const cx2 = 8 + i*(cw + 5);
+        chip(cx2, 8, cw, PNAME2[i]+' ◐'+moons[i]+' ✦'+Math.round(dispSparks[i]), PCOL2[i], !over && turn === i, false, true);
+        if(!over){
+          ctx.font = '700 9.5px "Nunito", sans-serif';
+          ctx.fillStyle = 'rgba(242,231,207,.55)';
+          ctx.textAlign = 'left';
+          ctx.fillText(((moonAt - pos[i] + NSP) % NSP)+' to moon', cx2 + 8, 52);
+        }
+      }
       ctx.textAlign = 'left';
     }
     if(dieBigT && nowD - dieBigT < 750 && dieVal){
@@ -5416,8 +5465,9 @@ Shell.register('board', (function(){
     const t = $('bd-tally');
     if(t) t.textContent = (ghostTally.you + ghostTally.ghost) ? 'vs the Ghost · you '+ghostTally.you+' · Ghost '+ghostTally.ghost : 'Ghost difficulty';
   }
-  function startMatch(vsCpu){
+  function startMatch(vsCpu, np){
     cpu = vsCpu;
+    NP = cpu ? 2 : Math.max(2, Math.min(4, np || 2));
     PNAME2[1] = cpu ? 'THE GHOST' : 'HAUNT';
     $('bd-mode').classList.remove('show');
     reset();
@@ -5432,18 +5482,18 @@ Shell.register('board', (function(){
       running = true;
       if(!resuming){
         over = true; cpu = true;
-        pos = [0,0]; sparks = [0,0]; moons = [0,0]; inv = [[],[]]; turn = 0; phase = 'over';
+        NP = 2; pos = arr(0); sparks = arr(0); moons = arr(0); inv = Array.from({length: NP}, ()=>[]); turn = 0; phase = 'over';
         dieVal = 0; banner2 = ''; bannerT = 0; landPulse = 0; round = 1; moonAt = 12;
         roundEvent = null; traps = [];
         buildTypes();
       }
       sizeCanvas();
-      tok = [ {x: pts[pos[0]].x, y: pts[pos[0]].y}, {x: pts[pos[1]].x, y: pts[pos[1]].y} ];
+      tok = pos.map(pi=>({x: pts[pi].x, y: pts[pi].y}));
       cam.x = W()/2; cam.y = H()/2; cam.z = 1;
       $('bd-roll').onclick = roll;
       $('bd-roll').disabled = true;
       $('bd-vs-ghost').onclick = ()=>startMatch(true);
-      $('bd-vs-friend').onclick = ()=>startMatch(false);
+      document.querySelectorAll('#bd-mode [data-np]').forEach(b=>{ b.onclick = ()=>startMatch(false, +b.dataset.np); });
       document.querySelectorAll('#bd-diffrow [data-diff]').forEach(b=>{
         b.onclick = ()=>{ diff = b.dataset.diff; Shell.store.set('bd-diff', diff); refreshDiffUI(); Snd.tap(); };
       });
