@@ -806,6 +806,7 @@
     box-shadow:0 0 16px var(--av, #e8895a), inset 0 1px 0 rgba(255,255,255,.4);}
   #bd-status{flex:1; min-width:0; font-family:'Nunito', sans-serif; font-weight:800; font-size:12px;
     letter-spacing:.6px; color:var(--text); text-align:left; line-height:1.3;}
+  .bd-goal{display:block; font-weight:600; font-size:11px; letter-spacing:.2px; color:var(--dim); margin-top:2px;}
   #bd-roll.pulse{animation:rollpulse 1.4s ease-in-out infinite;}
   @keyframes rollpulse{0%,100%{box-shadow:0 6px 18px rgba(232,160,90,.3), inset 0 1px 0 rgba(255,255,255,.4)} 50%{box-shadow:0 6px 28px rgba(232,160,90,.7), inset 0 1px 0 rgba(255,255,255,.4)}}
   #bd-roll{
@@ -1048,7 +1049,7 @@
   </div>
   <button class="chbtn" id="ch-enter">FRIENDS &amp; CHALLENGES</button>
   <div id="lantern-bar"></div>
-  <div class="verstamp">v2026.09.14.23</div>
+  <div class="verstamp">v2026.09.14.25</div>
 </div>
 
 <!-- ================= PARTY BOARD ================= -->
@@ -1069,7 +1070,7 @@
   </div>
   <div class="gover" id="bd-mode">
     <h2>PARTY BOARD</h2>
-    <p style="max-width:310px">Roll, land on spaces, collect sparks, shop for items, and win duels. Some duels are quick, some are 20 seconds of a real game. Reach the moon and <b>buy it for 10 sparks</b>; it moves after. Bonus moons at the end for the best earner and duelist. <b>Most moons wins.</b></p>
+    <p style="max-width:310px">Each round, everyone rolls and moves, then <b>everyone plays a real 20-second mini-game</b>. Best score earns the most sparks. Catch the moon on the trail for +10. <b>Most sparks after the last round wins the night.</b></p>
     <button class="bigbtn" id="bd-vs-ghost">PLAY THE GHOST</button>
     <div class="ch-row" id="bd-diffrow" style="margin:0">
       <button class="smallbtn ghost" data-diff="easy">EASY</button>
@@ -1077,11 +1078,11 @@
       <button class="smallbtn ghost" data-diff="mean">HARD</button>
     </div>
     <p class="sec-label" id="bd-tally" style="margin:0 !important"></p>
-    <p class="sec-label" style="margin:8px 0 0 !important">Match length</p>
+    <p class="sec-label" style="margin:8px 0 0 !important">Rounds</p>
     <div class="ch-row" id="bd-lenrow" style="margin:0">
-      <button class="smallbtn ghost" data-len="6">SHORT · 6</button>
-      <button class="smallbtn ghost" data-len="10">CLASSIC · 10</button>
-      <button class="smallbtn ghost" data-len="15">LONG · 15</button>
+      <button class="smallbtn ghost" data-len="3">QUICK · 3</button>
+      <button class="smallbtn ghost" data-len="5">CLASSIC · 5</button>
+      <button class="smallbtn ghost" data-len="8">LONG · 8</button>
     </div>
     <p class="sec-label" style="margin:8px 0 0 !important">Board</p>
     <div class="ch-row" id="bd-themerow" style="margin:0">
@@ -4014,7 +4015,7 @@ const HowTo = (function(){
     flight:  {ico:'👻', title:'Floaty',   cap:'<b>Tap to fly up.</b> Slip through the gaps. Your first crash is forgiven.'},
     shade:   {ico:'🏮', title:'Shoot', cap:'<b>Slide to move.</b> Your lantern fires by itself. Don’t let the moths reach your flame.'},
     blocks:  {ico:'🧱', title:'Block Battle', cap:'<b>◀ ▶ slide · ⟳ spin · ▼ drop.</b> Fill a line to clear it and dump a junk row on the other side. Fill up and you lose.'},
-    board:   {ico:'🎲', title:'Party Board', cap:'<b>Tap ROLL on your turn.</b> Collect sparks ✨ from candles and duels, grab items from chests, and buy the moon for 10 sparks when you reach it — it moves after each buy. 10 rounds. <b>Most moons wins.</b>'}
+    board:   {ico:'🎲', title:'Party Board', cap:'<b>Tap ROLL on your turn.</b> Roll and move, then everyone plays a real 20-second mini-game. Best score earns the most sparks. Catch the moon for +10. <b>Most sparks wins.</b>'}
   };
   let stopDemo = null;
   function show(key, onPlay){
@@ -4440,25 +4441,25 @@ Shell.register('blocks', (function(){
 ================================================================ */
 Shell.register('board', (function(){
   const $ = id => document.getElementById(id);
-  const NSP = 24, MOON_COST = 10, SPARK_MINI = 4;
-  let ROUNDS = 10, theme = 'swamp';
+  const NSP = 24, MOON_COST = 8, SPARK_MINI = 4;
+  let ROUNDS = 5, GOAL = 3, theme = 'swamp', bridged = false;
   const THEMES = {
     swamp: {name:'The Swamp', rows:6, cols:4,
       sky0:'rgba(44,36,84,.5)', sky1:'rgba(14,18,34,.24)', sky2:'rgba(8,28,30,.4)',
       tree0:'rgba(16,17,36,.85)', tree1:'rgba(6,8,17,.95)',
       water0:'rgba(12,44,48,.55)', water1:'rgba(4,14,16,.7)', waterLine:'rgba(38,224,255,.12)',
       tuft:'rgba(90,110,90,.35)', reed:'rgba(10,20,16,.9)', trail:'rgba(232,160,90,.35)', fly:'#e8a05a',
-      bag:['candle','candle','candle','candle','skull','skull','skull','duel','duel','duel','duel','ghost','ghost','ghost','chest','chest','chest','again','again','warp','warp','shop','shop']},
+      bag:['candle','candle','candle','skull','skull','skull','duel','duel','duel','duel','ghost','ghost','chest','chest','chest','again','again','warp','warp','shop','shop','bridge','bridge']},
     graveyard: {name:'The Graveyard', rows:8, cols:3,
       sky0:'rgba(58,50,86,.55)', sky1:'rgba(26,26,44,.3)', sky2:'rgba(18,22,30,.5)',
       tree0:'rgba(22,20,34,.85)', tree1:'rgba(9,8,16,.95)',
       water0:'rgba(40,44,52,.5)', water1:'rgba(10,12,16,.7)', waterLine:'rgba(200,210,230,.1)',
       tuft:'rgba(120,120,110,.3)', reed:'rgba(18,18,24,.9)', trail:'rgba(180,200,230,.3)', fly:'#9fd8ff',
-      bag:['candle','candle','candle','skull','skull','skull','skull','skull','duel','duel','duel','duel','ghost','ghost','ghost','chest','chest','chest','again','again','warp','shop','shop']}
+      bag:['candle','candle','skull','skull','skull','skull','skull','duel','duel','duel','duel','ghost','ghost','chest','chest','chest','again','again','warp','shop','shop','bridge','bridge']}
   };
   let stat = null;
-  const TCOL = {start:'#9a937e', plain:'#3a4358', candle:'#e2a562', skull:'#d47585', ghost:'#9d92d4', duel:'#74c4d6', again:'#84bc94', warp:'#dcc46f', chest:'#e9dfc8', shop:'#c9a7e0'};
-  const TFILL = {start:'#1a1e2c', plain:'#141a2a', candle:'#3b2a14', skull:'#3c1622', ghost:'#2a2048', duel:'#0f3540', again:'#14351f', warp:'#3b3010', chest:'#33281a', shop:'#2c2140'};
+  const TCOL = {start:'#9a937e', plain:'#3a4358', candle:'#e2a562', skull:'#d47585', ghost:'#9d92d4', duel:'#74c4d6', again:'#84bc94', warp:'#dcc46f', chest:'#e9dfc8', shop:'#c9a7e0', bridge:'#bcd3e6'};
+  const TFILL = {start:'#1a1e2c', plain:'#141a2a', candle:'#3b2a14', skull:'#3c1622', ghost:'#2a2048', duel:'#0f3540', again:'#14351f', warp:'#3b3010', chest:'#33281a', shop:'#2c2140', bridge:'#1b2836'};
   function drawIcon(t, x, y){
     ctx.save();
     ctx.translate(x, y);
@@ -4514,6 +4515,12 @@ Shell.register('board', (function(){
       ctx.beginPath(); ctx.arc(0, 0, 5.4, 0, Math.PI*1.25); ctx.stroke();
       ctx.beginPath(); ctx.arc(0.6, 0.4, 3.1, Math.PI*0.9, Math.PI*2.2); ctx.stroke();
       ctx.beginPath(); ctx.arc(0, 0, 1.1, 0, 7); ctx.stroke();
+    } else if(t === 'bridge'){
+      ctx.strokeStyle = '#dbe8f2'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 2, 6, Math.PI, 0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-6, 2); ctx.lineTo(-6, 6); ctx.moveTo(6, 2); ctx.lineTo(6, 6); ctx.moveTo(-8, 6); ctx.lineTo(8, 6); ctx.stroke();
+      ctx.fillStyle = '#dbe8f2';
+      ctx.beginPath(); ctx.moveTo(0, -7); ctx.lineTo(3, -3); ctx.lineTo(-3, -3); ctx.closePath(); ctx.fill();
     } else if(t === 'shop'){
       ctx.fillStyle = '#e9d8ff';
       ctx.beginPath(); ctx.ellipse(0, 2.5, 5.5, 2.4, 0, 0, Math.PI*2); ctx.fill();
@@ -4551,10 +4558,10 @@ Shell.register('board', (function(){
   const EVENTS = {
     festival:  {name:'Firefly festival', sub:'candles pay double this round', tag:'festival'},
     skullhour: {name:'Skull hour', sub:'skulls take double this round', tag:'skull hour'},
-    moonsale:  {name:'Moon sale', sub:'the moon costs 6 this round', tag:'moon sale'},
+    moonsale:  {name:'Moon sale', sub:'the moon costs 5 this round', tag:'moon sale'},
     ghostwind: {name:'Ghost wind', sub:'everyone rolls 4, 5 or 6 this round', tag:'ghost wind'}
   };
-  function moonCost(){ return roundEvent === 'moonsale' ? 6 : MOON_COST; }
+  function moonCost(){ return roundEvent === 'moonsale' ? 5 : MOON_COST; }
   const TAUNTS = ['THE GHOST: “Sweet sparks.”', 'THE GHOST: “Too slow, sugar.”', 'THE GHOST: “The night is long.”', 'THE GHOST: “Mine now.”'];
   const PNAME2 = ['EMBER', 'HAUNT', 'WISP', 'MOTH'];
   const PCOL2 = ['#e8895a', '#7cc7db', '#b39ddb', '#8fcf9f'];
@@ -4565,18 +4572,18 @@ Shell.register('board', (function(){
     let best = -1;
     for(let i=0;i<NP;i++){
       if(i === p) continue;
-      if(best < 0 || moons[i] > moons[best] || (moons[i] === moons[best] && sparks[i] > sparks[best])) best = i;
+      if(best < 0 || sparks[i] > sparks[best] || (sparks[i] === sparks[best] && moons[i] > moons[best])) best = i;
     }
     return best;
   }
   function leader(){
     let b = 0;
-    for(let i=1;i<NP;i++) if(moons[i] > moons[b] || (moons[i] === moons[b] && sparks[i] > sparks[b])) b = i;
+    for(let i=1;i<NP;i++) if(sparks[i] > sparks[b] || (sparks[i] === sparks[b] && moons[i] > moons[b])) b = i;
     return b;
   }
   function trailing(){
     let b = 0;
-    for(let i=1;i<NP;i++) if(moons[i] < moons[b] || (moons[i] === moons[b] && sparks[i] < sparks[b])) b = i;
+    for(let i=1;i<NP;i++) if(sparks[i] < sparks[b] || (sparks[i] === sparks[b] && moons[i] < moons[b])) b = i;
     return b;
   }
   function uniqueMax(a){
@@ -4652,7 +4659,7 @@ Shell.register('board', (function(){
     if(rb) rb.classList.toggle('pulse', !over && phase === 'await' && !(cpu && turn === 1));
   }
   function flash2(t, sub, col){ banner2 = t; bannerSub = sub || ''; bannerCol = col || '#e8a05a'; bannerT = 115; }
-  function hud(){ $('bd-score').textContent = 'ROUND '+Math.min(round, ROUNDS)+'/'+ROUNDS+(roundEvent ? ' · '+EVENTS[roundEvent].tag : ''); }
+  function hud(){ $('bd-score').textContent = 'ROUND '+Math.min(round, ROUNDS)+'/'+ROUNDS+' · MOST SPARKS WINS'+(roundEvent ? ' · '+EVENTS[roundEvent].tag : ''); }
 
   function itemsUI(){
     const box = $('bd-items');
@@ -4782,7 +4789,9 @@ Shell.register('board', (function(){
         setTimeout(()=>{ if(mid === matchId && running && !over && phase === 'await' && turn === 1) roll(); }, usedItem ? 900 : 100);
       }, 1000);
     } else {
-      say('<b style="color:'+PCOL2[me]+'">'+PNAME2[me]+'</b> — tap ROLL'+(round === ROUNDS ? ' · <b>final round</b>' : ''));
+      const distG = (moonAt - pos[me] + NSP) % NSP, ld = leader();
+      say('<b style="color:'+PCOL2[me]+'">'+PNAME2[me]+'</b> — tap ROLL'+(round === ROUNDS ? ' · <b>final round</b>' : '')+
+        '<span class="bd-goal">Moon +10 · '+distG+' space'+(distG === 1 ? '' : 's')+' away · '+(ld === me ? 'you lead' : PNAME2[ld]+' leads by '+(sparks[ld]-sparks[me]))+' · mini-game after this round</span>');
       flash2(PNAME2[me]+'’s turn', round === ROUNDS ? 'final round' : 'round '+round+' of '+ROUNDS, PCOL2[me]);
       $('bd-roll').disabled = false;
     }
@@ -4791,6 +4800,7 @@ Shell.register('board', (function(){
   function roll(){
     if(phase !== 'await' || over || !running) return;
     phase = 'roll';
+    bridged = false;
     $('bd-roll').disabled = true;
     itemsUI();
     dieAnimT = 30;
@@ -4826,6 +4836,36 @@ Shell.register('board', (function(){
     for(let q=0;q<4;q++) puffs.push({x: lp.x + (Math.random()-.5)*12, y: lp.y + 6, vx:(Math.random()-.5)*1.2, vy:-(0.3+Math.random()*0.6), t:1});
     Snd.pick(Math.min(6, k)); buzz(6);
     const mid = matchId;
+    if(types[pos[turn]] === 'bridge' && !bridged && n > 0){
+      bridged = true;
+      const rem = n - 1, p = turn;
+      const go = (crossed)=>{
+        if(mid !== matchId || !running || over) return;
+        if(crossed){
+          sparks[p] -= 3;
+          pos[p] = (pos[p] + 5) % NSP;
+          landPulse = 1; mood('#bcd3e6', .9);
+          flash2(PNAME2[p]+' crosses the ghost bridge', '5 spaces ahead for 3 sparks', '#bcd3e6');
+          Snd.swell(); buzz([20,30,20]);
+          if(pos[p] === moonAt) setTimeout(()=>{ if(mid === matchId && running && !over) tryBuyMoon(p); }, 400);
+          setTimeout(()=>{ if(mid === matchId && running && !over) hop(rem, k+1); }, 1000);
+        } else setTimeout(()=>{ if(mid === matchId && running && !over) hop(rem, k+1); }, 215);
+      };
+      if(cpu && p === 1){
+        const d0 = (moonAt - pos[1] + NSP) % NSP, d1 = (moonAt - (pos[1] + 5) + NSP*2) % NSP;
+        go(sparks[1] >= moonCost() + 3 && d1 < d0);
+        return;
+      }
+      if(sparks[p] < 3){ flash2('A ghost bridge', PNAME2[p]+' needs 3 sparks to cross', '#9a937e'); go(false); return; }
+      const card = $('bd-card');
+      card.innerHTML = '<h2>GHOST BRIDGE</h2>'+
+        '<p><b>'+PNAME2[p]+'</b>, cross it? Jump <b>5 spaces ahead</b> for <b>3 sparks</b>. The moon is '+((moonAt - pos[p] + NSP) % NSP)+' spaces away.</p>'+
+        '<div class="ch-row"><button class="smallbtn" id="bd-brgo">CROSS · 3 SPARKS</button><button class="smallbtn ghost" id="bd-brno">STAY</button></div>';
+      $('bd-brgo').onclick = ()=>{ $('bd-modal').classList.remove('show'); go(true); };
+      $('bd-brno').onclick = ()=>{ $('bd-modal').classList.remove('show'); go(false); };
+      $('bd-modal').classList.add('show');
+      return;
+    }
     let delay = 215;
     if(pos[turn] === moonAt){
       delay = 1000;
@@ -4835,10 +4875,10 @@ Shell.register('board', (function(){
   }
 
   function tryBuyMoon(p){
-    if(sparks[p] >= moonCost()){
-      sparks[p] -= moonCost();
+    {
+      sparks[p] += 10; earned[p] += 10; if(stat && 10 > stat.big[p]) stat.big[p] = 10;
       moons[p]++;
-      flash2(PNAME2[p]+' buys the moon', moons[p]+' moon'+(moons[p] === 1 ? '' : 's')+' · the moon moves on', '#f2e7cf');
+      flash2(PNAME2[p]+' catches the moon', '+10 sparks · the moon moves on', '#f2e7cf');
       if(cpu && p === 1) say('<b style="color:'+PCOL2[1]+'">'+TAUNTS[3]+'</b>');
       Snd.win(); setTimeout(()=>Snd.perfect(5), 180); buzz([40,60,40]);
       const old = moonAt;
@@ -4856,9 +4896,6 @@ Shell.register('board', (function(){
         scr.appendChild(sp);
         setTimeout(()=>sp.remove(), 2600);
       }
-    } else {
-      flash2('The moon wants '+moonCost()+' sparks', PNAME2[p]+' has '+sparks[p], '#9a937e');
-      Snd.bad(); buzz(15);
     }
   }
 
@@ -4884,7 +4921,7 @@ Shell.register('board', (function(){
       endTurn();
       return;
     }
-    if(t === 'candle'){ give(p, (3 + Math.floor(Math.random()*4)) * (roundEvent === 'festival' ? 2 : 1), (roundEvent === 'festival' ? 'festival candle · ' : '')+'for '+PNAME2[p]); endTurn(); }
+    if(t === 'candle'){ give(p, (4 + Math.floor(Math.random()*4)) * (roundEvent === 'festival' ? 2 : 1), (roundEvent === 'festival' ? 'festival candle · ' : '')+'for '+PNAME2[p]); endTurn(); }
     else if(t === 'skull'){ hurtSparks(p, (3 + Math.floor(Math.random()*3)) * (roundEvent === 'skullhour' ? 2 : 1), '· the skull taxes '+PNAME2[p]+(roundEvent === 'skullhour' ? ' · skull hour' : '')); endTurn(); }
     else if(t === 'plain' || t === 'start'){ give(p, 1, 'for '+PNAME2[p]); endTurn(); }
     else if(t === 'chest'){
@@ -4914,8 +4951,9 @@ Shell.register('board', (function(){
       endTurn();
     }
     else if(t === 'ghost'){ ghostEvent(p); }
+    else if(t === 'bridge'){ give(p, 1, 'for '+PNAME2[p]); endTurn(); }
     else if(t === 'shop'){ const mid = matchId; setTimeout(()=>{ if(mid === matchId && running && !over) openShop(p); }, 500); }
-    else if(t === 'duel'){ const mid = matchId; setTimeout(()=>{ if(mid === matchId && running && !over){ if(Math.random() < 0.45) openArcadeDuel(); else openMini(); } }, 500); }
+    else if(t === 'duel'){ const mid = matchId; setTimeout(()=>{ if(mid === matchId && running && !over) openMini(); }, 500); }
   }
 
   function ghostEvent(p){
@@ -4951,7 +4989,7 @@ Shell.register('board', (function(){
     if(cpu && p === 1){
       const keys = shuffle(Object.keys(ITEMS));
       keys.sort((a,b)=>(a==='ward'?-1:0) - (b==='ward'?-1:0));
-      const pick = inv[1].length < 2 ? keys.find(k=>sparks[1] - PRICES[k] >= 6) : null;
+      const pick = inv[1].length < 2 ? keys.find(k=>sparks[1] - PRICES[k] >= moonCost()) : null;
       if(pick){
         sparks[1] -= PRICES[pick]; inv[1].push(pick);
         flash2('The Ghost buys a '+ITEMS[pick].name.toLowerCase(), 'for '+PRICES[pick]+' sparks', '#c9a7e0');
@@ -5048,6 +5086,23 @@ Shell.register('board', (function(){
   }
   function afterResume(){
     if(!duel){ startTurn(); return; }
+    if(duel.roundMini){
+      if(duel.stage < duel.order.length - 1){
+        const prev = duel.order[duel.stage];
+        duel.stage++;
+        const nxt = duel.order[duel.stage];
+        const card = $('bd-card');
+        card.innerHTML = '<h2>PASS THE PHONE</h2>'+
+          '<p><b style="color:'+PCOL2[prev]+'">'+PNAME2[prev]+'</b> scored <b>'+duel.scores[duel.stage-1]+'</b>.</p>'+
+          '<p>Now <b style="color:'+PCOL2[nxt]+'">'+PNAME2[nxt]+'</b> plays '+AD_TITLES[duel.g]+' for 20 seconds.</p>'+
+          '<button class="bigbtn" id="bd-adgo">'+PNAME2[nxt]+' IS READY</button>';
+        $('bd-adgo').onclick = ()=>{ $('bd-modal').classList.remove('show'); launchStage(); };
+        $('bd-modal').classList.add('show');
+        return;
+      }
+      resolveRoundMini();
+      return;
+    }
     if(!cpu && duel.stage === 0){
       duel.stage = 1;
       const card = $('bd-card');
@@ -5207,27 +5262,78 @@ Shell.register('board', (function(){
     setTimeout(()=>{
       if(mid !== matchId || over || !running) return;
       turn = (turn + 1) % NP;
-      if(turn === 0){
-        round++;
-        hud();
-        if(round > ROUNDS){ endGame(); return; }
-        if(round === ROUNDS){ flash2('Final round'); Snd.swell(); buzz([30,40,30]); }
-        if(round === Math.round(ROUNDS/2) || round === ROUNDS - 1){
-          const trail = trailing();
-          sparks[trail] += 3;
-          flash2('The ghosts pity '+PNAME2[trail]+' · +3 sparks');
-        }
-        roundEvent = null;
-        if(round % 3 === 0 && round < ROUNDS){
-          const keys = Object.keys(EVENTS);
-          roundEvent = keys[Math.floor(Math.random()*keys.length)];
-          flash2(EVENTS[roundEvent].name, EVENTS[roundEvent].sub, '#dcc46f');
-          Snd.swell(); buzz([20,30,20]);
-        }
-        hud();
-      }
+      if(turn === 0){ roundMini(); return; }
       startTurn();
     }, 1200);
+  }
+
+  function advanceRound(){
+    if(over || !running) return;
+    round++;
+    hud();
+    if(round > ROUNDS){ endGame(); return; }
+    if(round === ROUNDS){ flash2('Final round', 'last roll, last mini-game', '#f2e7cf'); Snd.swell(); buzz([30,40,30]); }
+    if(round === Math.round(ROUNDS/2) + 1){
+      const trail = trailing();
+      sparks[trail] += 3;
+      flash2('The ghosts pity '+PNAME2[trail]+' · +3 sparks');
+    }
+    roundEvent = null;
+    if(round % 3 === 0 && round < ROUNDS){
+      const keys = Object.keys(EVENTS);
+      roundEvent = keys[Math.floor(Math.random()*keys.length)];
+      flash2(EVENTS[roundEvent].name, EVENTS[roundEvent].sub, '#dcc46f');
+      Snd.swell(); buzz([20,30,20]);
+    }
+    hud();
+    startTurn();
+  }
+
+  /* ---------- the round mini-game: everyone plays a real game ---------- */
+  const AWARDS = [6, 3, 1, 0];
+  function roundMini(){
+    if(over || !running) return;
+    phase = 'mini';
+    const g = ['S','N','F','H'][(round - 1) % 4];
+    const order = [];
+    for(let i=0;i<NP;i++) if(!(cpu && i === 1)) order.push(i);
+    seats = order;
+    duel = {g, stage: 0, scores: order.map(()=>0), target: cpu ? ghostTarget(g) : null, cur: 0, roundMini: true, order};
+    const card = $('bd-card');
+    card.innerHTML = '<h2>ROUND '+round+' MINI-GAME</h2>'+
+      '<div class="mathq" style="color:var(--gold)">'+AD_TITLES[g].toUpperCase()+'</div>'+
+      '<p>'+AD_TIPS[g]+'. <b>Everyone plays 20 seconds.</b> Best score +6, then +3, +1.'+(cpu ? ' The Ghost scored <b>'+duel.target+'</b>.' : '')+'</p>'+
+      '<p class="sec-label" style="margin:0 !important">'+PNAME2[order[0]]+' goes first</p>'+
+      '<button class="bigbtn" id="bd-adgo">PLAY</button>';
+    $('bd-adgo').onclick = ()=>{ $('bd-modal').classList.remove('show'); launchStage(); };
+    $('bd-modal').classList.add('show');
+    Snd.swell(); buzz([20,30,20]);
+  }
+  function resolveRoundMini(){
+    const d = duel;
+    duel = null; resume = false;
+    const entries = d.order.map((pl, i)=>({p: pl, sc: d.scores[i]}));
+    if(cpu) entries.push({p: 1, sc: d.target});
+    entries.sort((a, b)=>b.sc - a.sc);
+    let rank = 0;
+    entries.forEach((e, i)=>{
+      if(i > 0 && e.sc < entries[i-1].sc) rank = i;
+      e.award = AWARDS[Math.min(rank, AWARDS.length-1)];
+      sparks[e.p] += e.award; earned[e.p] += e.award;
+      if(stat && e.award > stat.big[e.p]) stat.big[e.p] = e.award;
+    });
+    if(entries[0].award > 0) duelsWon[entries[0].p]++;
+    const top = entries[0].p;
+    const card = $('bd-card');
+    card.innerHTML = '<h2>'+AD_TITLES[d.g].toUpperCase()+' RESULTS</h2>'+
+      entries.map(e=>'<div class="pt-row" style="padding:7px 12px"><span class="nm2"><span class="fr-name" style="color:'+PCOL2[e.p]+'">'+PNAME2[e.p]+'</span></span>'+
+        '<b style="font-family:\'Nunito\',sans-serif; font-size:12px">'+e.sc+'  ·  +'+e.award+' spark'+(e.award === 1 ? '' : 's')+'</b></div>').join('')+
+      '<button class="bigbtn" id="bd-rmgo">CONTINUE</button>';
+    $('bd-rmgo').onclick = ()=>{ $('bd-rmgo').onclick = null; $('bd-modal').classList.remove('show'); advanceRound(); };
+    $('bd-modal').classList.add('show');
+    mood(PCOL2[top], 1.1);
+    Snd.win(); buzz([30,40,30]);
+    if(cpu && top === 1) say('<b style="color:'+PCOL2[1]+'">'+TAUNTS[Math.floor(Math.random()*3)]+'</b>');
   }
 
   function endGame(){
@@ -5236,8 +5342,8 @@ Shell.register('board', (function(){
     phase = 'over';
     itemsUI();
     const bonus = [];
-    { const b = uniqueMax(earned); if(b >= 0){ moons[b]++; bonus.push('Bonus moon · most sparks earned · '+PNAME2[b]); } }
-    { const b = uniqueMax(duelsWon); if(b >= 0){ moons[b]++; bonus.push('Bonus moon · most duels won · '+PNAME2[b]); } }
+    { const b = uniqueMax(earned); if(b >= 0){ sparks[b] += 5; bonus.push('Best earner · '+PNAME2[b]+' · +5 sparks'); } }
+    { const b = uniqueMax(duelsWon); if(b >= 0 && duelsWon[b] > 0){ sparks[b] += 5; bonus.push('Best duelist · '+PNAME2[b]+' · +5 sparks'); } }
     const winr = leader();
     const report = [];
     if(stat){
@@ -5250,8 +5356,8 @@ Shell.register('board', (function(){
     const card = $('bd-card');
     card.innerHTML = '<h2 style="color:'+PCOL2[winr]+'">'+PNAME2[winr]+' wins the night</h2>'+
       (bonus.length ? '<p style="margin:0; color:var(--gold); font-weight:700">'+bonus.join('<br>')+'</p>' : '')+
-      '<p>'+Array.from({length: NP}, (_,i)=>'<b style="color:'+PCOL2[i]+'">'+PNAME2[i]+'</b> · '+moons[i]+' moons · '+sparks[i]+' sparks').join('<br>')+'</p>'+
-      '<p class="sec-label" style="margin:0 !important">MOONS WIN · SPARKS BREAK TIES</p>'+
+      '<p>'+Array.from({length: NP}, (_,i)=>i).sort((a,b)=>sparks[b]-sparks[a]).map(i=>'<b style="color:'+PCOL2[i]+'">'+PNAME2[i]+'</b> · '+sparks[i]+' sparks · '+moons[i]+' moon'+(moons[i]===1?'':'s')).join('<br>')+'</p>'+
+      '<p class="sec-label" style="margin:0 !important">MOST SPARKS WINS · MOONS BREAK TIES</p>'+
       (report.length ? '<p style="margin:0; font-size:12px; color:var(--dim); line-height:1.6">'+report.slice(0,3).join('<br>')+'</p>' : '')+
       '<button class="bigbtn" id="bd-again">PLAY AGAIN</button>'+
       '<button class="smallbtn ghost" id="bd-swmode">CHANGE MODE</button>';
@@ -5644,8 +5750,8 @@ Shell.register('board', (function(){
     ctx.fillRect(0, 0, w, h);
     for(let q=0;q<NP;q++){ dispSparks[q] += (sparks[q] - dispSparks[q])*0.12; if(Math.abs(sparks[q]-dispSparks[q]) < 0.5) dispSparks[q] = sparks[q]; }
     if(NP === 2){
-      chip(8, 8, 100, PNAME2[0]+'  ◐ '+moons[0]+'  ✦ '+Math.round(dispSparks[0]), PCOL2[0], !over && turn === 0, false);
-      chip(w-8, 8, 100, PNAME2[1]+'  ◐ '+moons[1]+'  ✦ '+Math.round(dispSparks[1]), PCOL2[1], !over && turn === 1, true);
+      chip(8, 8, 100, PNAME2[0]+'  ✦ '+Math.round(dispSparks[0])+'  ◐ '+moons[0], PCOL2[0], !over && turn === 0, false);
+      chip(w-8, 8, 100, PNAME2[1]+'  ✦ '+Math.round(dispSparks[1])+'  ◐ '+moons[1], PCOL2[1], !over && turn === 1, true);
       if(!over){
         ctx.font = '700 10px "Nunito", sans-serif';
         ctx.fillStyle = 'rgba(242,231,207,.55)';
@@ -5659,7 +5765,7 @@ Shell.register('board', (function(){
       const cw = (w - 16 - (NP-1)*5) / NP;
       for(let i=0;i<NP;i++){
         const cx2 = 8 + i*(cw + 5);
-        chip(cx2, 8, cw, PNAME2[i]+' ◐'+moons[i]+' ✦'+Math.round(dispSparks[i]), PCOL2[i], !over && turn === i, false, true);
+        chip(cx2, 8, cw, PNAME2[i]+' ✦'+Math.round(dispSparks[i])+' ◐'+moons[i], PCOL2[i], !over && turn === i, false, true);
         if(!over){
           ctx.font = '700 9.5px "Nunito", sans-serif';
           ctx.fillStyle = 'rgba(242,231,207,.55)';
@@ -5738,7 +5844,7 @@ Shell.register('board', (function(){
     PNAME2[1] = cpu ? 'THE GHOST' : 'HAUNT';
     $('bd-mode').classList.remove('show');
     reset();
-    flash2('Round 1 of '+ROUNDS, 'buy the moon for 10 sparks · most moons wins', '#f2e7cf');
+    flash2(ROUNDS+' rounds', 'roll, then everyone plays a mini-game · most sparks wins', '#f2e7cf');
   }
   function onResize(){ if(running) sizeCanvas(); }
 
@@ -5765,12 +5871,12 @@ Shell.register('board', (function(){
         b.onclick = ()=>{ diff = b.dataset.diff; Shell.store.set('bd-diff', diff); refreshDiffUI(); Snd.tap(); };
       });
       document.querySelectorAll('#bd-lenrow [data-len]').forEach(b=>{
-        b.onclick = ()=>{ ROUNDS = +b.dataset.len; Shell.store.set('bd-len', ROUNDS); refreshDiffUI(); Snd.tap(); };
+        b.onclick = ()=>{ ROUNDS = +b.dataset.len; Shell.store.set('bd-rounds', ROUNDS); refreshDiffUI(); Snd.tap(); };
       });
       document.querySelectorAll('#bd-themerow [data-theme]').forEach(b=>{
         b.onclick = ()=>{ theme = b.dataset.theme; Shell.store.set('bd-theme', theme); sizeCanvas(); if(!resuming) buildTypes(); tok.forEach((t2,i)=>{ t2.x = pts[pos[i]].x; t2.y = pts[pos[i]].y; }); refreshDiffUI(); Snd.tap(); };
       });
-      Shell.store.get('bd-len').then(v=>{ if(v && [6,10,15].includes(+v)) ROUNDS = +v; refreshDiffUI(); });
+      Shell.store.get('bd-rounds').then(v=>{ if(v && [3,5,8].includes(+v)) ROUNDS = +v; refreshDiffUI(); });
       Shell.store.get('bd-theme').then(v=>{ if(v && THEMES[v] && v !== theme){ theme = v; sizeCanvas(); if(!resuming) buildTypes(); tok.forEach((t2,i)=>{ t2.x = pts[pos[i]].x; t2.y = pts[pos[i]].y; }); } refreshDiffUI(); });
       Shell.store.get('bd-diff').then(v=>{ if(v && DIFF[v]) diff = v; refreshDiffUI(); });
       Shell.store.get('bd-wins').then(v=>{ if(v) ghostTally = v; refreshDiffUI(); });
