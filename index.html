@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Tupelo Ghost</title>
 <meta name="theme-color" content="#05070d">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -557,6 +557,205 @@
   }
   @media (prefers-reduced-motion: reduce){ .gover.show *{animation:none !important;} }
 
+  /* ============ BUTTON SYSTEM: one language for every control ============ */
+  :root{
+    --btn-gold:linear-gradient(180deg, #f6c283 0%, #e8a05a 55%, #d4843a 100%);
+    --btn-glass:linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+    --btn-edge:rgba(255,255,255,.14);
+  }
+  /* primary calls to action */
+  .bigbtn, #bd-roll, #howto-play{
+    background:var(--btn-gold); color:#1a1108; border:none; border-radius:999px;
+    box-shadow:0 10px 26px rgba(232,160,90,.28), inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 0 rgba(0,0,0,.12);
+    transition:transform .12s cubic-bezier(.34,1.56,.64,1), filter .15s, box-shadow .15s;
+    text-shadow:none;
+  }
+  .bigbtn{font-size:19px; letter-spacing:2.2px; padding:15px 38px;}
+  .bigbtn:active, #bd-roll:active, #howto-play:active{transform:scale(.96); filter:brightness(.94); box-shadow:0 4px 14px rgba(232,160,90,.25), inset 0 1px 0 rgba(255,255,255,.35);}
+  .smallbtn:not(.ghost){
+    background:var(--btn-gold); color:#1a1108; border:none;
+    box-shadow:0 6px 16px rgba(232,160,90,.22), inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  /* the teal "friend" variants keep their colour but take the same material */
+  .bigbtn[style*="cyan"]{box-shadow:0 10px 26px rgba(38,224,255,.22), inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 0 rgba(0,0,0,.12); color:#04202a !important;}
+  /* secondary: glass */
+  .backbtn, .smallbtn.ghost, .chbtn, .bd-itbtn, .bl-btn, .bd-vsbtn, .opt, .setbtn{
+    background:var(--btn-glass); border:1px solid var(--btn-edge); color:var(--text);
+    box-shadow:0 6px 16px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
+    transition:transform .12s cubic-bezier(.34,1.56,.64,1), background .15s, border-color .15s, box-shadow .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .smallbtn.ghost{color:var(--text); font-weight:800;}
+  .backbtn{font-weight:800; font-size:14px; padding:8px 15px 8px 12px;}
+  .chbtn{box-shadow:0 12px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1) !important;}
+  .backbtn:active, .smallbtn.ghost:active, .chbtn:active, .bd-itbtn:active, .setbtn:active{
+    transform:scale(.96); background:linear-gradient(180deg, rgba(232,160,90,.32), rgba(232,160,90,.16)); border-color:rgba(232,160,90,.55);
+  }
+  /* in-game pads: bigger, softer, lit on press */
+  .bl-btn{width:56px; height:48px; border-radius:16px; font-size:19px; color:#f2e7cf;}
+  .bl-btn:active{transform:scale(.92); background:linear-gradient(180deg, rgba(232,160,90,.45), rgba(232,160,90,.25)); border-color:rgba(232,160,90,.7); box-shadow:0 0 18px rgba(232,160,90,.35);}
+  .bd-vsbtn{border-radius:18px; border:1.5px solid var(--btn-edge); font-weight:900;}
+  .bd-vsbtn:active{transform:scale(.95); background:linear-gradient(180deg, rgba(232,160,90,.35), rgba(232,160,90,.18)); border-color:rgba(232,160,90,.6);}
+  .bd-vsbtn.hotbtn{background:var(--btn-gold); color:#1a1108; border-color:transparent; box-shadow:0 8px 22px rgba(232,160,90,.35), inset 0 1px 0 rgba(255,255,255,.4);}
+  .opt{border:1.5px solid var(--btn-edge); border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);}
+  .opt:active{transform:scale(.92); background:linear-gradient(180deg, rgba(232,160,90,.35), rgba(232,160,90,.18)); border-color:rgba(232,160,90,.6);}
+  .orb{
+    background:radial-gradient(circle at 38% 32%, rgba(255,255,255,.14), rgba(255,255,255,.02) 40%, #121826 70%);
+    border:3px solid rgba(160,175,200,.22);
+    box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.08), inset 0 -10px 24px rgba(0,0,0,.35);
+  }
+  /* shared states */
+  button[disabled], .bd-vsbtn[disabled], .bd-itbtn[disabled], #bd-roll[disabled]{opacity:.35; filter:saturate(.6);}
+  button:focus-visible, .gcard:focus-visible, .hero:focus-visible{outline:2px solid rgba(232,160,90,.85); outline-offset:3px;}
+  @media (hover:hover){
+    .bigbtn:hover, #bd-roll:hover, #howto-play:hover, .smallbtn:not(.ghost):hover{filter:brightness(1.06);}
+    .backbtn:hover, .smallbtn.ghost:hover, .chbtn:hover, .bd-itbtn:hover, .bl-btn:hover, .bd-vsbtn:hover, .opt:hover{border-color:rgba(232,160,90,.45); background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));}
+  }
+
+  /* ============ INTUITIVE: affordances & labels ============ */
+  .hub-head p{display:none;}
+  .epi{margin-top:12px; font-size:17px;}
+  .gcard{position:relative; padding-right:44px;}
+  .gcard::after{
+    content:'›'; position:absolute; right:18px; top:50%; transform:translateY(-50%);
+    font-family:var(--ui); font-weight:600; font-size:26px; line-height:1; color:rgba(232,160,90,.75);
+  }
+  .gcard.compact{padding-right:14px;}
+  .gcard.compact::after{top:14px; right:14px; transform:none; font-size:22px;}
+  .hub-tip{
+    position:relative; z-index:1; width:min(92vw,430px); margin-top:10px; text-align:center;
+    font-family:var(--ui); font-weight:600; font-size:12.5px; color:#b9b09a;
+  }
+  #ch-enter::after{
+    content:'friends, challenges and your record'; display:block; margin-top:4px;
+    font-family:var(--ui); font-weight:600; font-size:11px; letter-spacing:.2px; text-transform:none; color:var(--dim);
+  }
+  #scr-stack .gb-right::before, #scr-snake .gb-right::before, #scr-flight .gb-right::before, #scr-shade .gb-right::before{
+    content:'SCORE'; font-family:var(--ui); font-weight:800; font-size:9px; letter-spacing:1.8px; color:var(--dim); margin-right:8px;
+  }
+  #scr-blocks .gb-right::before{content:'LINES'; font-family:var(--ui); font-weight:800; font-size:9px; letter-spacing:1.8px; color:var(--dim); margin-right:8px;}
+  .bd-mode-card .ch-row{gap:8px;}
+  @media (hover:hover){ .gcard:hover::after{color:var(--gold); transform:translateY(-50%) translateX(3px);} .gcard.compact:hover::after{transform:translateX(3px);} }
+
+  /* ============ BEAUTY: light & material ============ */
+  body{
+    background-color:#05070d;
+    background-image:
+      radial-gradient(ellipse 70% 45% at 78% -8%, rgba(232,160,90,.16), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 15% 110%, rgba(38,224,255,.07), transparent 60%),
+      radial-gradient(circle at 12% 22%, rgba(242,231,207,.35) 0 .6px, transparent 1.2px),
+      radial-gradient(circle at 63% 9%, rgba(242,231,207,.3) 0 .5px, transparent 1.1px),
+      radial-gradient(circle at 88% 58%, rgba(242,231,207,.28) 0 .6px, transparent 1.2px),
+      radial-gradient(circle at 34% 76%, rgba(242,231,207,.25) 0 .5px, transparent 1.1px),
+      radial-gradient(circle at 71% 88%, rgba(242,231,207,.3) 0 .5px, transparent 1.1px);
+    background-attachment:fixed;
+  }
+  .hub-head h1{
+    background:linear-gradient(180deg, #fbf4e4 0%, #e6dcc4 55%, #c9bb9c 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 2px 14px rgba(0,0,0,.6));
+  }
+  .hub-head h1 span{
+    background:linear-gradient(180deg, #ffd9a3 0%, #e8a05a 55%, #b8712f 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:none; filter:drop-shadow(0 0 18px rgba(232,160,90,.35));
+  }
+  .gcard{
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--accent) 13%, transparent) 0%, transparent 42%),
+      linear-gradient(180deg, rgba(24,30,46,.94), rgba(10,14,24,.96));
+    border:1px solid rgba(255,255,255,.09);
+    box-shadow:0 18px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07);
+  }
+  .gcard .ico{
+    background:linear-gradient(160deg, color-mix(in srgb, var(--accent) 26%, #0c1120), #0a0e1a);
+    border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    box-shadow:0 0 26px color-mix(in srgb, var(--accent) 28%, transparent), inset 0 1px 0 rgba(255,255,255,.14);
+  }
+  .gcard .name{
+    background:linear-gradient(180deg, #fbf4e4, #d9cdb2);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .tag.players{box-shadow:0 0 14px color-mix(in srgb, var(--accent) 35%, transparent);}
+  .hero{
+    background:
+      radial-gradient(circle at 92% 8%, rgba(242,231,207,.32) 0 14px, rgba(242,231,207,.10) 15px 46px, transparent 82px),
+      linear-gradient(160deg, rgba(64,44,22,.9), rgba(14,18,30,.94));
+    border:1px solid rgba(232,160,90,.42);
+    box-shadow:0 18px 48px rgba(0,0,0,.5), 0 0 60px rgba(232,160,90,.10), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .hero-t{
+    background:linear-gradient(180deg, #ffe3b4, #e8a05a);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .hub-sec{display:flex; align-items:center; gap:12px;}
+  .hub-sec::after{content:''; flex:1; height:1px; background:linear-gradient(90deg, rgba(232,160,90,.35), transparent);}
+  .chbtn{
+    background:linear-gradient(180deg, rgba(34,40,60,.9), rgba(12,16,28,.94)) !important;
+    border:1px solid rgba(232,160,90,.32) !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  #lantern-bar{
+    padding:8px 14px; border-radius:999px; background:rgba(10,14,24,.7);
+    border:1px solid rgba(232,160,90,.25); box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .lb-track i{box-shadow:0 0 12px rgba(255,211,29,.55);}
+  .gamebar{border-bottom:1px solid rgba(255,255,255,.06); box-shadow:0 8px 24px rgba(0,0,0,.35);}
+  .gover h2{
+    background:linear-gradient(180deg, #fbf4e4, #d9cdb2);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 4px 18px rgba(0,0,0,.6));
+  }
+  .ch-card h2{
+    background:linear-gradient(180deg, #fbf4e4, #d6cab0);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .bigbtn{box-shadow:0 10px 28px rgba(232,160,90,.28), inset 0 1px 0 rgba(255,255,255,.4);}
+  html.lowfx body{background-attachment:scroll;}
+
+  /* ============ PREMIUM LAYOUT ============ */
+  #hub{padding-bottom:calc(30px + env(safe-area-inset-bottom, 0px));}
+  .hero{
+    position:relative; z-index:1; width:min(92vw,430px); margin-top:6px; text-align:left; cursor:pointer;
+    display:flex; flex-direction:column; gap:4px; padding:18px 20px 16px; border-radius:22px;
+    color:var(--text); border:1px solid rgba(232,160,90,.35);
+    background:linear-gradient(160deg, rgba(58,40,22,.85), rgba(14,18,30,.92));
+    box-shadow:0 14px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1);
+  }
+  .hero:active{transform:scale(.98);}
+  .hero-k{font-family:var(--ui); font-weight:800; font-size:10.5px; letter-spacing:2.4px; text-transform:uppercase; color:var(--gold);}
+  .hero-t{font-family:'Cormorant Garamond',serif; font-weight:700; font-size:30px; letter-spacing:2px; line-height:1;}
+  .hero-d{font-family:var(--ui); font-weight:600; font-size:13.5px; color:#b9b09a;}
+  .hero-b{position:absolute; right:16px; top:16px; font-family:var(--ui); font-weight:800; font-size:11px; letter-spacing:.6px;
+    padding:6px 11px; border-radius:999px; background:linear-gradient(180deg,#f2b26c,#dd8e44); color:#1a1108;}
+  .hub-sec{
+    position:relative; z-index:1; width:min(92vw,430px); margin:20px 0 6px; text-align:left;
+    font-family:var(--ui); font-weight:800; font-size:11px; letter-spacing:2.4px; text-transform:uppercase; color:#8f8871;
+  }
+  .cards.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .gcard.compact{flex-direction:column; align-items:flex-start; gap:10px; padding:14px 14px 12px;}
+  .gcard.compact .desc{display:none;}
+  .gcard.compact .name{font-size:19px;}
+  .gcard.compact .meta{margin-top:2px;}
+  .setbtn{
+    position:absolute; top:14px; right:14px; z-index:5; width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:var(--text); cursor:pointer;
+    background:rgba(10,14,24,.7); border:1px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  }
+  .setbtn:active{transform:scale(.94);}
+  html.lowfx .setbtn{backdrop-filter:none; -webkit-backdrop-filter:none;}
+  #set-modal{
+    position:fixed; inset:0; z-index:96; display:none; align-items:center; justify-content:center;
+    background:rgba(3,5,10,.78); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  }
+  #set-modal.show{display:flex;}
+  html.lowfx #set-modal{backdrop-filter:none; -webkit-backdrop-filter:none;}
+  @keyframes cardIn{from{transform:translateY(14px) scale(.97); opacity:0} to{transform:none; opacity:1}}
+  [id$="-modal"].show > .ch-card, #howto.show .howto-card{animation:cardIn .28s cubic-bezier(.2,.9,.3,1.05) both;}
+  @media (prefers-reduced-motion: reduce){ [id$="-modal"].show > .ch-card{animation:none;} }
+
   /* ============ MIDNIGHT RUN ============ */
   .runbtn{
     background:linear-gradient(180deg, #f2b26c, #d98a3e) !important;
@@ -601,8 +800,14 @@
   .bd-itbtn:active{transform:scale(.94); background:rgba(232,160,90,.3);}
   .bd-itbtn[disabled]{opacity:.35; pointer-events:none;}
   .bd-ithint{font-family:'Nunito',sans-serif; font-size:10px; letter-spacing:1px; color:var(--dim);}
-  #bd-status{flex:1; font-family:'Nunito',sans-serif; font-weight:800; font-size:12px;
-    letter-spacing:1px; color:var(--text); text-align:left;}
+  .bd-who{flex:1; display:flex; align-items:center; gap:10px; min-width:0;}
+  .bd-av{width:34px; height:34px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+    font-size:16px; background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.7), var(--av, #e8895a) 45%, var(--av, #e8895a));
+    box-shadow:0 0 16px var(--av, #e8895a), inset 0 1px 0 rgba(255,255,255,.4);}
+  #bd-status{flex:1; min-width:0; font-family:'Nunito', sans-serif; font-weight:800; font-size:12px;
+    letter-spacing:.6px; color:var(--text); text-align:left; line-height:1.3;}
+  #bd-roll.pulse{animation:rollpulse 1.4s ease-in-out infinite;}
+  @keyframes rollpulse{0%,100%{box-shadow:0 6px 18px rgba(232,160,90,.3), inset 0 1px 0 rgba(255,255,255,.4)} 50%{box-shadow:0 6px 28px rgba(232,160,90,.7), inset 0 1px 0 rgba(255,255,255,.4)}}
   #bd-roll{
     font-family:'Cormorant Garamond',serif; font-weight:700; letter-spacing:2px; text-transform:uppercase;
     font-size:17px; padding:12px 26px; border-radius:999px; border:none; cursor:pointer;
@@ -763,7 +968,8 @@
       <rect x="0" y="200" width="430" height="140" fill="url(#fade)"/>
     </svg>
   </div>
-  <button class="backbtn" id="mute-btn" style="position:absolute; top:14px; right:14px; padding:6px 12px; font-size:15px; z-index:5;">🔊</button>
+  <button class="backbtn" id="mute-btn" style="display:none">🔊</button>
+  <button class="setbtn" id="set-btn" aria-label="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   <div class="hub-head">
     <h1>TUPELO<span>GHOST</span></h1>
     <p>Seven small games. Best after dark.</p>
@@ -771,7 +977,14 @@
   </div>
   <button class="chbtn" id="party-btn" hidden></button>
   <button class="chbtn" id="live-btn" hidden></button>
-  <button class="chbtn runbtn" id="run-btn">MIDNIGHT RUN · FOUR GAMES, ONE SCORE</button>
+  <button class="hero" id="run-btn">
+    <span class="hero-k">Tonight</span>
+    <span class="hero-t">MIDNIGHT RUN</span>
+    <span class="hero-d">Four games, back to back. One score.</span>
+    <span class="hero-b" id="run-best"></span>
+  </button>
+  <div class="hub-tip" id="hub-tip">Tap any game to play. Each one shows you how first.</div>
+  <div class="hub-sec">Play together</div>
   <div class="cards">
     <button class="gcard" data-game="tw" style="--accent:var(--coral)">
       <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M13 2.5 6.5 13.5 H11 L9.5 21.5 17.5 10.5 H13 Z"/></svg></div>
@@ -779,38 +992,6 @@
         <div class="name">SPEED DUEL</div>
         <div class="desc">Quick-fire mini-games. Play a friend on one screen, or duel the Ghost solo.</div>
         <div class="meta"><span class="tag players">2 PLAYERS</span><span class="tag">DUEL</span><span class="tag">FIRST TO 7</span></div>
-      </div>
-    </button>
-    <button class="gcard" data-game="stack" style="--accent:var(--gold)">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="16.5" width="11" height="4" rx="1.2"/><rect x="7" y="10.5" width="11" height="4" rx="1.2"/><path d="M18.5 3.5 a4.4 4.4 0 1 0 2 5.4 a3.4 3.4 0 0 1 -2 -5.4 Z" fill="currentColor" stroke="none" opacity=".9"/></svg></div>
-      <div class="info">
-        <div class="name">STACK</div>
-        <div class="desc">Drop blocks to build a tower. Miss the edge and lose a piece, but the ghost saves your scraps.</div>
-        <div class="meta"><span class="tag players">SOLO</span><span class="tag">TIMING</span><span class="tag best">BEST <b id="best-stack">–</b></span></div>
-      </div>
-    </button>
-    <button class="gcard" data-game="snake" style="--accent:var(--cyan)">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3.5 16.5 C7 9.5, 10 21, 14 14.5 S19 7, 20.5 6"/><circle cx="20.5" cy="6" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="7" r="1.2" fill="currentColor" stroke="none" opacity=".7"/></svg></div>
-      <div class="info">
-        <div class="name">SLITHER</div>
-        <div class="desc">Classic snake with a hunter: eat fireflies, dodge the heron, don’t hit yourself.</div>
-        <div class="meta"><span class="tag players">SOLO</span><span class="tag">CLASSIC</span><span class="tag best">BEST <b id="best-snake">–</b></span></div>
-      </div>
-    </button>
-    <button class="gcard" data-game="flight" style="--accent:var(--grape)">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M5.5 20 v-8.5 a6.5 6.5 0 0 1 13 0 V20 l-2.2-1.8 -2.1 1.8 -2.2-1.8 -2.1 1.8 -2.2-1.8 Z"/><circle cx="9.8" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="11" r="1.1" fill="currentColor" stroke="none"/></svg></div>
-      <div class="info">
-        <div class="name">FLOATY</div>
-        <div class="desc">Tap to fly the little ghost through the gaps. One touch ends the run.</div>
-        <div class="meta"><span class="tag players">SOLO</span><span class="tag">ENDLESS</span><span class="tag best">BEST <b id="best-flight">–</b></span></div>
-      </div>
-    </button>
-    <button class="gcard" data-game="shade" style="--accent:var(--coral)">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 9.5 18 20.5 H6 Z"/><circle cx="12" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><path d="M12 2.5 v3 M7.5 4.5 l1.4 2.2 M16.5 4.5 l-1.4 2.2" opacity=".85"/></svg></div>
-      <div class="info">
-        <div class="name">SHOOT</div>
-        <div class="desc">Moths swarm toward your lantern’s flame. Slide, blast, survive the waves.</div>
-        <div class="meta"><span class="tag players">SOLO</span><span class="tag">SHOOTER</span><span class="tag best">BEST <b id="best-shade">–</b></span></div>
       </div>
     </button>
     <button class="gcard" data-game="blocks" style="--accent:var(--grape)">
@@ -830,9 +1011,44 @@
       </div>
     </button>
   </div>
+  <div class="hub-sec">Solo</div>
+  <div class="cards grid2">
+    <button class="gcard compact" data-game="stack" style="--accent:var(--gold)">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="16.5" width="11" height="4" rx="1.2"/><rect x="7" y="10.5" width="11" height="4" rx="1.2"/><path d="M18.5 3.5 a4.4 4.4 0 1 0 2 5.4 a3.4 3.4 0 0 1 -2 -5.4 Z" fill="currentColor" stroke="none" opacity=".9"/></svg></div>
+      <div class="info">
+        <div class="name">STACK</div>
+        <div class="desc">Drop blocks to build a tower. Miss the edge and lose a piece, but the ghost saves your scraps.</div>
+        <div class="meta"><span class="tag players">SOLO</span><span class="tag">TIMING</span><span class="tag best">BEST <b id="best-stack">–</b></span></div>
+      </div>
+    </button>
+    <button class="gcard compact" data-game="snake" style="--accent:var(--cyan)">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3.5 16.5 C7 9.5, 10 21, 14 14.5 S19 7, 20.5 6"/><circle cx="20.5" cy="6" r="1.6" fill="currentColor" stroke="none"/><circle cx="5" cy="7" r="1.2" fill="currentColor" stroke="none" opacity=".7"/></svg></div>
+      <div class="info">
+        <div class="name">SLITHER</div>
+        <div class="desc">Classic snake with a hunter: eat fireflies, dodge the heron, don’t hit yourself.</div>
+        <div class="meta"><span class="tag players">SOLO</span><span class="tag">CLASSIC</span><span class="tag best">BEST <b id="best-snake">–</b></span></div>
+      </div>
+    </button>
+    <button class="gcard compact" data-game="flight" style="--accent:var(--grape)">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M5.5 20 v-8.5 a6.5 6.5 0 0 1 13 0 V20 l-2.2-1.8 -2.1 1.8 -2.2-1.8 -2.1 1.8 -2.2-1.8 Z"/><circle cx="9.8" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="11" r="1.1" fill="currentColor" stroke="none"/></svg></div>
+      <div class="info">
+        <div class="name">FLOATY</div>
+        <div class="desc">Tap to fly the little ghost through the gaps. One touch ends the run.</div>
+        <div class="meta"><span class="tag players">SOLO</span><span class="tag">ENDLESS</span><span class="tag best">BEST <b id="best-flight">–</b></span></div>
+      </div>
+    </button>
+    <button class="gcard compact" data-game="shade" style="--accent:var(--coral)">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 9.5 18 20.5 H6 Z"/><circle cx="12" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><path d="M12 2.5 v3 M7.5 4.5 l1.4 2.2 M16.5 4.5 l-1.4 2.2" opacity=".85"/></svg></div>
+      <div class="info">
+        <div class="name">SHOOT</div>
+        <div class="desc">Moths swarm toward your lantern’s flame. Slide, blast, survive the waves.</div>
+        <div class="meta"><span class="tag players">SOLO</span><span class="tag">SHOOTER</span><span class="tag best">BEST <b id="best-shade">–</b></span></div>
+      </div>
+    </button>
+  </div>
   <button class="chbtn" id="ch-enter">FRIENDS &amp; CHALLENGES</button>
   <div id="lantern-bar"></div>
-  <div class="verstamp">v2026.09.14.18</div>
+  <div class="verstamp">v2026.09.14.23</div>
 </div>
 
 <!-- ================= PARTY BOARD ================= -->
@@ -846,14 +1062,14 @@
     <canvas id="bd-canvas"></canvas>
     <div class="bd-items" id="bd-items"></div>
     <div class="bd-bar">
-      <div id="bd-status">…</div>
+      <div class="bd-who" id="bd-who"><span class="bd-av" id="bd-av"></span><div id="bd-status">…</div></div>
       <button id="bd-roll">ROLL</button>
     </div>
     <div id="bd-modal"><div class="ch-card" id="bd-card"></div></div>
   </div>
   <div class="gover" id="bd-mode">
     <h2>PARTY BOARD</h2>
-    <p style="max-width:310px">Roll, land on spaces, collect sparks, shop for items, and win duels — some are quick, some are 20 seconds of a real game. Reach the moon and <b>buy it for 10 sparks</b>; it moves after. Bonus moons at the end for the best earner and duelist. <b>Most moons wins.</b></p>
+    <p style="max-width:310px">Roll, land on spaces, collect sparks, shop for items, and win duels. Some duels are quick, some are 20 seconds of a real game. Reach the moon and <b>buy it for 10 sparks</b>; it moves after. Bonus moons at the end for the best earner and duelist. <b>Most moons wins.</b></p>
     <button class="bigbtn" id="bd-vs-ghost">PLAY THE GHOST</button>
     <div class="ch-row" id="bd-diffrow" style="margin:0">
       <button class="smallbtn ghost" data-diff="easy">EASY</button>
@@ -861,16 +1077,18 @@
       <button class="smallbtn ghost" data-diff="mean">HARD</button>
     </div>
     <p class="sec-label" id="bd-tally" style="margin:0 !important"></p>
+    <p class="sec-label" style="margin:8px 0 0 !important">Match length</p>
     <div class="ch-row" id="bd-lenrow" style="margin:0">
       <button class="smallbtn ghost" data-len="6">SHORT · 6</button>
       <button class="smallbtn ghost" data-len="10">CLASSIC · 10</button>
       <button class="smallbtn ghost" data-len="15">LONG · 15</button>
     </div>
+    <p class="sec-label" style="margin:8px 0 0 !important">Board</p>
     <div class="ch-row" id="bd-themerow" style="margin:0">
       <button class="smallbtn ghost" data-theme="swamp">THE SWAMP</button>
       <button class="smallbtn ghost" data-theme="graveyard">THE GRAVEYARD</button>
     </div>
-    <p class="sec-label" style="margin:4px 0 0 !important">Friends · one phone</p>
+    <p class="sec-label" style="margin:10px 0 0 !important">Or play friends on this phone</p>
     <div class="ch-row" style="margin:0">
       <button class="smallbtn" data-np="2">2 PLAYERS</button>
       <button class="smallbtn" data-np="3">3 PLAYERS</button>
@@ -3829,6 +4047,13 @@ const HowTo = (function(){
 <div id="vs-modal"><div class="ch-card" id="vs-card"></div></div>
 <div id="pt-modal"><div class="ch-card" id="pt-card"></div></div>
 <div id="run-modal"><div class="ch-card" id="run-card"></div></div>
+<div id="set-modal"><div class="ch-card" id="set-card">
+  <h2>SETTINGS</h2>
+  <button class="smallbtn ghost" id="set-sound" style="width:100%">Sound · on</button>
+  <button class="smallbtn ghost" id="set-name" style="width:100%">Your ghost name &amp; friends</button>
+  <p class="sec-label" id="set-ver" style="margin:0 !important"></p>
+  <button class="smallbtn" id="set-close">DONE</button>
+</div></div>
 <div id="run-hud"></div>
 <div id="lv-modal"><div class="ch-card" id="lv-card"></div></div>
 
@@ -4124,7 +4349,7 @@ Shell.register('blocks', (function(){
       c.font = '700 '+Math.max(9, cell*0.42)+'px "Nunito", sans-serif';
       c.fillStyle = sd.colr;
       c.textAlign = 'left';
-      c.fillText(sd.name, pxo, cell*3.6);
+      c.fillText(sd.name.replace('THE ', ''), pxo, cell*3.6);
       c.fillStyle = 'rgba(242,231,207,.7)';
       c.fillText(sd.score+' LN', pxo, cell*4.4);
       c.restore();
@@ -4319,6 +4544,8 @@ Shell.register('board', (function(){
   const cam = {x:0, y:0, z:1};
   let hopAnim = null, puffs = [], tileFlash = null, dieBigT = 0, dispSparks = [5,5], bannerSub = '', bannerCol = '#e8a05a';
   let earned = [0,0], duelsWon = [0,0];
+  let moodT = 0, moodCol = '#e8a05a', moonAnim = null;
+  function mood(col, strength){ moodCol = col; moodT = strength || 1; }
   let roundEvent = null, traps = [], diff = 'normal', ghostTally = {you:0, ghost:0};
   const DIFF = {easy:{t:0.7, react:1.6, err:0.25}, normal:{t:1, react:1, err:0.12}, mean:{t:1.35, react:0.65, err:0.05}};
   const EVENTS = {
@@ -4417,7 +4644,13 @@ Shell.register('board', (function(){
     types[0] = 'start';
   }
 
-  function say(t){ $('bd-status').innerHTML = t; }
+  function say(t){
+    $('bd-status').innerHTML = t;
+    const av = $('bd-av');
+    if(av){ av.style.setProperty('--av', PCOL2[turn]); av.textContent = TOKG[turn]; }
+    const rb = $('bd-roll');
+    if(rb) rb.classList.toggle('pulse', !over && phase === 'await' && !(cpu && turn === 1));
+  }
   function flash2(t, sub, col){ banner2 = t; bannerSub = sub || ''; bannerCol = col || '#e8a05a'; bannerT = 115; }
   function hud(){ $('bd-score').textContent = 'ROUND '+Math.min(round, ROUNDS)+'/'+ROUNDS+(roundEvent ? ' · '+EVENTS[roundEvent].tag : ''); }
 
@@ -4524,7 +4757,7 @@ Shell.register('board', (function(){
     moonAt = 10 + Math.floor(Math.random()*10);
     hud();
     tok = Array.from({length: NP}, ()=>({x: pts[0].x, y: pts[0].y}));
-    landPulse = 0; hopAnim = null; puffs = []; tileFlash = null; dieBigT = 0; dispSparks = arr(5); earned = arr(0); duelsWon = arr(0); duel = null; resume = false; roundEvent = null; traps = []; stat = {big:arr(0), moved:arr(0), rolls:arr(0), pips:arr(0), trapped:arr(0)};
+    landPulse = 0; hopAnim = null; puffs = []; tileFlash = null; dieBigT = 0; dispSparks = arr(5); earned = arr(0); duelsWon = arr(0); duel = null; resume = false; roundEvent = null; traps = []; moodT = 0; moonAnim = null; stat = {big:arr(0), moved:arr(0), rolls:arr(0), pips:arr(0), trapped:arr(0)};
     cam.x = W()/2; cam.y = H()/2; cam.z = 1;
     $('bd-modal').classList.remove('show');
     itemsUI();
@@ -4610,6 +4843,8 @@ Shell.register('board', (function(){
       Snd.win(); setTimeout(()=>Snd.perfect(5), 180); buzz([40,60,40]);
       const old = moonAt;
       do{ moonAt = (old + 7 + Math.floor(Math.random()*11)) % NSP; } while(moonAt === old || moonAt === 0);
+      moonAnim = {from: pts[old], to: pts[moonAt], t0: Date.now()};
+      mood('#f2e7cf', 1.2);
       const scr = document.getElementById('scr-board');
       for(let ci=0;ci<8;ci++){
         const sp = document.createElement('span');
@@ -4632,12 +4867,19 @@ Shell.register('board', (function(){
     phase = 'event';
     const p = turn, t = types[pos[p]];
     tileFlash = {i: pos[p], t: 1};
+    if(t === 'candle') mood('#e8a05a', .9);
+    else if(t === 'skull') mood('#d47585', 1.1);
+    else if(t === 'ghost') mood('#9d92d4', 1);
+    else if(t === 'duel') mood('#74c4d6', .9);
+    else if(t === 'chest' || t === 'shop') mood('#e9dfc8', .7);
+    else if(t === 'warp') mood('#dcc46f', 1);
     const tr = traps.find(x=>x.i === pos[p]);
     if(tr && tr.owner !== p){
       traps = traps.filter(x=>x !== tr);
       const blocked = hurtSparks(p, 5, '· '+PNAME2[tr.owner]+'’s trap');
       if(!blocked){ sparks[tr.owner] += 5; earned[tr.owner] += 5; if(stat) stat.trapped[tr.owner]++; }
       flash2(PNAME2[p]+' stepped in a ghost trap', blocked ? 'the ward held' : '5 sparks go to '+PNAME2[tr.owner], '#d47585');
+      mood('#d47585', 1.3);
       Snd.bad(); buzz([30,30,30]);
       endTurn();
       return;
@@ -5045,7 +5287,11 @@ Shell.register('board', (function(){
   function drawDie(x, y, val, rolling){
     ctx.save();
     ctx.translate(x, y);
-    if(rolling) ctx.rotate(Math.sin(Date.now()/45)*0.18);
+    if(rolling){
+      ctx.rotate((Date.now()/38) % (Math.PI*2));
+      const sq = 1 + Math.sin(Date.now()/60)*0.12;
+      ctx.scale(sq, 2 - sq);
+    }
     ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 10;
     const g2 = ctx.createLinearGradient(-19, -19, 19, 19);
     g2.addColorStop(0, '#fdf6e6'); g2.addColorStop(1, '#d9c9a8');
@@ -5132,6 +5378,10 @@ Shell.register('board', (function(){
     ctx.fillRect(0, h-26, w, 26);
     ctx.fillStyle = TH.waterLine;
     ctx.fillRect(0, h-26, w, 2);
+    ctx.globalAlpha = 0.14 + 0.05*Math.sin(nowD/700);
+    ctx.fillStyle = '#f2e7cf';
+    ctx.beginPath(); ctx.ellipse(w*0.72, h-14, 34, 4, 0, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
     ctx.globalAlpha = 0.25 + 0.15*Math.sin(nowD/900);
     ctx.fillStyle = '#f2e7cf';
     ctx.fillRect(w*0.25 + Math.sin(nowD/1600)*10, h-16, 34, 1.5);
@@ -5269,9 +5519,16 @@ Shell.register('board', (function(){
       ctx.shadowBlur = 0;
     }
     ctx.globalAlpha = 1;
-    // the moon for sale: beam + moon + price pill
+    // the moon for sale: beam + moon + price pill (or mid-flight to its new home)
     {
-      const pt = pts[moonAt];
+      let pt = pts[moonAt];
+      if(moonAnim){
+        const mp2 = Math.min(1, (nowD - moonAnim.t0)/1400);
+        const e2 = mp2 < .5 ? 2*mp2*mp2 : 1 - Math.pow(-2*mp2+2, 2)/2;
+        pt = {x: moonAnim.from.x + (moonAnim.to.x - moonAnim.from.x)*e2,
+              y: moonAnim.from.y + (moonAnim.to.y - moonAnim.from.y)*e2 - Math.sin(mp2*Math.PI)*90};
+        if(mp2 >= 1) moonAnim = null;
+      }
       const pu = 1 + Math.sin(nowD/500)*0.06;
       const beam = ctx.createLinearGradient(0, pt.y - 78, 0, pt.y + 6);
       beam.addColorStop(0, 'rgba(242,231,207,0)');
@@ -5370,6 +5627,16 @@ Shell.register('board', (function(){
       ctx.fill();
     }
     ctx.lineWidth = 1;
+    if(moodT > 0){
+      moodT -= 0.035;
+      const mg = ctx.createRadialGradient(w/2, h*0.5, Math.min(w,h)*0.2, w/2, h*0.5, Math.max(w,h)*0.75);
+      mg.addColorStop(0, 'rgba(0,0,0,0)');
+      mg.addColorStop(1, moodCol);
+      ctx.globalAlpha = Math.max(0, moodT)*0.28;
+      ctx.fillStyle = mg;
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalAlpha = 1;
+    }
     const vg = ctx.createRadialGradient(w/2, h*0.46, Math.min(w,h)*0.42, w/2, h*0.46, Math.max(w,h)*0.78);
     vg.addColorStop(0, 'rgba(0,0,0,0)');
     vg.addColorStop(1, 'rgba(0,0,0,.4)');
@@ -5644,7 +5911,8 @@ const Run = (function(){
     const b = $('run-btn');
     if(!b) return;
     const best = await Shell.store.get('best-run');
-    b.innerHTML = 'MIDNIGHT RUN · FOUR GAMES, ONE SCORE'+(best ? ' · <b>BEST '+best+'</b>' : '');
+    const rb2 = document.getElementById('run-best');
+    if(rb2) rb2.textContent = best ? 'Best run · '+best : 'Play';
   }
 
   function abort(){
@@ -5656,6 +5924,30 @@ const Run = (function(){
   }
 
   document.getElementById('run-btn').addEventListener('click', ()=>{ if(!on) start(); });
+  (function(){
+    const tip = document.getElementById('hub-tip');
+    if(!tip) return;
+    let seen = false;
+    try{ seen = !!localStorage.getItem('arcade-tipseen'); }catch(e){}
+    if(seen){ tip.style.display = 'none'; return; }
+    const done = ()=>{ try{ localStorage.setItem('arcade-tipseen', '1'); }catch(e){} tip.style.display = 'none'; };
+    document.querySelectorAll('.gcard, #run-btn').forEach(c=>c.addEventListener('click', done, {once:true}));
+  })();
+  (function(){
+    const m = document.getElementById('set-modal');
+    if(!m) return;
+    const refresh = ()=>{
+      const muted = (document.getElementById('mute-btn').textContent || '').includes('🔇');
+      document.getElementById('set-sound').textContent = 'Sound · '+(muted ? 'off' : 'on');
+      const v = document.querySelector('.verstamp');
+      document.getElementById('set-ver').textContent = 'Tupelo Ghost · '+(v ? v.textContent : '');
+    };
+    document.getElementById('set-btn').onclick = ()=>{ refresh(); m.classList.add('show'); };
+    document.getElementById('set-close').onclick = ()=>m.classList.remove('show');
+    document.getElementById('set-sound').onclick = ()=>{ Snd.toggle(); setTimeout(refresh, 60); };
+    document.getElementById('set-name').onclick = ()=>{ m.classList.remove('show'); if(typeof Rivals !== 'undefined') Rivals.open(); };
+    m.addEventListener('pointerdown', e=>{ if(e.target === m) m.classList.remove('show'); });
+  })();
   setTimeout(updBtn, 500);
   return {active, onScore, intercept, abort, start};
 })();
@@ -5835,8 +6127,8 @@ const Challenge = (function(){
       active = null; save();
       if(chip) chip.className = 'ch-chip';
     }
-    html += '<button class="smallbtn" data-chsend>CHALLENGE A FRIEND</button>';
-    if(g !== 'B') html += '<button class="smallbtn" data-vsstart>PASS &amp; PLAY DUEL</button>';
+    html += '<button class="smallbtn ghost" data-chsend>CHALLENGE A FRIEND</button>';
+    if(g !== 'B') html += '<button class="smallbtn ghost" data-vsstart>PASS &amp; PLAY DUEL</button>';
     slot.innerHTML = html;
     slot.querySelector('[data-chsend]').onclick = ()=>openCreate(g, score);
     const vb = slot.querySelector('[data-vsstart]');
